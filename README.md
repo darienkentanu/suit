@@ -1,18 +1,18 @@
 # SUIT - (Sampah jadi dUIT)
+Turn your trash into rewards
 
 [![Go.Dev reference](https://img.shields.io/badge/gorm-reference-blue?logo=go&logoColor=blue)](https://pkg.go.dev/gorm.io/gorm?tab=doc)
 [![Go.Dev reference](https://img.shields.io/badge/echo-reference-blue?logo=go&logoColor=blue)](https://github.com/labstack/echo)
 
 
 # Table of Content
-
 - [Description](#description)
 - [How to use](#how-to-use)
 - [Endpoints](#endpoints)
 - [Credits](#credits)
 
 # Description
-project-base task alterra academy
+This is final project of alterra academy
 
 # How to use
 - Install Go and MySQL
