@@ -1,0 +1,1192 @@
+openapi: 3.0.2
+info:
+  title: SUIT
+  version: 1.0.0
+servers:
+  - url: https://localhost:8000
+paths:
+  /register:
+    post:
+      tags:
+        - Users
+      summary: User registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullname:
+                  type: string
+                username:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                phone_number:
+                  type: string
+                gender:
+                  type: string
+                  enum: [male, female]
+                address:
+                  type: string
+      responses:
+        '201':
+          $ref: "#/components/responses/ResponseCreateUser"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '500':
+          $ref: "#/components/responses/ServerError"
+  /login:
+    post:
+      tags:
+        - Users
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseLoginUser"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '500':
+          $ref: "#/components/responses/ServerError"   
+  
+  /users:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Users
+      summary: Get all users (admin only)
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseGetAllUsers"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          $ref: "#/components/responses/ServerError"
+  /profile:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Users
+      summary: Get current login user data
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseGetProfile"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          $ref: "#/components/responses/ServerError"   
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Users
+      summary: Edit current login user data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullname:
+                  type: string
+                username:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                phone_number:
+                  type: string
+                gender:
+                  type: string
+                  enum: [male, female]
+                address:
+                  type: string
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseEditUser"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '500':
+          $ref: "#/components/responses/ServerError"
+
+  /droppoints:
+    get:
+      tags:
+        - Drop Points
+      summary: Get all drop points
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseGetAllDropPoint"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          $ref: "#/components/responses/ServerError"
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Drop Points
+      summary: Add drop points (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                address:
+                  type: string
+      responses:
+        '201':
+          $ref: "#/components/responses/ResponseCreateDropPoint"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '500':
+          $ref: "#/components/responses/ServerError" 
+                  
+  /droppoints/{id}:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Drop Points
+      summary: Edit drop points by id (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id for edit specific drop point
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                address:
+                  type: string
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseEditDropPoint"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '500':
+          $ref: "#/components/responses/ServerError" 
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Drop Points
+      summary: Delete drop points by id (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id for delete specific drop point
+          schema:
+            type: number
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseDeleteDropPoint"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '500':
+          $ref: "#/components/responses/ServerError" 
+
+  /administrators:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Administrators
+      summary: Add administrators (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullname:
+                  type: string
+                username:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                phone_number:
+                  type: string
+                drop_point_id:
+                  type: number
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseCreateAdmin"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          $ref: "#/components/responses/ServerError"   
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Administrators
+      summary: Get all administrators (admin only)
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseGetAllAdmin"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '500':
+          $ref: "#/components/responses/ServerError"
+          
+  /categories:
+    get:
+      tags:
+        - Categories
+      summary: Get all categories
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseGetAllCategories"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          $ref: "#/components/responses/ServerError"
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Categories
+      summary: Add categories (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                point:
+                  type: number
+      responses:
+        '201':
+          $ref: "#/components/responses/ResponseCreateCategory"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '500':
+          $ref: "#/components/responses/ServerError" 
+                  
+  /categories/{id}:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Categories
+      summary: Edit category by id (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id for edit specific category
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                point:
+                  type: number
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseEditCategory"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '500':
+          $ref: "#/components/responses/ServerError" 
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Categories
+      summary: Delete category by id (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id for delete specific category
+          schema:
+            type: number
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseDeleteCategory"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '500':
+          $ref: "#/components/responses/ServerError" 
+
+  /vouchers:
+    get:
+      tags:
+        - Vouchers
+      summary: Get all vouchers
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseGetAllVouchers"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          $ref: "#/components/responses/ServerError"
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Vouchers
+      summary: Add vouchers (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                point:
+                  type: number
+      responses:
+        '201':
+          $ref: "#/components/responses/ResponseCreateVoucher"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '500':
+          $ref: "#/components/responses/ServerError" 
+                  
+  /vouchers/{id}:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Vouchers
+      summary: Edit vouchers by id (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id for edit specific vouchers
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                point:
+                  type: number
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseEditVoucher"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '500':
+          $ref: "#/components/responses/ServerError" 
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Vouchers
+      summary: Delete vouchers by id (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id for delete specific vouchers
+          schema:
+            type: number
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseDeleteVoucher"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '500':
+          $ref: "#/components/responses/ServerError"
+
+  /uservouchers:
+    get:
+      tags:
+        - Vouchers
+      summary: Get all user's vouchers
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseGetUserVouchers"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          $ref: "#/components/responses/ServerError"
+  
+  /claimvouchers/{id}:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Vouchers
+      summary: Claim vouchers by voucher id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id for claim vouchers
+          schema:
+            type: number
+      responses:
+        '201':
+          $ref: "#/components/responses/ResponseClaimVoucher"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '500':
+          $ref: "#/components/responses/ServerError" 
+
+  /redeemvouchers/{id}:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Vouchers
+      summary: Redeem vouchers by voucher id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id for redeem vouchers
+          schema:
+            type: number
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseRedeemVoucher"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '500':
+          $ref: "#/components/responses/ServerError" 
+                  
+  /carts:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Carts
+      summary: Add item to current login user cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                category_id:
+                  type: number
+                weight:
+                  type: number
+      responses:
+        '201': 
+          $ref: "#/components/responses/ResponseCreateCartItem"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          $ref: "#/components/responses/ServerError" 
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Carts
+      summary: Get current login user cart items
+      responses:
+        '200': 
+          $ref: "#/components/responses/ResponseGetCart"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          $ref: "#/components/responses/ServerError"
+
+  /cartitems/{id}:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Carts
+      summary: Edit cart item by cart item id (current login user)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id for get specific cart item
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                category_id:
+                  type: number
+                weight:
+                  type: number
+      responses:
+        '200': 
+          $ref: "#/components/responses/ResponseEditCartItem"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '500':
+          $ref: "#/components/responses/ServerError"
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Carts
+      summary: Delete cart item by cart item id (current login user)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id for get specific cart item
+          schema:
+            type: number
+      responses:
+        '200': 
+          $ref: "#/components/responses/ResponseDeleteCartItem"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '500':
+          $ref: "#/components/responses/ServerError"
+  
+  /checkout/{param}:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Checkout
+      summary: Add checkout
+      parameters:
+        - name: param
+          in: path
+          required: true
+          description: param for add request drop off or pickup
+          schema:
+            type: string
+            enum: [dropoff, pickup]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                drop_point_id:
+                  type: number
+                category_id:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        '201': 
+          $ref: "#/components/responses/ResponseCreateCheckout"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          $ref: "#/components/responses/ServerError"
+        '502':
+          $ref: "#/components/responses/BadGateway"
+  
+  /checkout/{id}:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Checkout
+      summary: Edit checkout (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id for edit spesific checkout
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                category_id:
+                  type: array
+                  items:
+                    type: integer
+                weight:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        '200': 
+          $ref: "#/components/responses/ResponseEditCheckout"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          $ref: "#/components/responses/ServerError"
+        '502':
+          $ref: "#/components/responses/BadGateway"
+  /verification/{id}:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Checkout
+      summary: Verification checkout (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id for verification spesific checkout
+          schema:
+            type: number
+      responses:
+        '200': 
+          $ref: "#/components/responses/ResponseVerificationCheckout"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          $ref: "#/components/responses/ServerError"
+        '502':
+          $ref: "#/components/responses/BadGateway"
+  
+  /transactions:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Transactions
+      summary: Get all transactions
+      description: admin can view all transactions, while user can view only her/his transactions
+      responses:
+        '200': 
+          $ref: "#/components/responses/ResponseGetAllTransactions"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          $ref: "#/components/responses/ServerError"
+  
+  /transactionreport?range={range}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Transactions
+      summary: Get transaction report (admin only)
+      parameters:
+        - name: range
+          in: query
+          required: true
+          description: range for get daily, weekly or monthly transactions
+          schema:
+            type: string
+            enum: [daily, weekly, monthly]
+      responses:
+        '200': 
+          $ref: "#/components/responses/ResponseGetAllTransactions"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          $ref: "#/components/responses/ServerError"
+
+  /transactionsqty:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Transactions
+      summary: Get total quantity of all transaction
+      responses:
+        '200': 
+          $ref: "#/components/responses/ResponseGetTotalTransactions"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          $ref: "#/components/responses/ServerError"
+
+  
+            
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    StatusOK:
+      description: OK 
+    BadRequest:
+      description: Bad request
+    Forbidden: 
+      description: Forbidden
+    UnauthorizedError:
+      description: Invalid or expired jwt
+    NotFound:
+      description: Status not found
+    ServerError:
+      description: Internal server error
+    BadGateway:
+      description: Status bad gateway
+    ResponseCreateUser:
+      description: Created
+      content:
+        application/json:
+          example:
+            status: user created successfully
+    ResponseCreateAdmin:
+      description: Created
+      content:
+        application/json:
+          example:
+            status: admin created successfully
+    ResponseEditUser:
+      description: OK
+      content:
+        application/json:
+          example:
+            status: success
+            data: 
+              fullname: User
+              username: user1
+              email: user@gmail.com
+              phone_number: 08123456789
+              gender: male
+              address: earth
+    ResponseLoginUser:
+      description: OK
+      content:
+        application/json:
+          example:
+            status: success
+            data:
+              username: user1
+              email: user@gmail.com
+              role: user
+              token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+    ResponseGetAllUsers:
+      description: OK
+      content:
+        application/json:
+          example:
+            status: success
+            data:
+            - id: 1
+              fullname: User
+              username: user1
+              email: user@gmail.com
+              phone_number: 08123456789
+              gender: male
+              address: earth
+              role: user
+            - id: 2
+              fullname: User 2
+              username: user2
+              email: user2@gmail.com
+              phone_number: 08123456789
+              gender: female
+              address: earth
+              role: user
+    ResponseGetAllAdmin:
+      description: OK
+      content:
+        application/json:
+          example:
+            status: success
+            data:
+            - id: 1
+              fullname: Admin
+              username: admin1
+              email: admin@gmail.com
+              phone_number: 08123456789
+              drop_point_id: 1
+              role: admin
+            - id: 2
+              fullname: Admin 2
+              username: admin2
+              email: admin2@gmail.com
+              phone_number: 08127372643
+              drop_point_id: 2
+              role: admin
+    ResponseGetProfile:
+      description: OK
+      content:
+        application/json:
+          example:
+            status: success
+            data:
+              id: 1
+              fullname: User
+              username: user1
+              email: user@gmail.com
+              phone_number: 08123456789
+              gender: male
+              address: earth
+              role: user
+    ResponseGetAllDropPoint:
+      description: OK
+      content:
+        application/json:
+          example:
+            status: success
+            data:
+            - id: 1
+              address: Jakarta
+            - id: 2
+              address: Bandung
+    ResponseCreateDropPoint:
+      description: Created
+      content:
+        application/json:
+          example:
+            status: success
+            data:
+              id: 1
+              address: Jakarta
+    ResponseEditDropPoint:
+      description: OK
+      content:
+        application/json:
+          example:
+            status: success
+            data:
+              id: 1
+              address: Jakarta
+    ResponseGetAllCategories:
+      description: OK
+      content:
+        application/json:
+          example:
+            status: success
+            data:
+            - id: 1
+              name: Plastik
+              point: 10
+            - id: 2
+              name: Kaca
+              point: 20
+    ResponseCreateCategory:
+      description: Created
+      content:
+        application/json:
+          example:
+            status: success
+            data:
+              id: 1
+              name: Plastik
+              point: 10
+    ResponseEditCategory:
+      description: OK
+      content:
+        application/json:
+          example:
+            status: success
+            data:
+              id: 1
+              name: Plastik
+              point: 10
+    ResponseGetAllVouchers:
+      description: OK
+      content:
+        application/json:
+          example:
+            status: success
+            data:
+            - id: 1
+              name: Voucher 1
+              point: 150
+            - id: 2
+              name: Voucher 2
+              point: 200
+    ResponseCreateVoucher:
+      description: Created
+      content:
+        application/json:
+          example:
+            status: success
+            data:
+              id: 1
+              name: Voucher 1
+              point: 150
+    ResponseEditVoucher:
+      description: OK
+      content:
+        application/json:
+          example:
+            status: success
+            data:
+              id: 1
+              name: Voucher 1
+              point: 150
+    ResponseGetUserVouchers:
+      description: OK
+      content:
+        application/json:
+          example:
+            status: success
+            data:
+            - id: 1
+              name: Voucher 1
+              status: Used
+            - id: 2
+              name: Voucher 2
+              status: Available
+    ResponseGetCart:
+      description: OK
+      content:
+        application/json:
+          example:
+            status: success
+            data:
+            - cart_item_id: 1
+              category_id: 1
+              category_name: Plastik
+              weight: 3
+            - cart_item_id: 2
+              category_id: 2
+              category_name: Kaca
+              weight: 1
+    ResponseCreateCartItem:
+      description: Created
+      content:
+        application/json:
+          example:
+            status: success
+            data:
+              id: 1
+              user_id: 1
+              category_id: 1
+              category_name: Plastik
+              weight: 3
+    ResponseEditCartItem:
+      description: OK
+      content:
+        application/json:
+          example:
+            status: success
+            data:
+              id: 1
+              user_id: 1
+              category_id: 2
+              category_name: Kaca
+              weight: 2
+    ResponseCreateCheckout:
+      description: Created
+      content:
+        application/json:
+          example:
+            id: 1
+            data:
+              categories:
+              - category_id: 1
+                category_name: Plastik
+                category_point: 10
+                weight: 1
+              - category_id: 2
+                category_name: Kaca
+                category_point: 20
+                weight: 2
+            total_points: 50
+            drop_point_id: 1
+    ResponseEditCheckout:
+      description: OK
+      content:
+        application/json:
+          example:
+            id: 1
+            data:
+              categories:
+              - category_id: 1
+                category_name: Plastik
+                category_point: 10
+                weight: 1
+              - category_id: 2
+                category_name: Kaca
+                category_point: 20
+                weight: 2
+            total_points: 50
+            drop_point_id: 1
+    ResponseVerificationCheckout:
+      description: OK
+      content:
+        application/json:
+          example:
+            id: 1
+            data:
+              categories:
+              - category_id: 1
+                category_name: Plastik
+                category_point: 10
+                weight: 1
+              - category_id: 2
+                category_name: Kaca
+                category_point: 20
+                weight: 2
+            status: Verified
+            total_points: 50     
+            drop_point_id: 1 
+    ResponseGetAllTransactions:
+      description: OK
+      content:
+        application/json:
+          example:
+            status: success
+            data:
+            - id: 1
+              user_id: 1
+              method: drop off
+              drop_point_id: 1
+              point: 50
+              categories:
+              - category_id: 1
+                category_name: Plastik
+                category_point: 10
+                weight: 1
+              - category_id: 2
+                category_name: Kaca
+                category_point: 20
+                weight: 2
+              created_at: "2021-09-01 20:49:51.428"
+            - id: 1
+              user_id: 1
+              method: pickup
+              drop_point_id: 1
+              point: 60
+              categories:
+              - category_id: 1
+                category_name: Plastik
+                category_point: 10
+                weight: 2
+              - category_id: 2
+                category_name: Kaca
+                category_point: 20
+                weight: 2
+              created_at: "2021-09-01 20:49:51.428"
+    ResponseGetTotalTransactions:
+      description: OK
+      content:
+        application/json:
+          example:
+            status: success
+            data:
+            - category_id: 1
+              category_name: Plastik
+              weight: 5
+            - category_id: 2
+              category_name: Kaca
+              weight: 3
+    ResponseDeleteCategory:
+      description: OK
+      content:
+        application/json:
+          example:
+            "message": category successfully deleted
+    ResponseDeleteVoucher:
+      description: OK
+      content:
+        application/json:
+          example:
+            "message": voucher successfully deleted
+    ResponseDeleteCartItem:
+      description: OK
+      content:
+        application/json:
+          example:
+            "message": cart item successfully deleted
+    ResponseDeleteDropPoint:
+      description: OK
+      content:
+        application/json:
+          example:
+            "message": drop point successfully deleted
+    ResponseClaimVoucher:
+      description: Created
+      content:
+        application/json:
+          example:
+            "message": claim voucher success
+    ResponseRedeemVoucher:
+      description: OK
+      content:
+        application/json:
+          example:
+            "message": redeem voucher success
+    
