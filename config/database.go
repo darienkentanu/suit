@@ -50,12 +50,12 @@ func InitDBSQL() *sql.DB {
 }
 
 func initMigration(db *gorm.DB) {
-	db.AutoMigrate(&models.Login{})
 	db.AutoMigrate(&models.User{})
 	db.AutoMigrate(&models.Voucher{})
 	db.AutoMigrate(&models.User_Voucher{})
 	db.AutoMigrate(&models.Drop_Point{})
-	db.AutoMigrate(&models.Admin{})
+	db.AutoMigrate(&models.Staff{})
+	db.AutoMigrate(&models.Login{})
 	db.AutoMigrate(&models.Checkout{})
 	db.AutoMigrate(&models.Transaction{})
 
