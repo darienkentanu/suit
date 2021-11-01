@@ -7,10 +7,14 @@ import (
 	"github.com/darienkentanu/suit/routes"
 )
 
+func init() {
+	config.InitDB()
+	config.InitDBSQL()
+}
+
 func main() {
-	db1 := config.InitDB()
-	db2 := config.InitDBSQL()
-	e := routes.New(db1, db2)
+
+	e := routes.New()
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.GetInt("port"))))
 }

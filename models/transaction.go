@@ -11,7 +11,8 @@ type Transaction struct {
 	Method       string     `gorm:"type:enum('courier', 'droppoint');" json:"method" form:"method"`
 	Drop_PointID int        `gorm:"type:bigint;not null" json:"drop_point_id" form:"drop_point_id"`
 	Drop_Point   Drop_Point `gorm:"foreignkey:Drop_PointID;" json:"-"`
-	CheckoutID   int        `gorm:"primarykey;not null" json:"checkout_id" form:"checkout_id"`
+	CheckoutID   int        `gorm:"not null" json:"checkout_id" form:"checkout_id"`
 	Checkout     Checkout   `gorm:"foreignkey:CheckoutID;" json:"-"`
 	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
