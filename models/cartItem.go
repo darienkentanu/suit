@@ -8,7 +8,7 @@ type CartItem struct {
 	Category   Category `gorm:"foreignkey:CategoryID" json:"-"`
 	Weight     int      `gorm:"type:int;not null" json:"weight" form:"weight"`
 	CheckoutID int      `gorm:"type:bigint" json:"checkout_id" form:"checkout_id"`
-	Checkout   Checkout `gorm:"foreignkey:CheckoutID;null" json:"-"`
+	Checkout   Checkout `gorm:"foreignkey:CheckoutID" json:"-"`
 	CartUserID int      `gorm:"type:bigint;not null" json:"cart_user_id" form:"cart_user_id"`
 	Cart       Cart     `gorm:"foreignkey:CartUserID" json:"-"`
 	CreatedAt  time.Time

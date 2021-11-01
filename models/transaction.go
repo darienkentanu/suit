@@ -8,7 +8,7 @@ type Transaction struct {
 	User         User       `gorm:"foreignkey:UserID" json:"-"`
 	Status       int        `gorm:"type:tinyint;not null;default:0;" json:"status" form:"status"`
 	Point        int        `gorm:"type:bigint;not null" json:"point" form:"point"`
-	Method       string     `gorm:"type:enum('courier', 'droppoint');" json:"method" form:"method"`
+	Method       string     `gorm:"type:enum('dropoff', 'pickup');" json:"method" form:"method"`
 	Drop_PointID int        `gorm:"type:bigint;not null" json:"drop_point_id" form:"drop_point_id"`
 	Drop_Point   Drop_Point `gorm:"foreignkey:Drop_PointID;" json:"-"`
 	CheckoutID   int        `gorm:"not null" json:"checkout_id" form:"checkout_id"`

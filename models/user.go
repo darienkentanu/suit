@@ -9,7 +9,8 @@ type User struct {
 	Gender      string `gorm:"type:enum('male', 'female');not null" json:"gender" form:"gender"`
 	Address     string `gorm:"type:longtext;not null" json:"address" form:"address"`
 	Point       int    `gorm:"type:bigint" json:"point" form:"point"`
-	// LoginID     int    `gorm:"type:bigint;not null" json:"login_id" form:"login_id"`
-	// Login       Login  `gorm:"foreignkey:LoginID;" json:"-"`
-	CreatedAt time.Time
+	Longitude 	string `gorm:"type:longtext" json:"longitute" form:"longitude"`
+	Latitude  	string `gorm:"type:longtext" json:"latitude" form:"latitude"`
+	CreatedAt 	time.Time
+	UpdatedAt 	time.Time
 }
