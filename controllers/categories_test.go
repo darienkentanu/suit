@@ -34,13 +34,13 @@ func TestGetCategories(t *testing.T) {
 		name       string
 		path       string
 		expectCode int
-		response   int
+		response   string
 	}{
 		{
 			name:       "GetCategories",
 			path:       "/categories",
 			expectCode: http.StatusOK,
-			response:   5,
+			response:   "Success",
 		},
 	}
 	e, db, _ := InitEcho()
@@ -58,13 +58,16 @@ func TestGetCategories(t *testing.T) {
 				assert.Equal(t, testCase.expectCode, w.Code)
 				body := w.Body.String()
 
-				var category models.Category_Response
-				err := json.Unmarshal([]byte(body), &category)
+				var response = struct {
+					Status string                     `json:"status"`
+					Data   []models.Category_Response `json:"data"`
+				}{}
+				err := json.Unmarshal([]byte(body), &response)
 
 				if err != nil {
 					assert.Error(t, err, "error")
 				}
-				assert.Equal(t, testCase.response, 5)
+				assert.Equal(t, testCase.response, response.Status)
 			}
 		})
 	}
