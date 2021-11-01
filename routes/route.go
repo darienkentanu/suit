@@ -16,5 +16,10 @@ func New() *echo.Echo {
 	e.GET("/profile", controllers.GetProfileController, middlewares.IsLoggedIn)
 	e.PUT("/profile", controllers.UpdateProfileController, middlewares.IsLoggedIn)
 
+	e.GET("/categories", controllers.GetCategories)
+	e.POST("/categories", controllers.AddCategories)
+	e.PUT("/categories/:id", controllers.EditCategories)
+	e.DELETE("/categories/:id", controllers.DeleteCategories)
+	
 	return e
 }

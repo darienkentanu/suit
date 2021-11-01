@@ -10,8 +10,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type M map[string]interface{}
-
 func RegisterUsersController(c echo.Context) error {
 	var register models.RegisterUser
 

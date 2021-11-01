@@ -9,3 +9,9 @@ type Category struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+type Category_Response struct {
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Point int    `json:"point"`
+}
