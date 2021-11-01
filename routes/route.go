@@ -17,9 +17,9 @@ func New() *echo.Echo {
 	e.PUT("/profile", controllers.UpdateProfileController, middlewares.IsLoggedIn)
 
 	e.GET("/categories", controllers.GetCategories)
-	e.POST("/categories", controllers.AddCategories)
-	e.PUT("/categories/:id", controllers.EditCategories)
-	e.DELETE("/categories/:id", controllers.DeleteCategories)
-	
+	e.POST("/categories", controllers.AddCategories, middlewares.IsLoggedIn, middlewares.IsStaff)
+	e.PUT("/categories/:id", controllers.EditCategories, middlewares.IsLoggedIn, middlewares.IsStaff)
+	e.DELETE("/categories/:id", controllers.DeleteCategories, middlewares.IsLoggedIn, middlewares.IsStaff)
+
 	return e
 }
