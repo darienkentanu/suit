@@ -225,11 +225,9 @@ paths:
 
   /administrators:
     post:
-      security:
-        - bearerAuth: []
       tags:
         - Administrators
-      summary: Add administrators (admin only)
+      summary: Add administrators
       requestBody:
         required: true
         content:
@@ -462,6 +460,8 @@ paths:
 
   /uservouchers:
     get:
+      security:
+        - bearerAuth: []
       tags:
         - Vouchers
       summary: Get all user's vouchers
@@ -473,7 +473,7 @@ paths:
         '500':
           $ref: "#/components/responses/ServerError"
   
-  /claimvouchers/{id}:
+  /claim/{id}:
     post:
       security:
         - bearerAuth: []
@@ -495,7 +495,7 @@ paths:
         '500':
           $ref: "#/components/responses/ServerError" 
 
-  /redeemvouchers/{id}:
+  /redeem/{id}:
     post:
       security:
         - bearerAuth: []
@@ -659,46 +659,6 @@ paths:
         '502':
           $ref: "#/components/responses/BadGateway"
   
-  /checkout/{id}:
-    put:
-      security:
-        - bearerAuth: []
-      tags:
-        - Checkout
-      summary: Edit checkout (admin only)
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: id for edit spesific checkout
-          schema:
-            type: number
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                category_id:
-                  type: array
-                  items:
-                    type: integer
-                weight:
-                  type: array
-                  items:
-                    type: integer
-      responses:
-        '200': 
-          $ref: "#/components/responses/ResponseEditCheckout"
-        '400':
-          $ref: "#/components/responses/BadRequest"
-        '401':
-          $ref: "#/components/responses/UnauthorizedError"
-        '500':
-          $ref: "#/components/responses/ServerError"
-        '502':
-          $ref: "#/components/responses/BadGateway"
   /verification/{id}:
     put:
       security:
@@ -1005,10 +965,12 @@ components:
             data:
             - id: 1
               name: Voucher 1
-              status: Used
+              point: 150
+              status: used
             - id: 2
               name: Voucher 2
-              status: Available
+              point: 200
+              status: available
     ResponseGetCart:
       description: OK
       content:
