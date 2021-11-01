@@ -8,7 +8,7 @@ type User_Voucher struct {
 	Voucher   Voucher `gorm:"foreignkey:VoucherID;" json:"-"`
 	UserID    int     `gorm:"type:bigint;not null" json:"user_id" form:"user_id"`
 	User      User    `gorm:"foreignkey:UserID;" json:"-"`
-	Status    int     `gorm:"type:enum('used','available')" json:"status" form:"status"`
+	Status    string  `gorm:"type:enum('used','available')" json:"status" form:"status"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

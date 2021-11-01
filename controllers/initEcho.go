@@ -8,12 +8,9 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
-	db_test    = config.InitDBTest()
-	dbSQL_test = config.InitDBSQL()
-)
-
 func InitEcho() (*echo.Echo, *gorm.DB, *sql.DB) {
 	e := echo.New()
+	db_test := config.InitDBTest()
+	dbSQL_test := config.InitDBSQL()
 	return e, db_test, dbSQL_test
 }

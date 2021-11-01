@@ -12,6 +12,12 @@ import (
 	"gorm.io/gorm"
 )
 
+func init() {
+	_, db, _ := InitEcho()
+	db.Migrator().DropTable(&models.Category{})
+	db.AutoMigrate(&models.Category{})
+}
+
 func InsertDataCategory(db *gorm.DB) error {
 	category := models.Category{
 		Name:  "gelas kaca",
