@@ -4,22 +4,40 @@ import (
 	"net/http"
 
 	"github.com/darienkentanu/suit/gmaps"
-	"github.com/darienkentanu/suit/lib/database"
 	"github.com/darienkentanu/suit/middlewares"
 	"github.com/darienkentanu/suit/models"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
+type LoginDB interface {
+	GetEmail(string) (int)
+	GetPhoneNumber(string) (int)
+	GetUsername(string) (int)
+	GetAccountByEmailOrUsername(requestLogin models.RequestLogin) (models.Login, error)
+	UpdateToken(id int, token string) (models.Login, error)
+	GetUserProfile(id int) (models.ResponseGetUser, error)
+	UpdateUser(id int, user models.User) (models.User, error)
+	UpdateLogin(id int, login models.Login) (models.Login, error)
+}
 
-func LoginController(c echo.Context) error {
+type LoginController struct {
+	db LoginDB
+}
+
+func NewLoginController(db LoginDB) LoginController {
+	return LoginController{db: db}
+}
+
+
+func (lc *LoginController) Login(c echo.Context) error {
 	var requestLogin models.RequestLogin
 	
 	if err := c.Bind(&requestLogin); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid input")
 	}
 
-	account, err := database.GetAccountByEmailOrUsername(requestLogin)
+	account, err := lc.db.GetAccountByEmailOrUsername(requestLogin)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Incorrect email or username")
 	}
@@ -43,7 +61,7 @@ func LoginController(c echo.Context) error {
 	}
 
 	account.Token = newToken
-	account, err = database.UpdateToken(int(account.ID), newToken)
+	account, err = lc.db.UpdateToken(int(account.ID), newToken)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Cannot add token")
 	}
@@ -65,10 +83,10 @@ func CheckPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-func GetProfileController(c echo.Context) error {
-	role := middlewares.CurrentRoleLoginUser(c)
+func (lc *LoginController) GetProfile(c echo.Context) error {
+	// role := middlewares.CurrentRoleLoginUser(c)
 	id := middlewares.CurrentLoginUser(c)
-	user, err := database.GetUserProfile(id, role)
+	user, err := lc.db.GetUserProfile(id)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
@@ -80,7 +98,7 @@ func GetProfileController(c echo.Context) error {
 	})
 }
 
-func UpdateProfileController(c echo.Context) error {
+func (lc *LoginController) UpdateProfile(c echo.Context) error {
 	var newProfile models.RegisterUser
 
 	id := middlewares.CurrentLoginUser(c)
@@ -89,17 +107,17 @@ func UpdateProfileController(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid input")
 	}
 
-	row := database.GetEmail(newProfile.Email)
+	row := lc.db.GetEmail(newProfile.Email)
 	if row > 1 {
 		return echo.NewHTTPError(http.StatusBadRequest, "Email is already registered")
 	}
 
-	row = database.GetPhoneNumber(newProfile.PhoneNumber)
+	row = lc.db.GetPhoneNumber(newProfile.PhoneNumber)
 	if row > 1 {
 		return echo.NewHTTPError(http.StatusBadRequest, "Phone number is already registered")
 	}
 
-	row = database.GetUsername(newProfile.Username)
+	row = lc.db.GetUsername(newProfile.Username)
 	if row > 1 {
 		return echo.NewHTTPError(http.StatusBadRequest, "Username is already registered")
 	}
@@ -119,7 +137,7 @@ func UpdateProfileController(c echo.Context) error {
 	user.Latitude		= lat
 	user.Longitude		= lng
 
-	user, err = database.UpdateUser(id, user)
+	user, err = lc.db.UpdateUser(id, user)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -129,7 +147,7 @@ func UpdateProfileController(c echo.Context) error {
 	login.Username = newProfile.Username
 	login.Password = hashPassword
 
-	login, err = database.UpdateLogin(id, login)
+	login, err = lc.db.UpdateLogin(id, login)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

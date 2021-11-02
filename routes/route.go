@@ -12,14 +12,8 @@ import (
 func New(db *gorm.DB, dbSQL *sql.DB) *echo.Echo {
 	e := echo.New()
 
-	e.POST("/register", controllers.RegisterUsersController)
-	e.POST("/login", controllers.LoginController)
-
-	e.GET("/users", controllers.GetAllUsersController, middlewares.IsLoggedIn)
-	e.GET("/profile", controllers.GetProfileController, middlewares.IsLoggedIn)
-	e.PUT("/profile", controllers.UpdateProfileController, middlewares.IsLoggedIn)
-
 	categoryRoute(e, db, dbSQL)
+	userRoute(e, db, dbSQL)
 
 	return e
 }
