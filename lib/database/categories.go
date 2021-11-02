@@ -7,6 +7,13 @@ import (
 	"gorm.io/gorm"
 )
 
+type LibCategoryDB interface {
+	GetCategories() ([]models.Category, error)
+	AddCategories(categories models.Category) (models.Category, error)
+	EditCategoriesById(id int, newCategories models.Category) (models.Category, error)
+	DeleteCategoriesById(id int) error
+}
+
 type CategoryDB struct {
 	db *gorm.DB
 }
