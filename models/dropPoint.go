@@ -10,3 +10,8 @@ type Drop_Point struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+type Drop_Points_Response struct {
+	ID      int    `json:"id"`
+	Address string `json:"address"`
+}
