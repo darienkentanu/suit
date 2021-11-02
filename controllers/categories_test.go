@@ -14,8 +14,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Setup() {
-	_, db, _ := InitEcho()
+func Setup(db *gorm.DB) {
 	db.Migrator().DropTable(&models.Category{})
 	db.AutoMigrate(&models.Category{})
 }
@@ -32,7 +31,6 @@ func InsertDataCategory(db *gorm.DB) error {
 }
 
 func TestGetCategories(t *testing.T) {
-	Setup()
 	var testCases = []struct {
 		name       string
 		path       string
@@ -47,6 +45,7 @@ func TestGetCategories(t *testing.T) {
 		},
 	}
 	e, db, _ := InitEcho()
+	Setup(db)
 	cdb := database.NewCategoryDB(db)
 	cc := NewCategoryController(cdb)
 	InsertDataCategory(db)
@@ -79,7 +78,6 @@ func TestGetCategories(t *testing.T) {
 }
 
 func TestAddCategories(t *testing.T) {
-	Setup()
 	var testCases = []struct {
 		name       string
 		path       string
@@ -95,6 +93,7 @@ func TestAddCategories(t *testing.T) {
 	}
 
 	e, db, _ := InitEcho()
+	Setup(db)
 	cdb := database.NewCategoryDB(db)
 	cc := NewCategoryController(cdb)
 	InsertDataCategory(db)
@@ -134,7 +133,6 @@ func TestAddCategories(t *testing.T) {
 }
 
 func TestEditCategories(t *testing.T) {
-	Setup()
 	var testCases = []struct {
 		name       string
 		path       string
@@ -150,6 +148,7 @@ func TestEditCategories(t *testing.T) {
 	}
 
 	e, db, _ := InitEcho()
+	Setup(db)
 	cdb := database.NewCategoryDB(db)
 	cc := NewCategoryController(cdb)
 	InsertDataCategory(db)
@@ -191,7 +190,6 @@ func TestEditCategories(t *testing.T) {
 }
 
 func TestDeleteCategories(t *testing.T) {
-	Setup()
 	var testCases = []struct {
 		name       string
 		path       string
@@ -207,6 +205,7 @@ func TestDeleteCategories(t *testing.T) {
 	}
 
 	e, db, _ := InitEcho()
+	Setup(db)
 	cdb := database.NewCategoryDB(db)
 	cc := NewCategoryController(cdb)
 	InsertDataCategory(db)
