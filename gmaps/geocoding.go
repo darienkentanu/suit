@@ -37,7 +37,7 @@ func Geocoding(address string) (lat, lng string) {
 	}
 
 	location := strings.Index(string(body), "location")
-	lat1 := string(body[location:])
+	lat1 := string(body)[location:]
 	temp := strings.SplitN(lat1[37:], ",", 2)
 	lat2 := temp[0]
 	lat = strings.TrimSpace(lat2)
