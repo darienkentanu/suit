@@ -14,7 +14,7 @@ func categoryRoute(e *echo.Echo, db *gorm.DB, dbSQL *sql.DB) {
 	cdb := database.NewCategoryDB(db)
 	cc := controllers.NewCategoryController(cdb)
 	e.GET("/categories", cc.GetCategories)
-	e.POST("/categories", cc.AddCategories, middlewares.IsLoggedIn)
-	e.PUT("/categories/:id", cc.EditCategories, middlewares.IsLoggedIn)
-	e.DELETE("/categories/:id", cc.DeleteCategories, middlewares.IsLoggedIn)
+	e.POST("/categories", cc.AddCategories, middlewares.IsLoggedIn, middlewares.IsStaff)
+	e.PUT("/categories/:id", cc.EditCategories, middlewares.IsLoggedIn, middlewares.IsStaff)
+	e.DELETE("/categories/:id", cc.DeleteCategories, middlewares.IsLoggedIn, middlewares.IsStaff)
 }

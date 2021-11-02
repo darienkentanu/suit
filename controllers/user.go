@@ -13,12 +13,14 @@ import (
 type UserController struct {
 	userModel	database.UserModel
 	loginModel	database.LoginModel
+	cartModel	database.CartModel
 }
 
-func NewUserController(userModel database.UserModel, loginModel database.LoginModel) *UserController {
+func NewUserController(userModel database.UserModel, loginModel database.LoginModel, cartModel database.CartModel) *UserController {
 	return &UserController{
 		userModel: userModel,
 		loginModel: loginModel,
+		cartModel: cartModel,
 	}
 }
 
@@ -78,7 +80,7 @@ func (controllers *UserController) RegisterUsers(c echo.Context) error {
 
 	var cart models.Cart
 	cart.UserID = user.ID
-	err = controllers.userModel.CreateCart(cart)
+	err = controllers.cartModel.CreateCart(cart)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Cannot create cart")
 	}
