@@ -132,3 +132,52 @@ func TestRegisterUser(t *testing.T) {
 		})
 	}
 }
+
+func TestGetAllUsers(t *testing.T) {
+	var testCases = []struct {
+		name       string
+		path       string
+		expectCode int
+		response   string
+	}{
+		{
+			name:       "GetAllUsers",
+			path:       "/users",
+			expectCode: http.StatusOK,
+			response:   "success",
+		},
+	}
+	
+	e, db, dbSQL := InitEcho()
+	UserSetup(db)
+	userDB := database.NewUserDB(db, dbSQL)
+	loginDB := database.NewLoginDB(db)
+	controllers := NewUserController(userDB, loginDB)
+	InsertDataUser(db)
+
+	for _, testCase := range testCases {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+
+		c.SetPath(testCase.path)
+
+		t.Run(testCase.name, func(t *testing.T) {
+			if assert.NoError(t, controllers.GetAllUsers(c)) {
+				assert.Equal(t, testCase.expectCode, rec.Code)
+				body := rec.Body.String()
+
+				var response = struct {
+					Status string					`json:"status"`
+					Data   []models.ResponseGetUser `json:"data"`
+				}{}
+				err := json.Unmarshal([]byte(body), &response)
+
+				if err != nil {
+					assert.Error(t, err, "error")
+				}
+				assert.Equal(t, testCase.response, response.Status)
+			}
+		})
+	}
+}
