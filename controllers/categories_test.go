@@ -14,7 +14,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func init() {
+func Setup() {
 	_, db, _ := InitEcho()
 	db.Migrator().DropTable(&models.Category{})
 	db.AutoMigrate(&models.Category{})
@@ -32,6 +32,7 @@ func InsertDataCategory(db *gorm.DB) error {
 }
 
 func TestGetCategories(t *testing.T) {
+	Setup()
 	var testCases = []struct {
 		name       string
 		path       string
@@ -78,6 +79,7 @@ func TestGetCategories(t *testing.T) {
 }
 
 func TestAddCategories(t *testing.T) {
+	Setup()
 	var testCases = []struct {
 		name       string
 		path       string
@@ -126,6 +128,111 @@ func TestAddCategories(t *testing.T) {
 					assert.Error(t, err, "error")
 				}
 				assert.Equal(t, testCase.response, response.Status)
+			}
+		})
+	}
+}
+
+func TestEditCategories(t *testing.T) {
+	Setup()
+	var testCases = []struct {
+		name       string
+		path       string
+		expectCode int
+		response   string
+	}{
+		{
+			name:       "EditCategories",
+			path:       "/categories/:id",
+			expectCode: http.StatusCreated,
+			response:   "success",
+		},
+	}
+
+	e, db, _ := InitEcho()
+	cdb := database.NewCategoryDB(db)
+	cc := NewCategoryController(cdb)
+	InsertDataCategory(db)
+
+	reqBody, err := json.Marshal(M{
+		"name":  "botol plastik",
+		"point": 10,
+	})
+	if err != nil {
+		t.Error(err)
+	}
+
+	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
+	w := httptest.NewRecorder()
+	ctx := e.NewContext(r, w)
+
+	for _, testCase := range testCases {
+		ctx.SetPath(testCase.path)
+		ctx.SetParamNames("id")
+		ctx.SetParamValues("1")
+
+		t.Run(testCase.name, func(t *testing.T) {
+			if assert.NoError(t, cc.EditCategories(ctx)) {
+				assert.Equal(t, testCase.expectCode, w.Code)
+				body := w.Body.String()
+
+				var response = struct {
+					Status string `json:"status"`
+					Data   M      `json:"data"`
+				}{}
+				err := json.Unmarshal([]byte(body), &response)
+				if err != nil {
+					assert.Error(t, err, "error")
+				}
+				assert.Equal(t, testCase.response, response.Status)
+			}
+		})
+	}
+}
+
+func TestDeleteCategories(t *testing.T) {
+	Setup()
+	var testCases = []struct {
+		name       string
+		path       string
+		expectCode int
+		response   string
+	}{
+		{
+			name:       "EditCategories",
+			path:       "/categories/:id",
+			expectCode: http.StatusOK,
+			response:   "category succesfully deleted",
+		},
+	}
+
+	e, db, _ := InitEcho()
+	cdb := database.NewCategoryDB(db)
+	cc := NewCategoryController(cdb)
+	InsertDataCategory(db)
+
+	r := httptest.NewRequest(http.MethodPost, "/", nil)
+	w := httptest.NewRecorder()
+	ctx := e.NewContext(r, w)
+
+	for _, testCase := range testCases {
+		ctx.SetPath(testCase.path)
+		ctx.SetParamNames("id")
+		ctx.SetParamValues("1")
+
+		t.Run(testCase.name, func(t *testing.T) {
+			if assert.NoError(t, cc.DeleteCategories(ctx)) {
+				assert.Equal(t, testCase.expectCode, w.Code)
+				body := w.Body.String()
+
+				var response = struct {
+					Message string `json:"message"`
+				}{}
+				err := json.Unmarshal([]byte(body), &response)
+				if err != nil {
+					assert.Error(t, err, "error")
+				}
+				assert.Equal(t, testCase.response, response.Message)
 			}
 		})
 	}
