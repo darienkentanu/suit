@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 
+	"github.com/darienkentanu/suit/gmaps"
 	"github.com/darienkentanu/suit/lib/database"
 	"github.com/darienkentanu/suit/middlewares"
 	"github.com/darienkentanu/suit/models"
@@ -108,11 +109,15 @@ func UpdateProfileController(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "error in password hash")
 	}
 
+	lat, lng := gmaps.Geocoding(newProfile.Address)
+
 	var user models.User
 	user.Fullname 		= newProfile.Fullname
 	user.PhoneNumber 	= newProfile.PhoneNumber
 	user.Gender			= newProfile.Gender
 	user.Address 		= newProfile.Address
+	user.Latitude		= lat
+	user.Longitude		= lng
 
 	user, err = database.UpdateUser(id, user)
 	if err != nil {

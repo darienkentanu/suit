@@ -3,7 +3,7 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/darienkentanu/suit/config"
+	"github.com/darienkentanu/suit/gmaps"
 	"github.com/darienkentanu/suit/lib/database"
 	"github.com/darienkentanu/suit/models"
 	"github.com/labstack/echo/v4"
@@ -36,13 +36,17 @@ func RegisterUsersController(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "error in password hash")
 	}
+
+	lat, lng := gmaps.Geocoding(register.Address)
 	
 	var user models.User
 	user.Fullname = register.Fullname
 	user.PhoneNumber = register.PhoneNumber
 	user.Gender = register.Gender
 	user.Address = register.Address
-
+	user.Latitude = lat
+	user.Longitude = lng
+	
 	user, err = database.CreateUser(user)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Cannot create user")
@@ -90,23 +94,3 @@ func GetAllUsersController(c echo.Context) error {
 	})
 }
 
-func UpdateLogin(id int, newLogin models.Login) (models.Login, error) {
-	var login models.Login
-	if err := config.InitDB().First(&login, id).Error; err != nil {
-		return login, err
-	}
-
-	login.Email 	= newLogin.Email
-	login.Username	= newLogin.Username
-	login.Password	= newLogin.Password
-
-	if err := config.InitDB().Model(&login).Updates(models.Login{
-		Email: login.Email,
-		Username: login.Username,
-		Password: login.Password,
-	}).Error; err != nil {
-		return login, err
-	}
-
-	return login, nil
-}

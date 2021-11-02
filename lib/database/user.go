@@ -6,8 +6,8 @@ import (
 )
 
 func GetPhoneNumber(number string) int {
-	var login models.Login
-	row := config.InitDB().Where("phone_number = ?", number).Find(&login).RowsAffected
+	var user models.User
+	row := config.InitDB().Where("phone_number = ?", number).Find(&user).RowsAffected
 	return int(row)
 }
 
