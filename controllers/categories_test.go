@@ -1,12 +1,15 @@
 package controllers_test
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	. "github.com/darienkentanu/suit/controllers"
+	"github.com/darienkentanu/suit/lib/database"
 	"github.com/darienkentanu/suit/models"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
@@ -20,8 +23,8 @@ func init() {
 
 func InsertDataCategory(db *gorm.DB) error {
 	category := models.Category{
-		Name:  "gelas kaca",
-		Point: 5,
+		Name:  "pecahan kaca",
+		Point: 10,
 	}
 	if err := db.Save(&category).Error; err != nil {
 		return err
@@ -44,6 +47,8 @@ func TestGetCategories(t *testing.T) {
 		},
 	}
 	e, db, _ := InitEcho()
+	cdb := database.NewCategoryDB(db)
+	cc := NewCategoryController(cdb)
 	InsertDataCategory(db)
 
 	r := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -54,7 +59,7 @@ func TestGetCategories(t *testing.T) {
 		ctx.SetPath(testCase.path)
 
 		t.Run(testCase.name, func(t *testing.T) {
-			if assert.NoError(t, GetCategories(ctx)) {
+			if assert.NoError(t, cc.GetCategories(ctx)) {
 				assert.Equal(t, testCase.expectCode, w.Code)
 				body := w.Body.String()
 
@@ -64,6 +69,61 @@ func TestGetCategories(t *testing.T) {
 				}{}
 				err := json.Unmarshal([]byte(body), &response)
 
+				if err != nil {
+					assert.Error(t, err, "error")
+				}
+				assert.Equal(t, testCase.response, response.Status)
+			}
+		})
+	}
+}
+
+func TestAddCategories(t *testing.T) {
+	var testCases = []struct {
+		name       string
+		path       string
+		expectCode int
+		response   string
+	}{
+		{
+			name:       "AddCategories",
+			path:       "/categories",
+			expectCode: http.StatusCreated,
+			response:   "success",
+		},
+	}
+
+	e, db, _ := InitEcho()
+	cdb := database.NewCategoryDB(db)
+	cc := NewCategoryController(cdb)
+	InsertDataCategory(db)
+
+	reqBody, err := json.Marshal(M{
+		"name":  "botol plastik",
+		"point": 5,
+	})
+	if err != nil {
+		t.Error(err)
+	}
+
+	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
+	w := httptest.NewRecorder()
+	ctx := e.NewContext(r, w)
+
+	for _, testCase := range testCases {
+		ctx.SetPath(testCase.path)
+
+		t.Run(testCase.name, func(t *testing.T) {
+			if assert.NoError(t, cc.AddCategories(ctx)) {
+				assert.Equal(t, testCase.expectCode, w.Code)
+				body := w.Body.String()
+
+				var response = struct {
+					Status string `json:"status"`
+					Data   M      `json:"data"`
+				}{}
+				err := json.Unmarshal([]byte(body), &response)
+				fmt.Println("==========================", response.Data, "====================")
 				if err != nil {
 					assert.Error(t, err, "error")
 				}
