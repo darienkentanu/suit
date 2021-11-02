@@ -30,36 +30,41 @@ func UserSetup(db *gorm.DB) {
 
 func InsertDataUser(db *gorm.DB) error {
 	register := models.RegisterUser{
-		Fullname: "Alika Tania",
-		Email: "alikatania@gmail.com",
-		Username: "alika",
-		Password: "alika123",
-		PhoneNumber: "08123456789",
-		Gender: "female",
-		Address: "Jl. Margonda Raya, Pondok Cina, Kecamatan Beji, Kota Depok, Jawa Barat 16424",
+		Fullname	: "Alika Tania",
+		Email		: "alikatania@gmail.com",
+		Username	: "alika",
+		Password	: "alika123",
+		PhoneNumber	: "08123456789",
+		Gender		: "female",
+		Address		: "Jl. Margonda Raya, Pondok Cina, Kecamatan Beji, Kota Depok, Jawa Barat 16424",
 	}
 
 	lat, lng := gmaps.Geocoding(register.Address)
 	
 	user := models.User{
-		Fullname: register.Fullname,
-		PhoneNumber: register.PhoneNumber,
-		Gender: register.Gender,
-		Address: register.Address,
-		Latitude: lat,
-		Longitude: lng,
+		Fullname	: register.Fullname,
+		PhoneNumber	: register.PhoneNumber,
+		Gender		: register.Gender,
+		Address		: register.Address,
+		Latitude	: lat,
+		Longitude	: lng,
 	}
 
 	if err := db.Save(&user).Error; err != nil {
 		return err
 	}
 
+	hashPassword, err := GenerateHashPassword(register.Password)
+	if err != nil {
+		return err
+	}
+
 	login := models.Login{
-		Email: register.Email,
+		Email	: register.Email,
 		Username: register.Username,
-		Password: register.Password,
-		Role: "user",
-		UserID: user.ID,
+		Password: hashPassword,
+		Role	: "user",
+		UserID	: user.ID,
 	}
 
 	if err := db.Select("email", "username", "password", "role", "user_id").Create(&login).Error; err != nil {
