@@ -10,24 +10,36 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func RegisterUsersController(c echo.Context) error {
+type UserController struct {
+	userModel	database.UserModel
+	loginModel	database.LoginModel
+}
+
+func NewUserController(userModel database.UserModel, loginModel database.LoginModel) *UserController {
+	return &UserController{
+		userModel: userModel,
+		loginModel: loginModel,
+	}
+}
+
+func (controllers *UserController) RegisterUsers(c echo.Context) error {
 	var register models.RegisterUser
 
 	if err := c.Bind(&register); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid input")
 	}
 
-	row := database.GetEmail(register.Email)
+	row := controllers.loginModel.GetEmail(register.Email)
 	if row != 0 {
 		return echo.NewHTTPError(http.StatusBadRequest, "Email is already registered")
 	}
 
-	row = database.GetPhoneNumber(register.PhoneNumber)
+	row = controllers.userModel.GetPhoneNumber(register.PhoneNumber)
 	if row != 0 {
 		return echo.NewHTTPError(http.StatusBadRequest, "Phone number is already registered")
 	}
 
-	row = database.GetUsername(register.Username)
+	row = controllers.loginModel.GetUsername(register.Username)
 	if row != 0 {
 		return echo.NewHTTPError(http.StatusBadRequest, "Username is already registered")
 	}
@@ -47,7 +59,7 @@ func RegisterUsersController(c echo.Context) error {
 	user.Latitude = lat
 	user.Longitude = lng
 	
-	user, err = database.CreateUser(user)
+	user, err = controllers.userModel.CreateUser(user)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Cannot create user")
 	}
@@ -59,20 +71,31 @@ func RegisterUsersController(c echo.Context) error {
 	login.Role = "user"
 	login.UserID = user.ID
 
-	login, err = database.CreateLogin(login)
+	login, err = controllers.loginModel.CreateLogin(login)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Cannot create user")
 	}
 
 	var cart models.Cart
 	cart.UserID = user.ID
-	err = database.CreateCart(cart)
+	err = controllers.userModel.CreateCart(cart)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Cannot create cart")
 	}
 
+	var response models.ResponseGetUser
+	response.ID			= user.ID
+	response.Fullname 	= user.Fullname
+	response.Email 		= login.Email
+	response.Username 	= login.Username
+	response.PhoneNumber= user.PhoneNumber
+	response.Gender		= user.Gender
+	response.Address 	= user.Address
+	response.Role		= login.Role
+
 	return c.JSON(http.StatusCreated, M{
-		"status": "user created successfully",
+		"status": "success",
+		"data": response,
 	})
 }
 
@@ -81,8 +104,8 @@ func GenerateHashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-func GetAllUsersController(c echo.Context) error {
-	users, err := database.GetAllUsers()
+func (controllers *UserController) GetAllUsers(c echo.Context) error {
+	users, err := controllers.userModel.GetAllUsers()
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
