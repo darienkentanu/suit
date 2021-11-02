@@ -4,38 +4,47 @@ import (
 	"errors"
 
 	"github.com/darienkentanu/suit/models"
+	"gorm.io/gorm"
 )
 
-func GetCategories() ([]models.Category, error) {
+type CategoryDB struct {
+	db *gorm.DB
+}
+
+func NewCategoryDB(db *gorm.DB) *CategoryDB {
+	return &CategoryDB{db: db}
+}
+
+func (cdb *CategoryDB) GetCategories() ([]models.Category, error) {
 	var categories []models.Category
-	if err := db.Find(&categories).Error; err != nil {
+	if err := cdb.db.Find(&categories).Error; err != nil {
 		return categories, err
 	}
 	return categories, nil
 }
 
-func AddCategories(categories models.Category) (models.Category, error) {
-	if err := db.Save(&categories).Error; err != nil {
+func (cdb *CategoryDB) AddCategories(categories models.Category) (models.Category, error) {
+	if err := cdb.db.Save(&categories).Error; err != nil {
 		return categories, err
 	}
 	return categories, nil
 }
 
-func EditCategoriesById(id int, newCategories models.Category) (models.Category, error) {
+func (cdb *CategoryDB) EditCategoriesById(id int, newCategories models.Category) (models.Category, error) {
 	var category models.Category
-	if err := db.First(&category, id).Error; err != nil {
+	if err := cdb.db.First(&category, id).Error; err != nil {
 		return category, err
 	}
 	category.Name = newCategories.Name
 	category.Point = newCategories.Point
-	if err := db.Save(&category).Error; err != nil {
+	if err := cdb.db.Save(&category).Error; err != nil {
 		return category, err
 	}
 	return category, nil
 }
 
-func DeleteCategoriesById(id int) error {
-	rows := db.Delete(&models.Category{}, id).RowsAffected
+func (cdb *CategoryDB) DeleteCategoriesById(id int) error {
+	rows := cdb.db.Delete(&models.Category{}, id).RowsAffected
 	if rows == 0 {
 		err := errors.New("categories to be deleted is not found")
 		return err
@@ -43,9 +52,9 @@ func DeleteCategoriesById(id int) error {
 	return nil
 }
 
-// func GetCategoryId(id int) (models.Category, error) {
+// func (cdb *CategoryDB) GetCategoryId(id int) (models.Category, error) {
 // 	var category models.Category
-// 	err := db.Where("id = ?", id).First(&category).Error
+// 	err := cdb.db.Where("id = ?", id).First(&category).Error
 // 	if err != nil {
 // 		return category, err
 // 	}

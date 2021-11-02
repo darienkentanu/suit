@@ -4,14 +4,28 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/darienkentanu/suit/lib/database"
 	"github.com/darienkentanu/suit/models"
 
 	"github.com/labstack/echo/v4"
 )
 
-func GetCategories(c echo.Context) error {
-	categories, err := database.GetCategories()
+type CategoryDB interface {
+	GetCategories() ([]models.Category, error)
+	AddCategories(categories models.Category) (models.Category, error)
+	EditCategoriesById(id int, newCategories models.Category) (models.Category, error)
+	DeleteCategoriesById(id int) error
+}
+
+type CategoryController struct {
+	categoryDB CategoryDB
+}
+
+func NewCategoryController(categoryDB CategoryDB) CategoryController {
+	return CategoryController{categoryDB: categoryDB}
+}
+
+func (cc *CategoryController) GetCategories(c echo.Context) error {
+	categories, err := cc.categoryDB.GetCategories()
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -30,11 +44,11 @@ func GetCategories(c echo.Context) error {
 	})
 }
 
-func AddCategories(c echo.Context) error {
+func (cc *CategoryController) AddCategories(c echo.Context) error {
 	var category models.Category
 	c.Bind(&category)
 
-	category, err := database.AddCategories(category)
+	category, err := cc.categoryDB.AddCategories(category)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -49,14 +63,14 @@ func AddCategories(c echo.Context) error {
 	})
 }
 
-func EditCategories(c echo.Context) error {
+func (cc *CategoryController) EditCategories(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	var newCategory models.Category
 	c.Bind(&newCategory)
-	newCategory, err = database.EditCategoriesById(id, newCategory)
+	newCategory, err = cc.categoryDB.EditCategoriesById(id, newCategory)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -70,13 +84,13 @@ func EditCategories(c echo.Context) error {
 	})
 }
 
-func DeleteCategories(c echo.Context) error {
+func (cc *CategoryController) DeleteCategories(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	err = database.DeleteCategoriesById(id)
+	err = cc.categoryDB.DeleteCategoriesById(id)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
