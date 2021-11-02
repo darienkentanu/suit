@@ -65,7 +65,6 @@ func (dpc *DropPointsController) EditDropPoints(c echo.Context) error {
 	var newDropPoints models.Drop_Point
 	c.Bind(&newDropPoints)
 	newDropPoints.Latitude, newDropPoints.Longitude = gmaps.Geocoding(newDropPoints.Address)
-
 	newDropPoints, err = dpc.db.EditDropPointsById(id, newDropPoints)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
