@@ -17,15 +17,15 @@ type CategoryDB interface {
 }
 
 type CategoryController struct {
-	categoryDB CategoryDB
+	db CategoryDB
 }
 
-func NewCategoryController(categoryDB CategoryDB) CategoryController {
-	return CategoryController{categoryDB: categoryDB}
+func NewCategoryController(db CategoryDB) CategoryController {
+	return CategoryController{db: db}
 }
 
 func (cc *CategoryController) GetCategories(c echo.Context) error {
-	categories, err := cc.categoryDB.GetCategories()
+	categories, err := cc.db.GetCategories()
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -48,7 +48,7 @@ func (cc *CategoryController) AddCategories(c echo.Context) error {
 	var category models.Category
 	c.Bind(&category)
 
-	category, err := cc.categoryDB.AddCategories(category)
+	category, err := cc.db.AddCategories(category)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -70,7 +70,7 @@ func (cc *CategoryController) EditCategories(c echo.Context) error {
 	}
 	var newCategory models.Category
 	c.Bind(&newCategory)
-	newCategory, err = cc.categoryDB.EditCategoriesById(id, newCategory)
+	newCategory, err = cc.db.EditCategoriesById(id, newCategory)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -90,7 +90,7 @@ func (cc *CategoryController) DeleteCategories(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	err = cc.categoryDB.DeleteCategoriesById(id)
+	err = cc.db.DeleteCategoriesById(id)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}

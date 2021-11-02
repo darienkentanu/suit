@@ -3,7 +3,6 @@ package controllers_test
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -123,7 +122,6 @@ func TestAddCategories(t *testing.T) {
 					Data   M      `json:"data"`
 				}{}
 				err := json.Unmarshal([]byte(body), &response)
-				fmt.Println("==========================", response.Data, "====================")
 				if err != nil {
 					assert.Error(t, err, "error")
 				}
