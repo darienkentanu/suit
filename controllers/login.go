@@ -4,40 +4,34 @@ import (
 	"net/http"
 
 	"github.com/darienkentanu/suit/gmaps"
+	"github.com/darienkentanu/suit/lib/database"
 	"github.com/darienkentanu/suit/middlewares"
 	"github.com/darienkentanu/suit/models"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type LoginDB interface {
-	GetEmail(string) (int)
-	GetPhoneNumber(string) (int)
-	GetUsername(string) (int)
-	GetAccountByEmailOrUsername(requestLogin models.RequestLogin) (models.Login, error)
-	UpdateToken(id int, token string) (models.Login, error)
-	GetUserProfile(id int) (models.ResponseGetUser, error)
-	UpdateUser(id int, user models.User) (models.User, error)
-	UpdateLogin(id int, login models.Login) (models.Login, error)
-}
-
 type LoginController struct {
-	db LoginDB
+	userModel	database.UserModel
+	loginModel	database.LoginModel
 }
 
-func NewLoginController(db LoginDB) LoginController {
-	return LoginController{db: db}
+func NewLoginController(userModel database.UserModel, loginModel database.LoginModel) *LoginController {
+	return &LoginController{
+		userModel: userModel,
+		loginModel: loginModel,
+	}
 }
 
 
-func (lc *LoginController) Login(c echo.Context) error {
+func (controllers *LoginController) Login(c echo.Context) error {
 	var requestLogin models.RequestLogin
 	
 	if err := c.Bind(&requestLogin); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid input")
 	}
 
-	account, err := lc.db.GetAccountByEmailOrUsername(requestLogin)
+	account, err := controllers.loginModel.GetAccountByEmailOrUsername(requestLogin)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Incorrect email or username")
 	}
@@ -61,7 +55,7 @@ func (lc *LoginController) Login(c echo.Context) error {
 	}
 
 	account.Token = newToken
-	account, err = lc.db.UpdateToken(int(account.ID), newToken)
+	account, err = controllers.loginModel.UpdateToken(int(account.ID), newToken)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Cannot add token")
 	}
@@ -83,10 +77,10 @@ func CheckPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-func (lc *LoginController) GetProfile(c echo.Context) error {
+func (controllers *LoginController) GetProfile(c echo.Context) error {
 	// role := middlewares.CurrentRoleLoginUser(c)
 	id := middlewares.CurrentLoginUser(c)
-	user, err := lc.db.GetUserProfile(id)
+	user, err := controllers.userModel.GetUserProfile(id)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
@@ -98,7 +92,7 @@ func (lc *LoginController) GetProfile(c echo.Context) error {
 	})
 }
 
-func (lc *LoginController) UpdateProfile(c echo.Context) error {
+func (controllers *LoginController) UpdateProfile(c echo.Context) error {
 	var newProfile models.RegisterUser
 
 	id := middlewares.CurrentLoginUser(c)
@@ -107,17 +101,17 @@ func (lc *LoginController) UpdateProfile(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid input")
 	}
 
-	row := lc.db.GetEmail(newProfile.Email)
+	row := controllers.loginModel.GetEmail(newProfile.Email)
 	if row > 1 {
 		return echo.NewHTTPError(http.StatusBadRequest, "Email is already registered")
 	}
 
-	row = lc.db.GetPhoneNumber(newProfile.PhoneNumber)
+	row = controllers.userModel.GetPhoneNumber(newProfile.PhoneNumber)
 	if row > 1 {
 		return echo.NewHTTPError(http.StatusBadRequest, "Phone number is already registered")
 	}
 
-	row = lc.db.GetUsername(newProfile.Username)
+	row = controllers.loginModel.GetUsername(newProfile.Username)
 	if row > 1 {
 		return echo.NewHTTPError(http.StatusBadRequest, "Username is already registered")
 	}
@@ -137,7 +131,7 @@ func (lc *LoginController) UpdateProfile(c echo.Context) error {
 	user.Latitude		= lat
 	user.Longitude		= lng
 
-	user, err = lc.db.UpdateUser(id, user)
+	user, err = controllers.userModel.UpdateUser(id, user)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -147,7 +141,7 @@ func (lc *LoginController) UpdateProfile(c echo.Context) error {
 	login.Username = newProfile.Username
 	login.Password = hashPassword
 
-	login, err = lc.db.UpdateLogin(id, login)
+	login, err = controllers.loginModel.UpdateLogin(id, login)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

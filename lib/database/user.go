@@ -16,24 +16,33 @@ func NewUserDB(db *gorm.DB, dbSQL *sql.DB) *UserDB {
 	return &UserDB{db: db, dbSQL: dbSQL}
 }
 
-func (udb *UserDB) GetPhoneNumber(number string) int {
+type UserModel interface {
+	GetPhoneNumber(string) (int)
+	CreateUser(user models.User) (models.User, error)
+	GetAllUsers() ([]models.ResponseGetUser, error)
+	UpdateUser(id int, newUser models.User) (models.User, error)
+	CreateCart(cart models.Cart) (error)
+	GetUserProfile(id int) (interface{}, error)
+}
+
+func (m *UserDB) GetPhoneNumber(number string) int {
 	var user models.User
-	row := udb.db.Where("phone_number = ?", number).Find(&user).RowsAffected
+	row := m.db.Where("phone_number = ?", number).Find(&user).RowsAffected
 	return int(row)
 }
 
-func (udb *UserDB) CreateUser(user models.User) (models.User, error) {
-	if err := udb.db.Save(&user).Error; err != nil {
+func (m *UserDB) CreateUser(user models.User) (models.User, error) {
+	if err := m.db.Save(&user).Error; err != nil {
 		return user, err
 	}
 
 	return user, nil
 }
 
-func (udb *UserDB) GetAllUsers() ([]models.ResponseGetUser, error) {
+func (m *UserDB) GetAllUsers() ([]models.ResponseGetUser, error) {
 	var users []models.ResponseGetUser
 
-	rows, err := udb.dbSQL.Query("SELECT u.id, u.fullname, l.email, l.username, u.phone_number, u.gender, u.address, l.role FROM users u JOIN logins l ON u.id = l.user_id")
+	rows, err := m.dbSQL.Query("SELECT u.id, u.fullname, l.email, l.username, u.phone_number, u.gender, u.address, l.role FROM users u JOIN logins l ON u.id = l.user_id")
 	if err != nil {
 		return nil, err
 	}
@@ -50,10 +59,10 @@ func (udb *UserDB) GetAllUsers() ([]models.ResponseGetUser, error) {
 	return users, nil
 }
 
-func (udb *UserDB) UpdateUser(id int, newUser models.User) (models.User, error) {
+func (m *UserDB) UpdateUser(id int, newUser models.User) (models.User, error) {
 	var user models.User
 
-	if err := udb.db.First(&user, id).Error; err != nil {
+	if err := m.db.First(&user, id).Error; err != nil {
 		return user, err
 	}
 
@@ -61,15 +70,15 @@ func (udb *UserDB) UpdateUser(id int, newUser models.User) (models.User, error) 
 	user.PhoneNumber = newUser.PhoneNumber
 	user.Gender = newUser.Gender
 	user.Address = newUser.Address
-	if err := udb.db.Save(&user).Error; err != nil {
+	if err := m.db.Save(&user).Error; err != nil {
 		return user, err
 	}
 
 	return user, nil
 }
 
-func (udb *UserDB) GetUserProfile(id int) (interface{}, error) {
-	rows, err := udb.dbSQL.Query("SELECT u.id, u.fullname, l.email, l.username, u.phone_number, u.gender, u.address, l.role FROM users u JOIN logins l ON u.id = l.user_id WHERE user_id = ?", id)
+func (m *UserDB) GetUserProfile(id int) (interface{}, error) {
+	rows, err := m.dbSQL.Query("SELECT u.id, u.fullname, l.email, l.username, u.phone_number, u.gender, u.address, l.role FROM users u JOIN logins l ON u.id = l.user_id WHERE user_id = ?", id)
 	if err != nil {
 		return nil, err
 	}
@@ -87,8 +96,8 @@ func (udb *UserDB) GetUserProfile(id int) (interface{}, error) {
 	return nil, nil
 }
 
-func (udb *UserDB) CreateCart(cart models.Cart) error {
-	if err := udb.db.Save(&cart).Error; err != nil {
+func (m *UserDB) CreateCart(cart models.Cart) error {
+	if err := m.db.Save(&cart).Error; err != nil {
 		return err
 	}
 	return nil

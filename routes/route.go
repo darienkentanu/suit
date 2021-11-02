@@ -3,8 +3,6 @@ package routes
 import (
 	"database/sql"
 
-	"github.com/darienkentanu/suit/controllers"
-	"github.com/darienkentanu/suit/middlewares"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )

@@ -12,11 +12,13 @@ import (
 
 func userRoute(e *echo.Echo, db *gorm.DB, dbSQL *sql.DB) {
 	udb := database.NewUserDB(db, dbSQL)
-	uc := controllers.NewUserController(udb)
-	e.POST("/register", controllers.RegisterUsersController)
-	e.POST("/login", controllers.LoginController)
+	ldb := database.NewLoginDB(db)
+	uc := controllers.NewUserController(udb, ldb)
+	lc := controllers.NewLoginController(udb, ldb)
+	e.POST("/register", uc.RegisterUsers)
+	e.POST("/login", lc.Login)
 
-	e.GET("/users", controllers.GetAllUsersController, middlewares.IsLoggedIn)
-	e.GET("/profile", controllers.GetProfileController, middlewares.IsLoggedIn)
-	e.PUT("/profile", controllers.UpdateProfileController, middlewares.IsLoggedIn)
+	e.GET("/users", uc.GetAllUsers, middlewares.IsLoggedIn)
+	e.GET("/profile", lc.GetProfile, middlewares.IsLoggedIn)
+	e.PUT("/profile", lc.UpdateProfile, middlewares.IsLoggedIn)
 }
