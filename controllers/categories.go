@@ -11,10 +11,10 @@ import (
 )
 
 type CategoryController struct {
-	db database.LibCategoryDB
+	db database.CategoryModel
 }
 
-func NewCategoryController(db database.LibCategoryDB) CategoryController {
+func NewCategoryController(db database.CategoryModel) CategoryController {
 	return CategoryController{db: db}
 }
 

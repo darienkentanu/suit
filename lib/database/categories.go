@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type LibCategoryDB interface {
+type CategoryModel interface {
 	GetCategories() ([]models.Category, error)
 	AddCategories(categories models.Category) (models.Category, error)
 	EditCategoriesById(id int, newCategories models.Category) (models.Category, error)
