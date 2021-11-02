@@ -20,6 +20,7 @@ type LoginModel interface {
 	GetAccountByEmailOrUsername(requestLogin models.RequestLogin) (models.Login, error)
 	UpdateToken(id int, token string) (models.Login, error)
 	UpdateLogin(id int, login models.Login) (models.Login, error)
+	CreateLoginStaff(login models.Login) (models.Login, error)
 }
 
 func (m *LoginDB) GetEmail(email string) int {
@@ -36,6 +37,14 @@ func (m *LoginDB) GetUsername(username string) int {
 
 func (m *LoginDB) CreateLogin(login models.Login) (models.Login, error) {
 	if err := m.db.Select("email", "username", "password", "role", "user_id").Create(&login).Error; err != nil {
+		return login, err
+	}
+
+	return login, nil
+}
+
+func (m *LoginDB) CreateLoginStaff(login models.Login) (models.Login, error) {
+	if err := m.db.Select("email", "username", "password", "role", "staff_id").Create(&login).Error; err != nil {
 		return login, err
 	}
 

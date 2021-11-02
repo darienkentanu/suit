@@ -21,7 +21,6 @@ type UserModel interface {
 	CreateUser(user models.User) (models.User, error)
 	GetAllUsers() ([]models.ResponseGetUser, error)
 	UpdateUser(id int, newUser models.User) (models.User, error)
-	CreateCart(cart models.Cart) (error)
 	GetUserProfile(id int) (interface{}, error)
 }
 
@@ -94,11 +93,4 @@ func (m *UserDB) GetUserProfile(id int) (interface{}, error) {
 	}
 
 	return nil, nil
-}
-
-func (m *UserDB) CreateCart(cart models.Cart) error {
-	if err := m.db.Save(&cart).Error; err != nil {
-		return err
-	}
-	return nil
 }
