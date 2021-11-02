@@ -20,3 +20,13 @@ type RegisterStaff struct {
 	PhoneNumber string	`json:"phone_number" form:"phone_number"`
 	DropPointID	int		`json:"drop_point_id" form:"drop_point_id"`
 }
+
+type ResponseGetStaff struct {
+	ID			int		`json:"id"`
+	Fullname    string 	`json:"fullname"`
+	Email     	string 	`json:"email"`
+	Username  	string 	`json:"username"`
+	PhoneNumber string 	`json:"phone_number"`
+	Role		string	`json:"role"`
+	DropPointID	int		`json:"drop_point_id"`
+}

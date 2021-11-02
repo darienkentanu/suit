@@ -29,13 +29,3 @@ type ResponseLogin struct {
 	Role		string	`json:"role"`
 	Token		string	`json:"token"`
 }
-
-type ResponseGetStaff struct {
-	ID			int		`json:"id"`
-	Fullname    string 	`json:"fullname"`
-	Email     	string 	`json:"email"`
-	Username  	string 	`json:"username"`
-	PhoneNumber string 	`json:"phone_number"`
-	Role		string	`json:"role"`
-	DropPointID	int		`json:"drop_point_id"`
-}

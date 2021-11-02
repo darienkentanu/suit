@@ -118,7 +118,6 @@ func TestGetProfile(t *testing.T) {
 	userDB := database.NewUserDB(db, dbSQL)
 	loginDB := database.NewLoginDB(db)
 	loginControllers := NewLoginController(userDB, loginDB)
-	// userControllers := NewUserController(userDB, loginDB)
 	InsertDataUser(db)
 
 	for _, testCase := range testCases {

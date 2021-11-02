@@ -103,7 +103,8 @@ func TestRegisterUser(t *testing.T) {
 	UserSetup(db)
 	userDB := database.NewUserDB(db, dbSQL)
 	loginDB := database.NewLoginDB(db)
-	controllers := NewUserController(userDB, loginDB)
+	cartDB := database.NewCartDB(db)
+	controllers := NewUserController(userDB, loginDB, cartDB)
 	InsertDataUser(db)
 
 	for _, testCase := range testCases {
@@ -157,7 +158,8 @@ func TestGetAllUsers(t *testing.T) {
 	UserSetup(db)
 	userDB := database.NewUserDB(db, dbSQL)
 	loginDB := database.NewLoginDB(db)
-	controllers := NewUserController(userDB, loginDB)
+	cartDB := database.NewCartDB(db)
+	controllers := NewUserController(userDB, loginDB, cartDB)
 	InsertDataUser(db)
 
 	for _, testCase := range testCases {
