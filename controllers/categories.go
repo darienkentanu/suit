@@ -14,8 +14,8 @@ type CategoryController struct {
 	db database.CategoryModel
 }
 
-func NewCategoryController(db database.CategoryModel) CategoryController {
-	return CategoryController{db: db}
+func NewCategoryController(db database.CategoryModel) *CategoryController {
+	return &CategoryController{db: db}
 }
 
 func (cc *CategoryController) GetCategories(c echo.Context) error {
