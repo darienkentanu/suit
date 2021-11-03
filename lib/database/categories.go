@@ -12,6 +12,7 @@ type CategoryModel interface {
 	AddCategories(categories models.Category) (models.Category, error)
 	EditCategoriesById(id int, newCategories models.Category) (models.Category, error)
 	DeleteCategoriesById(id int) error
+	GetCategoryById(id int) (models.Category, error)
 }
 
 type CategoryDB struct {
@@ -59,11 +60,11 @@ func (cdb *CategoryDB) DeleteCategoriesById(id int) error {
 	return nil
 }
 
-// func (cdb *CategoryDB) GetCategoryId(id int) (models.Category, error) {
-// 	var category models.Category
-// 	err := cdb.db.Where("id = ?", id).First(&category).Error
-// 	if err != nil {
-// 		return category, err
-// 	}
-// 	return category, nil
-// }
+func (cdb *CategoryDB) GetCategoryById(id int) (models.Category, error) {
+	var category models.Category
+	err := cdb.db.Where("id = ?", id).First(&category).Error
+	if err != nil {
+		return category, err
+	}
+	return category, nil
+}

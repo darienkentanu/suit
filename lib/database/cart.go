@@ -21,6 +21,7 @@ type CartModel interface {
 	GetCartItem(userID int) ([]models.CartItem, error)
 	EditCartItem(cartID int, input models.CartItem_Input) (models.CartItem, error)
 	DeleteCartItem(cardID int) error
+	GetCartItemByCheckoutID(checkoutID int) ([]models.CartItem, error)
 	CheckCartByCategoryID(int, int) bool
 	AddCartWeight(int, models.CartItem_Input) (models.CartItem, error)
 }
@@ -68,6 +69,14 @@ func (cdb *CartDB) DeleteCartItem(cardID int) error {
 	return nil
 }
 
+func (cdb *CartDB) GetCartItemByCheckoutID(checkoutID int) ([]models.CartItem, error) {
+	var cartItems []models.CartItem
+	if err := cdb.db.Find(&cartItems, "checkout_id = ?", checkoutID).Error; err != nil {
+		return nil, err
+	}
+	return cartItems, nil
+}
+
 func (cdb *CartDB) CheckCartByCategoryID(Userid int, categoryID int) bool {
 	var cartItem models.CartItem
 	row := cdb.db.First(&cartItem, "cart_user_id = ?", Userid, "category_id = ?", categoryID, "checkout_id = null").RowsAffected
@@ -88,3 +97,4 @@ func (cdb *CartDB) AddCartWeight(userID int, input models.CartItem_Input) (model
 	}
 	return cartItem, nil
 }
+

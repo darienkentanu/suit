@@ -21,7 +21,7 @@ type UserModel interface {
 	CreateUser(user models.User) (models.User, error)
 	GetAllUsers() ([]models.ResponseGetUser, error)
 	UpdateUser(id int, newUser models.User) (models.User, error)
-	GetUserProfile(id int) (interface{}, error)
+	GetUserProfile(id int) (models.ResponseGetUser, error)
 	GetUserByID(userID int) (models.User, error)
 	UpdatePoint(userID int, newPoint int) (models.User, error)
 }
@@ -78,23 +78,21 @@ func (m *UserDB) UpdateUser(id int, newUser models.User) (models.User, error) {
 	return user, nil
 }
 
-func (m *UserDB) GetUserProfile(id int) (interface{}, error) {
+func (m *UserDB) GetUserProfile(id int) (models.ResponseGetUser, error) {
+	var account models.ResponseGetUser
 	rows, err := m.dbSQL.Query("SELECT u.id, u.fullname, l.email, l.username, u.point, u.phone_number, u.gender, u.address, l.role FROM users u JOIN logins l ON u.id = l.user_id WHERE user_id = ?", id)
 	if err != nil {
-		return nil, err
+		return account, err
 	}
 	defer rows.Close()
 	
 	for rows.Next() {
-		var account models.ResponseGetUser
 		if err := rows.Scan(&account.ID, &account.Fullname, &account.Email, &account.Username, &account.Point, &account.PhoneNumber, &account.Gender, &account.Address, &account.Role); err != nil {
-			return nil, err
-		}
-		
-		return account, nil
+			return account, err
+		}		
 	}
 
-	return nil, nil
+	return account, nil
 }
 
 func (m *UserDB) UpdatePoint(userID int, newPoint int) (models.User, error) {
