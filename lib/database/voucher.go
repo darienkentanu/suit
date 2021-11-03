@@ -12,6 +12,7 @@ type VoucherModel interface {
 	AddVouchers(voucher models.Voucher) (models.Voucher, error)
 	EditVouchersById(id int, newVoucher models.Voucher) (models.Voucher, error)
 	DeleteVouchersById(id int) error
+	GetVoucherByID(voucherID int) (models.Voucher, error)
 }
 
 type VoucherDB struct {
@@ -57,4 +58,13 @@ func (vdb *VoucherDB) DeleteVouchersById(id int) error {
 		return err
 	}
 	return nil
+}
+
+func (vdb *VoucherDB) GetVoucherByID(voucherID int) (models.Voucher, error) {
+	var voucher models.Voucher
+	if err := vdb.db.First(&voucher, voucherID).Error; err != nil {
+		return voucher, err
+	}
+
+	return voucher, nil
 }
