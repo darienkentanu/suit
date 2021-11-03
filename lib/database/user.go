@@ -22,6 +22,8 @@ type UserModel interface {
 	GetAllUsers() ([]models.ResponseGetUser, error)
 	UpdateUser(id int, newUser models.User) (models.User, error)
 	GetUserProfile(id int) (interface{}, error)
+	GetUserByID(userID int) (models.User, error)
+	UpdatePoint(userID int, newPoint int) (models.User, error)
 }
 
 func (m *UserDB) GetPhoneNumber(number string) int {
@@ -41,7 +43,7 @@ func (m *UserDB) CreateUser(user models.User) (models.User, error) {
 func (m *UserDB) GetAllUsers() ([]models.ResponseGetUser, error) {
 	var users []models.ResponseGetUser
 
-	rows, err := m.dbSQL.Query("SELECT u.id, u.fullname, l.email, l.username, u.phone_number, u.gender, u.address, l.role FROM users u JOIN logins l ON u.id = l.user_id")
+	rows, err := m.dbSQL.Query("SELECT u.id, u.fullname, l.email, l.username, u.point, u.phone_number, u.gender, u.address, l.role FROM users u JOIN logins l ON u.id = l.user_id")
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +51,7 @@ func (m *UserDB) GetAllUsers() ([]models.ResponseGetUser, error) {
 	
 	for rows.Next() {
 		var user models.ResponseGetUser
-		if err := rows.Scan(&user.ID, &user.Fullname, &user.Email, &user.Username, &user.PhoneNumber, &user.Gender, &user.Address, &user.Role); err != nil {
+		if err := rows.Scan(&user.ID, &user.Fullname, &user.Email, &user.Username, &user.Point, &user.PhoneNumber, &user.Gender, &user.Address, &user.Role); err != nil {
 			return nil, err
 		}
 		users = append(users, user)
@@ -77,7 +79,7 @@ func (m *UserDB) UpdateUser(id int, newUser models.User) (models.User, error) {
 }
 
 func (m *UserDB) GetUserProfile(id int) (interface{}, error) {
-	rows, err := m.dbSQL.Query("SELECT u.id, u.fullname, l.email, l.username, u.phone_number, u.gender, u.address, l.role FROM users u JOIN logins l ON u.id = l.user_id WHERE user_id = ?", id)
+	rows, err := m.dbSQL.Query("SELECT u.id, u.fullname, l.email, l.username, u.point, u.phone_number, u.gender, u.address, l.role FROM users u JOIN logins l ON u.id = l.user_id WHERE user_id = ?", id)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +87,7 @@ func (m *UserDB) GetUserProfile(id int) (interface{}, error) {
 	
 	for rows.Next() {
 		var account models.ResponseGetUser
-		if err := rows.Scan(&account.ID, &account.Fullname, &account.Email, &account.Username, &account.PhoneNumber, &account.Gender, &account.Address, &account.Role); err != nil {
+		if err := rows.Scan(&account.ID, &account.Fullname, &account.Email, &account.Username, &account.Point, &account.PhoneNumber, &account.Gender, &account.Address, &account.Role); err != nil {
 			return nil, err
 		}
 		
@@ -93,4 +95,26 @@ func (m *UserDB) GetUserProfile(id int) (interface{}, error) {
 	}
 
 	return nil, nil
+}
+
+func (m *UserDB) UpdatePoint(userID int, newPoint int) (models.User, error) {
+	var user models.User
+	if err := m.db.First(&user, userID).Error; err != nil {
+		return user, err
+	}
+
+	if err := m.db.Model(&user).Update("point", newPoint).Error; err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
+func (m *UserDB) GetUserByID(userID int) (models.User, error) {
+	var user models.User
+	if err := m.db.First(&user, userID).Error; err != nil {
+		return user, err
+	}
+
+	return user, nil
 }
