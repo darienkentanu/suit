@@ -22,6 +22,8 @@ type CartModel interface {
 	EditCartItem(cartID int, input models.CartItem_Input) (models.CartItem, error)
 	DeleteCartItem(cardID int) error
 	GetCartItemByCheckoutID(checkoutID int) ([]models.CartItem, error)
+	CheckCartByCategoryID(int, int) bool
+	AddCartWeight(int, models.CartItem_Input) (models.CartItem, error)
 }
 
 func (cdb *CartDB) CreateCart(cart models.Cart) error {
@@ -52,11 +54,9 @@ func (cdb *CartDB) GetCartItem(userID int) ([]models.CartItem, error) {
 
 func (cdb *CartDB) EditCartItem(cartID int, input models.CartItem_Input) (models.CartItem, error) {
 	var cartItems models.CartItem
-	if err := cdb.db.First(&cartItems, cartID).Error; err != nil {
+	if err := cdb.db.First(&cartItems, cartID).Update("weight", input.Weight).Error; err != nil {
 		return cartItems, err
 	}
-	cartItems.Weight = input.Weight
-	cartItems.CategoryID = input.CategoryID
 	return cartItems, nil
 }
 
@@ -76,3 +76,25 @@ func (cdb *CartDB) GetCartItemByCheckoutID(checkoutID int) ([]models.CartItem, e
 	}
 	return cartItems, nil
 }
+
+func (cdb *CartDB) CheckCartByCategoryID(Userid int, categoryID int) bool {
+	var cartItem models.CartItem
+	row := cdb.db.First(&cartItem, "cart_user_id = ?", Userid, "category_id = ?", categoryID, "checkout_id = null").RowsAffected
+	if row == 1 {
+		return true
+	}
+	return false
+}
+
+func (cdb *CartDB) AddCartWeight(userID int, input models.CartItem_Input) (models.CartItem, error) {
+	var cartItem models.CartItem
+	if err := cdb.db.Where("cart_user_id = ? and category_id = ? and checkout_id IS NULL", userID, input.CategoryID).First(&cartItem).Error; err != nil {
+		return cartItem, err
+	}
+	updatedWeight := input.Weight + cartItem.Weight
+	if err := cdb.db.Model(&cartItem).Update("weight", updatedWeight).Error; err != nil {
+		return cartItem, err
+	}
+	return cartItem, nil
+}
+
