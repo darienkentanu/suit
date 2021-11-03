@@ -14,13 +14,14 @@ func NewLoginDB(db *gorm.DB) *LoginDB {
 }
 
 type LoginModel interface {
-	GetEmail(string) (int)
-	GetUsername(string) (int)
+	GetEmail(string) int
+	GetUsername(string) int
 	CreateLogin(login models.Login) (models.Login, error)
 	GetAccountByEmailOrUsername(requestLogin models.RequestLogin) (models.Login, error)
 	UpdateToken(id int, token string) (models.Login, error)
 	UpdateLogin(id int, login models.Login) (models.Login, error)
 	CreateLoginStaff(login models.Login) (models.Login, error)
+	GetLoginByUserID(userID int) (models.Login, error)
 }
 
 func (m *LoginDB) GetEmail(email string) int {
@@ -81,15 +82,24 @@ func (m *LoginDB) UpdateLogin(id int, newLogin models.Login) (models.Login, erro
 		return login, err
 	}
 
-	login.Email 	= newLogin.Email
-	login.Username	= newLogin.Username
-	login.Password	= newLogin.Password
+	login.Email = newLogin.Email
+	login.Username = newLogin.Username
+	login.Password = newLogin.Password
 
 	if err := m.db.Model(&login).Updates(models.Login{
-		Email: login.Email,
+		Email:    login.Email,
 		Username: login.Username,
 		Password: login.Password,
 	}).Error; err != nil {
+		return login, err
+	}
+
+	return login, nil
+}
+
+func (m *LoginDB) GetLoginByUserID(userID int) (models.Login, error) {
+	var login models.Login
+	if err := m.db.Where("user_id = ?", userID).First(&login).Error; err != nil {
 		return login, err
 	}
 

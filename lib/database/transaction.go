@@ -8,7 +8,7 @@ import (
 )
 
 type TransactionDB struct {
-	db *gorm.DB
+	db    *gorm.DB
 	dbSQL *sql.DB
 }
 
@@ -19,6 +19,7 @@ func NewTransactionDB(db *gorm.DB, dbSQL *sql.DB) *TransactionDB {
 type TransactionModel interface {
 	GetAllTransaction() ([]models.Transaction, error)
 	CreateTransaction(transaction models.Transaction) (models.Transaction, error)
+	UpdateStatusTransaction(transactionID int) (models.Transaction, error)
 }
 
 func (m *TransactionDB) GetAllTransaction() ([]models.Transaction, error) {
@@ -37,5 +38,13 @@ func (m *TransactionDB) CreateTransaction(transaction models.Transaction) (model
 		return transaction, err
 	}
 
+	return transaction, nil
+}
+
+func (m *TransactionDB) UpdateStatusTransaction(transactionID int) (models.Transaction, error) {
+	var transaction models.Transaction
+	if err := m.db.First(&transaction, transactionID).Update("status", 1).Error; err != nil {
+		return transaction, err
+	}
 	return transaction, nil
 }

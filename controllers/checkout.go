@@ -3,8 +3,10 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/darienkentanu/suit/gmaps"
+	"github.com/darienkentanu/suit/gomails"
 	"github.com/darienkentanu/suit/lib/database"
 	"github.com/darienkentanu/suit/middlewares"
 	"github.com/darienkentanu/suit/models"
@@ -18,9 +20,10 @@ type CheckoutController struct {
 	dropPointModel   database.DropPointsModel
 	userModel        database.UserModel
 	transactionModel database.TransactionModel
+	loginModel       database.LoginModel
 }
 
-func NewCheckoutController(checkoutModel database.CheckoutModel, cartModel database.CartModel, categoryModel database.CategoryModel, dropPointModel database.DropPointsModel, userModel database.UserModel, transactionModel database.TransactionModel) *CheckoutController {
+func NewCheckoutController(checkoutModel database.CheckoutModel, cartModel database.CartModel, categoryModel database.CategoryModel, dropPointModel database.DropPointsModel, userModel database.UserModel, transactionModel database.TransactionModel, loginModel database.LoginModel) *CheckoutController {
 	return &CheckoutController{
 		checkoutModel:    checkoutModel,
 		cartModel:        cartModel,
@@ -28,6 +31,7 @@ func NewCheckoutController(checkoutModel database.CheckoutModel, cartModel datab
 		dropPointModel:   dropPointModel,
 		userModel:        userModel,
 		transactionModel: transactionModel,
+		loginModel:       loginModel,
 	}
 }
 
@@ -247,5 +251,42 @@ func (controllers *CheckoutController) CreateCheckoutDropOff(c echo.Context) err
 	return c.JSON(http.StatusOK, M{
 		"status": "success",
 		"data":   checkoutResponse,
+	})
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (controllers *CheckoutController) Verification(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+	transaction, err := controllers.transactionModel.UpdateStatusTransaction(id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+	user, err := controllers.userModel.GetUserByID(transaction.UserID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+	// var newPoint int
+	newPoint := user.Point + transaction.Point
+	_, err = controllers.userModel.UpdatePoint(transaction.UserID, newPoint)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+	userLogin, err := controllers.loginModel.GetLoginByUserID(user.ID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+	message := fmt.Sprintf("transaksi anda telah di verifikasi detail transaksi:ID=%d\tUserID=%d\tStatus=%d\tPoint=%d\tMethod=%s\tDrop_PointID=%d\tCheckoutID=%d\tCreatedAt=%v\tUpdatedAt%v", transaction.ID, transaction.UserID, transaction.Status, transaction.Point, transaction.Method, transaction.Drop_PointID, transaction.CheckoutID, transaction.CreatedAt, transaction.UpdatedAt)
+
+	err = gomails.SendMail(userLogin.Email, message)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, M{
+		"status": "success",
+		"data":   transaction,
 	})
 }

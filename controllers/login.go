@@ -12,21 +12,20 @@ import (
 )
 
 type LoginController struct {
-	userModel	database.UserModel
-	loginModel	database.LoginModel
+	userModel  database.UserModel
+	loginModel database.LoginModel
 }
 
 func NewLoginController(userModel database.UserModel, loginModel database.LoginModel) *LoginController {
 	return &LoginController{
-		userModel: userModel,
+		userModel:  userModel,
 		loginModel: loginModel,
 	}
 }
 
-
 func (controllers *LoginController) Login(c echo.Context) error {
 	var requestLogin models.RequestLogin
-	
+
 	if err := c.Bind(&requestLogin); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid input")
 	}
@@ -124,12 +123,12 @@ func (controllers *LoginController) UpdateProfile(c echo.Context) error {
 	lat, lng := gmaps.Geocoding(newProfile.Address)
 
 	var user models.User
-	user.Fullname 		= newProfile.Fullname
-	user.PhoneNumber 	= newProfile.PhoneNumber
-	user.Gender			= newProfile.Gender
-	user.Address 		= newProfile.Address
-	user.Latitude		= lat
-	user.Longitude		= lng
+	user.Fullname = newProfile.Fullname
+	user.PhoneNumber = newProfile.PhoneNumber
+	user.Gender = newProfile.Gender
+	user.Address = newProfile.Address
+	user.Latitude = lat
+	user.Longitude = lng
 
 	user, err = controllers.userModel.UpdateUser(id, user)
 	if err != nil {
@@ -147,14 +146,14 @@ func (controllers *LoginController) UpdateProfile(c echo.Context) error {
 	}
 
 	var response models.ResponseGetUser
-	response.ID 			= id
-	response.Fullname 		= user.Fullname
-	response.Email 			= login.Email
-	response.Username 		= login.Username
-	response.PhoneNumber	= user.PhoneNumber
-	response.Gender 		= user.Gender
-	response.Address 		= user.Address
-	response.Role 			= login.Role
+	response.ID = id
+	response.Fullname = user.Fullname
+	response.Email = login.Email
+	response.Username = login.Username
+	response.PhoneNumber = user.PhoneNumber
+	response.Gender = user.Gender
+	response.Address = user.Address
+	response.Role = login.Role
 
 	return c.JSON(http.StatusOK, M{
 		"status": "success",
