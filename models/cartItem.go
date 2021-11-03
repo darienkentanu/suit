@@ -13,3 +13,8 @@ type CartItem struct {
 	Cart       Cart     `gorm:"foreignkey:CartUserID" json:"-"`
 	CreatedAt  time.Time
 }
+
+type CartItem_Input struct {
+	CategoryID int `json:"category_id" form:"category_id"`
+	Weight     int `json:"weight" form:"weight"`
+}
