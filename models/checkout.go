@@ -15,3 +15,10 @@ type Checkout_Input_DropOff struct {
 	CategoryID  []int `json:"category_id" form:"category_id"`
 	DropPointID int   `json:"drop_point_id" form:"drop_point_id"`
 }
+
+type Checkout_Response_PickUp struct {
+	Distance int
+}
+
+type Checkout_Response_DropOff struct {
+}

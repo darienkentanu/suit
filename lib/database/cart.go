@@ -79,7 +79,8 @@ func (cdb *CartDB) GetCartItemByCheckoutID(checkoutID int) ([]models.CartItem, e
 
 func (cdb *CartDB) CheckCartByCategoryID(Userid int, categoryID int) bool {
 	var cartItem models.CartItem
-	row := cdb.db.First(&cartItem, "cart_user_id = ?", Userid, "category_id = ?", categoryID, "checkout_id = null").RowsAffected
+	// row := cdb.db.First(&cartItem, "cart_user_id = ?", Userid, "category_id = ?", categoryID, "checkout_id = null").RowsAffected
+	row := cdb.db.Where("cart_user_id = ? and category_id = ? and checkout_id IS NULL", Userid, categoryID).Find(&cartItem).RowsAffected
 	if row == 1 {
 		return true
 	}
@@ -97,4 +98,3 @@ func (cdb *CartDB) AddCartWeight(userID int, input models.CartItem_Input) (model
 	}
 	return cartItem, nil
 }
-
