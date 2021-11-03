@@ -16,7 +16,8 @@ func transactionRoute(e *echo.Echo, db *gorm.DB, dbSQL *sql.DB) {
 	tdb := database.NewTransactionDB(db, dbSQL)
 	cdb := database.NewCategoryDB(db)
 	ccdb := database.NewCartDB(db)
-	tvc := controllers.NewTransactionController(tdb, cdb, ccdb)
+	dpdb := database.NewDropPointsDB(db)
+	tvc := controllers.NewTransactionController(tdb, cdb, ccdb, dpdb)
 
 	e.GET("/transactions", tvc.GetTransactions, middlewares.IsLoggedIn, middlewares.IsStaff)
 }

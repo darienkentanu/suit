@@ -12,13 +12,15 @@ type TransactionController struct {
 	transactionModel	database.TransactionModel
 	categoryModel		database.CategoryModel
 	cartModel			database.CartModel
+	dropPointModel		database.DropPointsModel
 }
 
-func NewTransactionController(transactionModel database.TransactionModel, categoryModel database.CategoryModel, cartModel database.CartModel) *TransactionController {
+func NewTransactionController(transactionModel database.TransactionModel, categoryModel database.CategoryModel, cartModel database.CartModel, dropPointModel database.DropPointsModel) *TransactionController {
 	return &TransactionController{
 		transactionModel: transactionModel,
 		categoryModel: categoryModel,
 		cartModel: cartModel,
+		dropPointModel: dropPointModel,
 	}
 }
 
@@ -53,11 +55,17 @@ func (controllers *TransactionController) GetTransactions(c echo.Context) error 
 			categories = append(categories, resCategory)
 		}
 
+		dropPoint, err := controllers.dropPointModel.GetDropPointsByID(transaction.Drop_PointID)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+		}
+
 		var resTransaction models.ResponseGetTransactions
 		resTransaction.ID = transaction.ID
 		resTransaction.UserID = transaction.UserID
 		resTransaction.Method = transaction.Method
 		resTransaction.DropPointID = transaction.Drop_PointID
+		resTransaction.DropPointAddress = dropPoint.Address
 		resTransaction.Point = transaction.Point
 		resTransaction.Categories = categories
 

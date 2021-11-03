@@ -12,6 +12,7 @@ type DropPointsModel interface {
 	AddDropPoints(dropPoints models.Drop_Point) (models.Drop_Point, error)
 	EditDropPointsById(id int, newDropPoints models.Drop_Point) (models.Drop_Point, error)
 	DeleteDropPointsById(id int) error
+	GetDropPointsByID(id int) (models.Drop_Point, error)
 }
 
 type DropPointsDB struct {
@@ -61,11 +62,12 @@ func (dpdb *DropPointsDB) DeleteDropPointsById(id int) error {
 	return nil
 }
 
-// func (cdb *CategoryDB) GetCategoryId(id int) (models.Category, error) {
-// 	var category models.Category
-// 	err := cdb.db.Where("id = ?", id).First(&category).Error
-// 	if err != nil {
-// 		return category, err
-// 	}
-// 	return category, nil
-// }
+func (dpdb *DropPointsDB) GetDropPointsByID(id int) (models.Drop_Point, error) {
+	var dropPoint models.Drop_Point
+	err := dpdb.db.Where("id = ?", id).First(&dropPoint).Error
+	if err != nil {
+		return dropPoint, err
+	}
+	return dropPoint, nil
+}
+
