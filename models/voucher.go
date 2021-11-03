@@ -9,3 +9,9 @@ type Voucher struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+type Voucher_Response struct {
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Point int    `json:"point"`
+}
