@@ -12,21 +12,21 @@ import (
 )
 
 type CheckoutController struct {
-	checkoutModel		database.CheckoutModel
-	cartModel			database.CartModel
-	categoryModel		database.CategoryModel
-	dropPointModel		database.DropPointsModel
-	userModel			database.UserModel
-	transactionModel	database.TransactionModel
+	checkoutModel    database.CheckoutModel
+	cartModel        database.CartModel
+	categoryModel    database.CategoryModel
+	dropPointModel   database.DropPointsModel
+	userModel        database.UserModel
+	transactionModel database.TransactionModel
 }
 
 func NewCheckoutController(checkoutModel database.CheckoutModel, cartModel database.CartModel, categoryModel database.CategoryModel, dropPointModel database.DropPointsModel, userModel database.UserModel, transactionModel database.TransactionModel) *CheckoutController {
 	return &CheckoutController{
-		checkoutModel: checkoutModel,
-		cartModel: cartModel,
-		categoryModel: categoryModel,
-		dropPointModel: dropPointModel,
-		userModel: userModel,
+		checkoutModel:    checkoutModel,
+		cartModel:        cartModel,
+		categoryModel:    categoryModel,
+		dropPointModel:   dropPointModel,
+		userModel:        userModel,
 		transactionModel: transactionModel,
 	}
 }
@@ -53,6 +53,9 @@ func (controllers *CheckoutController) CreateCheckoutPickup(c echo.Context) erro
 
 		var resCategory models.ResponseGetCategory
 		category, err := controllers.categoryModel.GetCategoryById(categoryID)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err)
+		}
 		resCategory.ID = category.ID
 		resCategory.Name = category.Name
 		resCategory.Point = category.Point
