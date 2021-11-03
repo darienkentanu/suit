@@ -22,7 +22,7 @@ type CartModel interface {
 	EditCartItem(cartID int, input models.CartItem_Input) (models.CartItem, error)
 	DeleteCartItem(cardID int) error
 	GetCartItemByCheckoutID(checkoutID int) ([]models.CartItem, error)
-	CheckCartByCategoryID(int, int) bool
+	CheckCartByCategoryID(Userid int, categoryID int) bool
 	AddCartWeight(int, models.CartItem_Input) (models.CartItem, error)
 	GetItemInCart(userID, categoryID int) (models.CartItem, error)
 	UpdateCheckoutIdInCartItem(checkoutID, userID, categoryID int) (models.CartItem, error)

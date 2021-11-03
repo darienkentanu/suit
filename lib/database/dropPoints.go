@@ -70,4 +70,3 @@ func (dpdb *DropPointsDB) GetDropPointsByID(id int) (models.Drop_Point, error) {
 	}
 	return dropPoint, nil
 }
-

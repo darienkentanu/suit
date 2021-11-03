@@ -21,6 +21,6 @@ func checkout(e *echo.Echo, db *gorm.DB, dbSQL *sql.DB) {
 
 	cc := controllers.NewCheckoutController(cdb, crdb, ctdb, dpdb, udb, tdb)
 	e.POST("/checkoutbypickup", cc.CreateCheckoutPickup, middlewares.IsLoggedIn, middlewares.IsUser)
-	// e.POST("/checkoutbypickup", cc.checkoutByPickUp, middlewares.IsLoggedIn, middlewares.IsUser)
+	e.POST("/checkoutbydropoff", cc.CreateCheckoutDropOff, middlewares.IsLoggedIn, middlewares.IsUser)
 	// e.PUT("/verification/:id", cc.verification, middlewares.IsLoggedIn, middlewares.IsStaff)
 }

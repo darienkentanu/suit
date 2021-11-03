@@ -17,8 +17,8 @@ type Category_Response struct {
 }
 
 type ResponseGetCategory struct {
-	ID		int		`json:"category_id"`
-	Name	string	`json:"category_name"`
-	Point	int		`json:"category_point"`
-	Weight	int		`json:"weight"`
+	ID     int    `json:"category_id"`
+	Name   string `json:"category_name"`
+	Point  int    `json:"category_point"`
+	Weight int    `json:"weight"`
 }

@@ -44,17 +44,22 @@ func (controllers *CheckoutController) CreateCheckoutPickup(c echo.Context) erro
 	var categoryIDSelected []int // berupa category id yg dipilih
 	var categories []models.ResponseGetCategory
 	for _, categoryID := range checkout.CategoryID {
-		item, err := controllers.cartModel.GetItemInCart(userID, categoryID)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+		exist := controllers.cartModel.CheckCartByCategoryID(userID, categoryID)
+		if !exist {
+			continue
 		}
 
-		categoryIDSelected = append(categoryIDSelected, item.CategoryID)
+		categoryIDSelected = append(categoryIDSelected, categoryID)
 
 		var resCategory models.ResponseGetCategory
 		category, err := controllers.categoryModel.GetCategoryById(categoryID)
 		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, err)
+			return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+		}
+
+		item, err := controllers.cartModel.GetItemInCart(userID, categoryID)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 		}
 		resCategory.ID = category.ID
 		resCategory.Name = category.Name
@@ -145,6 +150,97 @@ func (controllers *CheckoutController) CreateCheckoutPickup(c echo.Context) erro
 	checkoutResponse.DropPointAddress = dropPointAddress[minDropPointID]
 	checkoutResponse.Distance = minDistance
 	checkoutResponse.Duration = dropPointDuration[minDropPointID]
+	checkoutResponse.TotalPoint = totalPoint
+	checkoutResponse.Categories = categories
+
+	return c.JSON(http.StatusOK, M{
+		"status": "success",
+		"data":   checkoutResponse,
+	})
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (controllers *CheckoutController) CreateCheckoutDropOff(c echo.Context) error {
+	var checkout models.Checkout_Input_DropOff
+	c.Bind(&checkout)
+
+	userID := middlewares.CurrentLoginUser(c)
+	// id category yang ingin di checkout dan terdapat pada cart
+	var categoryIDSelected []int
+	var categories []models.ResponseGetCategory
+	for _, categoryID := range checkout.CategoryID {
+		if exist := controllers.cartModel.CheckCartByCategoryID(userID, categoryID); !exist {
+			continue
+		}
+		categoryIDSelected = append(categoryIDSelected, categoryID)
+
+		var resCategory models.ResponseGetCategory
+		category, err := controllers.categoryModel.GetCategoryById(categoryID)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+		}
+
+		item, err := controllers.cartModel.GetItemInCart(userID, categoryID)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+		}
+		resCategory.ID = category.ID
+		resCategory.Name = category.Name
+		resCategory.Point = category.Point
+		resCategory.Weight = item.Weight
+
+		categories = append(categories, resCategory)
+	}
+
+	if len(categoryIDSelected) == 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, "Category is not exist in cart")
+	}
+
+	checkoutID, err := controllers.checkoutModel.AddCheckout()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+	}
+
+	for _, categoryID := range categoryIDSelected {
+		_, err := controllers.cartModel.UpdateCheckoutIdInCartItem(checkoutID, userID, categoryID)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+		}
+	}
+
+	var totalPoint int
+	for _, resCategory := range categories {
+		weight := resCategory.Weight
+		point := resCategory.Point
+
+		totalPointItem := weight * point
+
+		totalPoint += totalPointItem
+	}
+
+	var transaction models.Transaction
+	transaction.UserID = userID
+	transaction.Point = totalPoint
+	transaction.Method = "dropoff"
+	transaction.CheckoutID = checkoutID
+	transaction.Drop_PointID = checkout.DropPointID
+
+	transaction, err = controllers.transactionModel.CreateTransaction(transaction)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+	}
+
+	dropPoint, err := controllers.dropPointModel.GetDropPointsByID(checkout.DropPointID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+	}
+
+	var checkoutResponse models.Checkout_Response_DropOff
+	checkoutResponse.TransactionID = transaction.ID
+	checkoutResponse.Method = transaction.Method
+	checkoutResponse.DropPointID = transaction.Drop_PointID
+	checkoutResponse.DropPointAddress = dropPoint.Address
 	checkoutResponse.TotalPoint = totalPoint
 	checkoutResponse.Categories = categories
 

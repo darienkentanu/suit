@@ -17,15 +17,21 @@ type Checkout_Input_DropOff struct {
 }
 
 type Checkout_Response_PickUp struct {
-	TransactionID		int						`json:"transaction_id"`
-	Method				string					`json:"method"`
-	DropPointID			int						`json:"drop_point_id"`
-	DropPointAddress	string					`json:"drop_point_address"`
-	Distance			float64					`json:"distance"`
-	Duration			int						`json:"duration"`
-	TotalPoint			int						`json:"total_points"`
-	Categories			[]ResponseGetCategory	`json:"categories"`
+	TransactionID    int                   `json:"transaction_id"`
+	Method           string                `json:"method"`
+	DropPointID      int                   `json:"drop_point_id"`
+	DropPointAddress string                `json:"drop_point_address"`
+	Distance         float64               `json:"distance"`
+	Duration         int                   `json:"duration"`
+	TotalPoint       int                   `json:"total_points"`
+	Categories       []ResponseGetCategory `json:"categories"`
 }
 
 type Checkout_Response_DropOff struct {
+	TransactionID    int                   `json:"transaction_id"`
+	Method           string                `json:"method"`
+	DropPointID      int                   `json:"drop_point_id"`
+	DropPointAddress string                `json:"drop_point_address"`
+	TotalPoint       int                   `json:"total_points"`
+	Categories       []ResponseGetCategory `json:"categories"`
 }
