@@ -22,7 +22,18 @@ func (cc *CartController) AddToCart(c echo.Context) error {
 	var input models.CartItem_Input
 	c.Bind(&input)
 	userID := middlewares.CurrentLoginUser(c)
-	newItem, err := cc.db.AddToCart(userID, input)
+	exist := cc.db.CheckCartByCategoryID(userID, input.CategoryID)
+	if !exist {
+		newItem, err := cc.db.AddToCart(userID, input)
+		if err != nil {
+			echo.NewHTTPError(http.StatusInternalServerError, err)
+		}
+		return c.JSON(http.StatusCreated, M{
+			"status": "success",
+			"data":   newItem,
+		})
+	}
+	newItem, err := cc.db.AddCartWeight(userID, input)
 	if err != nil {
 		echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
