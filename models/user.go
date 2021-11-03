@@ -30,6 +30,7 @@ type ResponseGetUser struct {
 	Fullname    string 	`json:"fullname"`
 	Email     	string 	`json:"email"`
 	Username  	string 	`json:"username"`
+	Point		int		`json:"point"`
 	PhoneNumber string 	`json:"phone_number"`
 	Gender      string 	`json:"gender"`
 	Address     string 	`json:"address"`

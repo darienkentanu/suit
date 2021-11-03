@@ -45,6 +45,20 @@ func IsStaff(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
+func IsUser(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(e echo.Context) error {
+		token := e.Get("user").(*jwt.Token)
+		if token.Valid {
+			claims := token.Claims.(jwt.MapClaims)
+			role := claims["role"].(string)
+			if role != "user" {
+				return echo.ErrUnauthorized
+			}
+		}
+		return next(e)
+	}
+}
+
 func CurrentLoginUser(e echo.Context) int {
 	token := e.Get("user").(*jwt.Token)
 	if token != nil && token.Valid {

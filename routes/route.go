@@ -17,6 +17,7 @@ func New(db *gorm.DB, dbSQL *sql.DB) *echo.Echo {
 	dropPointsRoute(e, db, dbSQL)
 	staffRoute(e, db, dbSQL)
 	voucherRoute(e, db, dbSQL)
+	userVoucherRoute(e, db, dbSQL)
 
 
 	return e
