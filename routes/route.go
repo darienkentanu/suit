@@ -19,6 +19,7 @@ func New(db *gorm.DB, dbSQL *sql.DB) *echo.Echo {
 	voucherRoute(e, db, dbSQL)
 	cartRoute(e, db, dbSQL)
 	userVoucherRoute(e, db, dbSQL)
+	transactionRoute(e, db, dbSQL)
   
 	return e
 }
