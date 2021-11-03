@@ -18,12 +18,22 @@ func NewTransactionDB(db *gorm.DB, dbSQL *sql.DB) *TransactionDB {
 
 type TransactionModel interface {
 	GetAllTransaction() ([]models.Transaction, error)
+	CreateTransaction(transaction models.Transaction) (models.Transaction, error)
 }
 
 func (m *TransactionDB) GetAllTransaction() ([]models.Transaction, error) {
 	var transaction []models.Transaction
 
 	if err := m.db.Find(&transaction).Error; err != nil {
+		return transaction, err
+	}
+
+	return transaction, nil
+}
+
+func (m *TransactionDB) CreateTransaction(transaction models.Transaction) (models.Transaction, error) {
+
+	if err := m.db.Save(&transaction).Error; err != nil {
 		return transaction, err
 	}
 

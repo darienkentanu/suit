@@ -24,6 +24,8 @@ type CartModel interface {
 	GetCartItemByCheckoutID(checkoutID int) ([]models.CartItem, error)
 	CheckCartByCategoryID(int, int) bool
 	AddCartWeight(int, models.CartItem_Input) (models.CartItem, error)
+	GetItemInCart(userID, categoryID int) (models.CartItem, error)
+	UpdateCheckoutIdInCartItem(checkoutID, userID, categoryID int) (models.CartItem, error)
 }
 
 func (cdb *CartDB) CreateCart(cart models.Cart) error {
@@ -96,5 +98,28 @@ func (cdb *CartDB) AddCartWeight(userID int, input models.CartItem_Input) (model
 	if err := cdb.db.Model(&cartItem).Update("weight", updatedWeight).Error; err != nil {
 		return cartItem, err
 	}
+	return cartItem, nil
+}
+
+func (cdb *CartDB) GetItemInCart(userID, categoryID int) (models.CartItem, error) {
+	var cartItem models.CartItem
+	if err := cdb.db.Where("cart_user_id = ? and category_id = ? and checkout_id IS NULL", userID, categoryID).First(&cartItem).Error; err != nil {
+		return cartItem, err
+	}
+
+	return cartItem, nil
+}
+
+func (cdb *CartDB) UpdateCheckoutIdInCartItem(checkoutID, userID, categoryID int) (models.CartItem, error) {
+	var cartItem models.CartItem
+
+	if err := cdb.db.Where("cart_user_id = ? and category_id = ? and checkout_id IS NULL", userID, categoryID).First(&cartItem).Error; err != nil {
+		return cartItem, err
+	}
+
+	if err := cdb.db.Model(&cartItem).Update("checkout_id", checkoutID).Error; err != nil {
+		return cartItem, err
+	}
+
 	return cartItem, nil
 }

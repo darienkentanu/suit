@@ -20,6 +20,7 @@ func New(db *gorm.DB, dbSQL *sql.DB) *echo.Echo {
 	cartRoute(e, db, dbSQL)
 	userVoucherRoute(e, db, dbSQL)
 	transactionRoute(e, db, dbSQL)
+	checkout(e, db, dbSQL)
   
 	return e
 }
