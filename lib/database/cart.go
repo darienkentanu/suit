@@ -21,6 +21,7 @@ type CartModel interface {
 	GetCartItem(userID int) ([]models.CartItem, error)
 	EditCartItem(cartID int, input models.CartItem_Input) (models.CartItem, error)
 	DeleteCartItem(cardID int) error
+	GetCartItemByCheckoutID(checkoutID int) ([]models.CartItem, error)
 }
 
 func (cdb *CartDB) CreateCart(cart models.Cart) error {
@@ -66,4 +67,12 @@ func (cdb *CartDB) DeleteCartItem(cardID int) error {
 		return err
 	}
 	return nil
+}
+
+func (cdb *CartDB) GetCartItemByCheckoutID(checkoutID int) ([]models.CartItem, error) {
+	var cartItems []models.CartItem
+	if err := cdb.db.Find(&cartItems, "checkout_id = ?", checkoutID).Error; err != nil {
+		return nil, err
+	}
+	return cartItems, nil
 }

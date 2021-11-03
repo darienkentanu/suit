@@ -16,3 +16,14 @@ type Transaction struct {
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }
+
+type ResponseGetTransactions struct {
+	ID			int						`json:"id"`
+	UserID		int						`json:"user_id"`
+	Method		string					`json:"method"`
+	DropPointID	int						`json:"drop_point_id"`
+	Point		int						`json:"point"`
+	Categories	[]ResponseGetCategory	`json:"categories"`
+	CreatedAt	time.Time
+	UpdatedAt   time.Time
+}
