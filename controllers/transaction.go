@@ -33,7 +33,7 @@ func (controllers *TransactionController) GetTransactions(c echo.Context) error 
 	var resAllTransactions []models.ResponseGetTransactions
 
 	for _, transaction := range transactions {
-		var totalPointsUsed int
+		// var totalPointsUsed int
 		cartItems, err := controllers.cartModel.GetCartItemByCheckoutID(transaction.CheckoutID)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
@@ -52,8 +52,8 @@ func (controllers *TransactionController) GetTransactions(c echo.Context) error 
 			resCategory.Name = category.Name
 			resCategory.Point = category.Point
 			resCategory.Weight = item.Weight
-			resCategory.PointUsed = resCategory.Point * resCategory.Weight
-			totalPointsUsed += resCategory.PointUsed
+			resCategory.ReceivedPoints = resCategory.Point * resCategory.Weight
+			// totalPointsUsed += resCategory.PointUsed
 			categories = append(categories, resCategory)
 		}
 
@@ -68,14 +68,14 @@ func (controllers *TransactionController) GetTransactions(c echo.Context) error 
 		resTransaction.Method = transaction.Method
 		resTransaction.DropPointID = transaction.Drop_PointID
 		resTransaction.DropPointAddress = dropPoint.Address
-		// resTransaction.Point = transaction.Point
+		resTransaction.TotalReceivedPoints = transaction.Point
 		resTransaction.Categories = categories
 		if transaction.Status == 1 {
 			resTransaction.Status = "transaction succeed"
 		} else {
 			resTransaction.Status = "transaction is being processed by staff"
 		}
-		resTransaction.TotalPointUsed = totalPointsUsed
+		// resTransaction.TotalPoint = totalPointsUsed
 		resAllTransactions = append(resAllTransactions, resTransaction)
 	}
 

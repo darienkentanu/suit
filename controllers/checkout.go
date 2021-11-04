@@ -69,6 +69,7 @@ func (controllers *CheckoutController) CreateCheckoutPickup(c echo.Context) erro
 		resCategory.Name = category.Name
 		resCategory.Point = category.Point
 		resCategory.Weight = item.Weight
+		resCategory.ReceivedPoints = category.Point * item.Weight
 
 		categories = append(categories, resCategory)
 	}
@@ -154,7 +155,7 @@ func (controllers *CheckoutController) CreateCheckoutPickup(c echo.Context) erro
 	checkoutResponse.DropPointAddress = dropPointAddress[minDropPointID]
 	checkoutResponse.Distance = minDistance
 	checkoutResponse.Duration = dropPointDuration[minDropPointID]
-	checkoutResponse.TotalPoint = totalPoint
+	checkoutResponse.TotalReceivedPoints = totalPoint
 	checkoutResponse.Categories = categories
 
 	return c.JSON(http.StatusOK, M{
@@ -193,6 +194,7 @@ func (controllers *CheckoutController) CreateCheckoutDropOff(c echo.Context) err
 		resCategory.Name = category.Name
 		resCategory.Point = category.Point
 		resCategory.Weight = item.Weight
+		resCategory.ReceivedPoints = category.Point * item.Weight
 
 		categories = append(categories, resCategory)
 	}
@@ -245,7 +247,7 @@ func (controllers *CheckoutController) CreateCheckoutDropOff(c echo.Context) err
 	checkoutResponse.Method = transaction.Method
 	checkoutResponse.DropPointID = transaction.Drop_PointID
 	checkoutResponse.DropPointAddress = dropPoint.Address
-	checkoutResponse.TotalPoint = totalPoint
+	checkoutResponse.TotalReceivedPoints = totalPoint
 	checkoutResponse.Categories = categories
 
 	return c.JSON(http.StatusOK, M{
