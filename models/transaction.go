@@ -18,15 +18,15 @@ type Transaction struct {
 }
 
 type ResponseGetTransactions struct {
-	ID               	int    `json:"id"`
-	UserID           	int    `json:"user_id"`
-	Method           	string `json:"method"`
-	DropPointID      	int    `json:"drop_point_id"`
-	DropPointAddress 	string `json:"drop_point_address"`
-	TotalReceivedPoints	int    `json:"total_received_points"`
-	Categories     		[]ResponseGetCategory `json:"categories"`
-	Status         		string                `json:"status" form:"status"`
+	ID               int                   `json:"id"`
+	UserID           int                   `json:"user_id"`
+	Method           string                `json:"method"`
+	DropPointID      int                   `json:"drop_point_id"`
+	DropPointAddress string                `json:"drop_point_address"`
+	Categories       []ResponseGetCategory `json:"categories"`
+	Status           string                `json:"status" form:"status"`
 	// TotalPointUsed int                   `json:"total_point_used" form:"total_point_used"`
-	CreatedAt      		time.Time
-	UpdatedAt      		time.Time
+	TotalReceivedPoints int `json:"total_received_points"`
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
 }
