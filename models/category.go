@@ -23,3 +23,9 @@ type ResponseGetCategory struct {
 	Weight    		int    `json:"weight"`
 	ReceivedPoints 	int    `json:"received_points"`
 }
+
+type ResponseCategoryReport struct {
+	ID        		int    `json:"category_id"`
+	Name      		string `json:"category_name"`
+	Weight    		int    `json:"weight"`
+}
