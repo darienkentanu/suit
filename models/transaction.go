@@ -30,3 +30,15 @@ type ResponseGetTransactions struct {
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
 }
+
+type TransactionSQL struct {
+	ID           int        `json:"id"`
+	UserID       int        `json:"user_id"`
+	Status       int        `json:"status"`
+	Point        int        `json:"point"`
+	Method       string     `json:"method"`
+	Drop_PointID int        `json:"drop_point_id"`
+	CheckoutID   int        `json:"checkout_id"`
+	CreatedAt    string		`json:"created_at"`
+	UpdatedAt    string		`json:"updated_at"`
+}

@@ -19,5 +19,10 @@ func transactionRoute(e *echo.Echo, db *gorm.DB, dbSQL *sql.DB) {
 	dpdb := database.NewDropPointsDB(db)
 	tvc := controllers.NewTransactionController(tdb, cdb, ccdb, dpdb)
 
-	e.GET("/transactions", tvc.GetTransactions, middlewares.IsLoggedIn, middlewares.IsStaff)
+	e.GET("/transactions", tvc.GetTransactions, middlewares.IsLoggedIn)
+	e.GET("/transactionsbydroppoint/:id", tvc.GetTransactionsDropPoint, middlewares.IsLoggedIn, middlewares.IsStaff)
+	e.GET("/transactionreport/:range", tvc.GetTransactionsWithRangeDate, middlewares.IsLoggedIn)	// daily, weekly, monthly
+
+	e.GET("/totaltransaction", tvc.GetTransactionTotal, middlewares.IsLoggedIn)
+	e.GET("/totaltransaction/:range", tvc.GetTransactionTotalWithRangeDate, middlewares.IsLoggedIn)	// daily, weekly, monthly
 }
