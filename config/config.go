@@ -4,23 +4,38 @@ import (
 	"database/sql"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/darienkentanu/suit/models"
-	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
+
+func getDockerConfig() map[string]string {
+	var dc = make(map[string]string)
+	dc["DB_USERNAME"] = "docker"
+	dc["DB_PASSWORD"] = "password"
+	dc["DB_HOST"] = "godockerDB"
+	// dc["DB_PORT"] = "3307"
+	dc["DB_NAME"] = "godocker"
+
+	dc["DB_TEST_USERNAME"] = "docker"
+	dc["DB_TEST_PASSWORD"] = "password"
+	dc["DB_TEST_HOST"] = "godockerDB_test"
+	// dc["DB_TEST_PORT"] = "3308"
+	dc["DB_TEST_NAME"] = "godocker_test"
+	return dc
+}
 
 func GetConfig() (config map[string]string) {
 	conf, err := godotenv.Read()
 	if err != nil {
 		conf2, err := godotenv.Read("../../suit/.env")
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
 			return nil
 		}
 		return conf2
@@ -30,14 +45,21 @@ func GetConfig() (config map[string]string) {
 
 func InitDB() *gorm.DB {
 	conf := GetConfig()
-	connStr := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
-		conf["DB_USERNAME"], conf["DB_PASSWORD"], conf["DB_HOST"],
-		conf["DB_PORT"], conf["DB_NAME"],
+	connStr := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local",
+		conf["DB_USERNAME"], conf["DB_PASSWORD"], conf["DB_HOST"], conf["DB_NAME"],
 	)
 
 	db, err := gorm.Open(mysql.Open(connStr), &gorm.Config{})
 	if err != nil {
-		panic(err)
+		conf2 := getDockerConfig()
+		connStr := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local",
+			conf2["DB_USERNAME"], conf2["DB_PASSWORD"], conf2["DB_HOST"], conf2["DB_NAME"],
+		)
+		db, err := gorm.Open(mysql.Open(connStr), &gorm.Config{})
+		if err != nil {
+			panic(err)
+		}
+		return db
 	}
 	initMigration(db)
 	return db
@@ -45,13 +67,20 @@ func InitDB() *gorm.DB {
 
 func InitDBSQL() *sql.DB {
 	conf := GetConfig()
-	connStr := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
-		conf["DB_USERNAME"], conf["DB_PASSWORD"], conf["DB_HOST"],
-		conf["DB_PORT"], conf["DB_NAME"],
+	connStr := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local",
+		conf["DB_USERNAME"], conf["DB_PASSWORD"], conf["DB_HOST"], conf["DB_NAME"],
 	)
 	db, err := sql.Open("mysql", connStr)
 	if err != nil {
-		panic(err)
+		conf2 := getDockerConfig()
+		connStr := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local",
+			conf2["DB_USERNAME"], conf2["DB_PASSWORD"], conf2["DB_HOST"], conf2["DB_NAME"],
+		)
+		db, err := sql.Open("mysql", connStr)
+		if err != nil {
+			panic(err)
+		}
+		return db
 	}
 	db.SetConnMaxLifetime(time.Minute * 3)
 	db.SetMaxOpenConns(10)
@@ -75,14 +104,21 @@ func initMigration(db *gorm.DB) {
 
 func InitDBTest() *gorm.DB {
 	conf := GetConfig()
-	connStr := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
-		conf["DB_TEST_USERNAME"], conf["DB_TEST_PASSWORD"], conf["DB_TEST_HOST"],
-		conf["DB_TEST_PORT"], conf["DB_TEST_NAME"],
+	connStr := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local",
+		conf["DB_TEST_USERNAME"], conf["DB_TEST_PASSWORD"], conf["DB_TEST_HOST"], conf["DB_TEST_NAME"],
 	)
 
 	db, err := gorm.Open(mysql.Open(connStr), &gorm.Config{})
 	if err != nil {
-		panic(err)
+		conf2 := getDockerConfig()
+		connStr := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local",
+			conf2["DB_TEST_USERNAME"], conf2["DB_TEST_PASSWORD"], conf2["DB_TEST_HOST"], conf2["DB_TEST_NAME"],
+		)
+		db, err := gorm.Open(mysql.Open(connStr), &gorm.Config{})
+		if err != nil {
+			panic(err)
+		}
+		return db
 	}
 	// initMigrationTest(db)
 	return db
@@ -90,13 +126,20 @@ func InitDBTest() *gorm.DB {
 
 func InitDBSQLTest() *sql.DB {
 	conf := GetConfig()
-	connStr := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
-		conf["DB_TEST_USERNAME"], conf["DB_TEST_PASSWORD"], conf["DB_TEST_HOST"],
-		conf["DB_TEST_PORT"], conf["DB_TEST_NAME"],
+	connStr := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local",
+		conf["DB_TEST_USERNAME"], conf["DB_TEST_PASSWORD"], conf["DB_TEST_HOST"], conf["DB_TEST_NAME"],
 	)
 	db, err := sql.Open("mysql", connStr)
 	if err != nil {
-		panic(err)
+		conf2 := getDockerConfig()
+		connStr := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local",
+			conf2["DB_TEST_USERNAME"], conf2["DB_TEST_PASSWORD"], conf2["DB_TEST_HOST"], conf2["DB_TEST_NAME"],
+		)
+		db, err := sql.Open("mysql", connStr)
+		if err != nil {
+			panic(err)
+		}
+		return db
 	}
 	db.SetConnMaxLifetime(time.Minute * 3)
 	db.SetMaxOpenConns(10)

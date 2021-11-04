@@ -1,4 +1,4 @@
-package controllers_test
+package controllers
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	. "github.com/darienkentanu/suit/controllers"
+	// . "github.com/darienkentanu/suit/controllers"
 	"github.com/darienkentanu/suit/lib/database"
 	"github.com/darienkentanu/suit/models"
 	"github.com/stretchr/testify/assert"

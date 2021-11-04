@@ -1,4 +1,4 @@
-package controllers_test
+package controllers
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	. "github.com/darienkentanu/suit/controllers"
+	// . "github.com/darienkentanu/suit/controllers"
 	"github.com/darienkentanu/suit/gmaps"
 	"github.com/darienkentanu/suit/lib/database"
 	"github.com/darienkentanu/suit/models"
@@ -133,18 +133,18 @@ func TestGetDropPoints(t *testing.T) {
 
 func TestAddDropPoints(t *testing.T) {
 	var testCases = []struct {
-		name       	string
-		path       	string
-		expectCode 	int
-		response   	string
-		reqBody		map[string]string
+		name       string
+		path       string
+		expectCode int
+		response   string
+		reqBody    map[string]string
 	}{
 		{
 			name:       "AddDropPoints",
 			path:       "/droppoints",
 			expectCode: http.StatusCreated,
 			response:   "success",
-			reqBody: 	map[string]string{
+			reqBody: map[string]string{
 				"address": "universitas padjadjaran",
 			},
 		},
@@ -165,7 +165,7 @@ func TestAddDropPoints(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
-		
+
 		c.SetPath(testCase.path)
 
 		t.Run(testCase.name, func(t *testing.T) {
@@ -245,18 +245,18 @@ func TestAddDropPoints(t *testing.T) {
 
 func TestEditDropPoints(t *testing.T) {
 	var testCases = []struct {
-		name       	string
-		path       	string
-		expectCode 	int
-		response   	string
-		reqBody		map[string]string
+		name       string
+		path       string
+		expectCode int
+		response   string
+		reqBody    map[string]string
 	}{
 		{
 			name:       "EditDropPoints",
 			path:       "//droppoints/:id",
 			expectCode: http.StatusOK,
 			response:   "success",
-			reqBody: 	map[string]string{
+			reqBody: map[string]string{
 				"address": "universitas brawijaya",
 			},
 		},
@@ -278,7 +278,7 @@ func TestEditDropPoints(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
-		
+
 		c.SetPath(testCase.path)
 		c.SetParamNames("id")
 		c.SetParamValues("1")
