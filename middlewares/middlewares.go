@@ -14,12 +14,13 @@ var IsLoggedIn = echoMiddleware.JWTWithConfig(echoMiddleware.JWTConfig{
 	SigningKey: []byte(constants.JWT_SECRET),
 })
 
-func CreateToken(id int, role string) (string, error) {
+func CreateToken(id, loginID int, role string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 
 	claims["authorized"] = true
 	claims["id"] = id
+	claims["loginID"] = loginID
 	claims["role"] = role
 	claims["exp"] = time.Now().Add(time.Hour * 1).Unix() // Token expires after 1 hour
 
@@ -86,4 +87,19 @@ func CurrentRoleLoginUser(e echo.Context) string {
 		}
 	}
 	return "" // invalid
+}
+
+func CurrentLoginID(e echo.Context) int {
+	token := e.Get("user").(*jwt.Token)
+	if token != nil && token.Valid {
+		claims := token.Claims.(jwt.MapClaims)
+		id := claims["loginID"]
+		switch id.(type) {
+		case float64:
+			return int(id.(float64))
+		default:
+			return id.(int)
+		}
+	}
+	return -1 // invalid user
 }

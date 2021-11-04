@@ -41,7 +41,9 @@ func TestLogin(t *testing.T) {
 	UserSetup(db)
 	userDB := database.NewUserDB(db, dbSQL)
 	loginDB := database.NewLoginDB(db)
-	loginControllers := NewLoginController(userDB, loginDB)
+	staffDB := database.NewStaffDB(db, dbSQL)
+	dropPointDB := database.NewDropPointsDB(db)
+	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	InsertDataUser(db)
 
 	for _, testCase := range testCases {
@@ -117,7 +119,9 @@ func TestGetProfile(t *testing.T) {
 	UserSetup(db)
 	userDB := database.NewUserDB(db, dbSQL)
 	loginDB := database.NewLoginDB(db)
-	loginControllers := NewLoginController(userDB, loginDB)
+	staffDB := database.NewStaffDB(db, dbSQL)
+	dropPointDB := database.NewDropPointsDB(db)
+	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	InsertDataUser(db)
 
 	for _, testCase := range testCases {

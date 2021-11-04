@@ -69,7 +69,7 @@ func (dpc *DropPointsController) EditDropPoints(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusCreated, M{
+	return c.JSON(http.StatusOK, M{
 		"status": "success",
 		"data": M{
 			"id":      newDropPoints.ID,
