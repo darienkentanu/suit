@@ -17,14 +17,14 @@ import (
 
 func UserSetup(db *gorm.DB) {
 	db.Migrator().DropTable(&models.Login{})
-	db.Migrator().DropTable(&models.Drop_Point{})
 	db.Migrator().DropTable(&models.Staff{})
+	db.Migrator().DropTable(&models.Drop_Point{})
 	db.Migrator().DropTable(&models.Cart{})
 	db.Migrator().DropTable(&models.User{})
 	db.AutoMigrate(&models.User{})
 	db.AutoMigrate(&models.Cart{})
-	db.AutoMigrate(&models.Staff{})
 	db.AutoMigrate(&models.Drop_Point{})
+	db.AutoMigrate(&models.Staff{})
 	db.AutoMigrate(&models.Login{})
 }
 

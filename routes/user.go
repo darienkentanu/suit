@@ -16,8 +16,10 @@ func userRoute(e *echo.Echo, db *gorm.DB, dbSQL *sql.DB) {
 	udb := database.NewUserDB(db, dbSQL)
 	ldb := database.NewLoginDB(db)
 	cdb := database.NewCartDB(db)
+	sdb := database.NewStaffDB(db, dbSQL)
+	dpdb := database.NewDropPointsDB(db)
 	uc := controllers.NewUserController(udb, ldb, cdb)
-	lc := controllers.NewLoginController(udb, ldb)
+	lc := controllers.NewLoginController(udb, ldb, sdb, dpdb)
 	e.POST("/register", uc.RegisterUsers)
 	e.POST("/login", lc.Login)
 
