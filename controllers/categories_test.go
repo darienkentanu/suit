@@ -161,7 +161,7 @@ func TestEditCategories(t *testing.T) {
 		t.Error(err)
 	}
 
-	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
+	r := httptest.NewRequest(http.MethodPut, "/", bytes.NewBuffer(reqBody))
 	w := httptest.NewRecorder()
 	ctx := e.NewContext(r, w)
 
@@ -197,7 +197,7 @@ func TestDeleteCategories(t *testing.T) {
 		response   string
 	}{
 		{
-			name:       "EditCategories",
+			name:       "DeleteCategories",
 			path:       "/categories/:id",
 			expectCode: http.StatusOK,
 			response:   "category succesfully deleted",
@@ -205,12 +205,13 @@ func TestDeleteCategories(t *testing.T) {
 	}
 
 	e, db, _ := InitEcho()
+	CartSetup(db)
 	Setup(db)
 	cdb := database.NewCategoryDB(db)
 	cc := NewCategoryController(cdb)
 	InsertDataCategory(db)
 
-	r := httptest.NewRequest(http.MethodPost, "/", nil)
+	r := httptest.NewRequest(http.MethodDelete, "/", nil)
 	w := httptest.NewRecorder()
 	ctx := e.NewContext(r, w)
 
