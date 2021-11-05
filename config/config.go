@@ -39,7 +39,7 @@ func InitDB() *gorm.DB {
 
 	db, err := gorm.Open(mysql.Open(connStr), &gorm.Config{})
 	if err != nil {
-		fmt.Println("cannot read '.env' files -> reading docker CONN_STRING")
+		fmt.Println("cannot use '.env' files for db-connections -> using docker CONN_STRING")
 
 		connStrDocker := os.Getenv("CONN_STRING")
 		db, err2 := gorm.Open(mysql.Open(connStrDocker), &gorm.Config{})
