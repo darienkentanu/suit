@@ -10,6 +10,8 @@ services:
       interval: 10s
     ports:
     - "3307:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
 
   app:
     container_name: go-app
@@ -31,3 +33,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
+        
+volumes:
+  dbdata:
