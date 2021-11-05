@@ -59,6 +59,7 @@ func InitDB() *gorm.DB {
 		if err != nil {
 			panic(err)
 		}
+		initMigration(db)
 		return db
 	}
 	initMigration(db)
