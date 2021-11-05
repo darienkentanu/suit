@@ -103,7 +103,7 @@ func TestGetProfile(t *testing.T) {
 		login		map[string]string
 	}{
 		{
-			name:       "GetProfile",
+			name:       "Get Profile User",
 			path:       "/profile",
 			loginPath:	"/login",
 			expectCode: http.StatusOK,
@@ -111,6 +111,17 @@ func TestGetProfile(t *testing.T) {
 			login:		map[string]string{
 				"email"			: "alikatania@gmail.com",
 				"password"		: "alika123",
+			},
+		},
+		{
+			name:       "Get Profile Staff",
+			path:       "/profile",
+			loginPath:	"/login",
+			expectCode: http.StatusOK,
+			response:   "success",
+			login:		map[string]string{
+				"email"			: "azkam@gmail.com",
+				"password"		: "azka123",
 			},
 		},
 	}
@@ -123,6 +134,8 @@ func TestGetProfile(t *testing.T) {
 	dropPointDB := database.NewDropPointsDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	InsertDataUser(db)
+	InsertDataDropPoints(db)
+	InsertDataStaff(db)
 
 	for _, testCase := range testCases {
 		login, err := json.Marshal(testCase.login)
