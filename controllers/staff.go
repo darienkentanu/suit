@@ -9,8 +9,8 @@ import (
 )
 
 type StaffController struct {
-	staffModel	database.StaffModel
-	loginModel	database.LoginModel
+	staffModel database.StaffModel
+	loginModel database.LoginModel
 }
 
 func NewStaffController(staffModel database.StaffModel, loginModel database.LoginModel) *StaffController {
@@ -46,12 +46,12 @@ func (controllers *StaffController) AddStaff(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "error in password hash")
 	}
-	
+
 	var staff models.Staff
 	staff.Fullname = register.Fullname
 	staff.PhoneNumber = register.PhoneNumber
 	staff.Drop_PointID = register.DropPointID
-	
+
 	staff, err = controllers.staffModel.CreateStaff(staff)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Cannot create staff")
@@ -70,17 +70,17 @@ func (controllers *StaffController) AddStaff(c echo.Context) error {
 	}
 
 	var response models.ResponseGetStaff
-	response.ID			= staff.ID
-	response.Fullname 	= staff.Fullname
-	response.Email 		= login.Email
-	response.Username 	= login.Username
-	response.PhoneNumber= staff.PhoneNumber
-	response.Role		= login.Role
-	response.DropPointID= staff.Drop_PointID
+	response.ID = staff.ID
+	response.Fullname = staff.Fullname
+	response.Email = login.Email
+	response.Username = login.Username
+	response.PhoneNumber = staff.PhoneNumber
+	response.Role = login.Role
+	response.DropPointID = staff.Drop_PointID
 
 	return c.JSON(http.StatusCreated, M{
 		"status": "success",
-		"data": response,
+		"data":   response,
 	})
 }
 
@@ -88,7 +88,7 @@ func (controllers *StaffController) GetAllStaff(c echo.Context) error {
 	staff, err := controllers.staffModel.GetAllStaff()
 
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 
 	return c.JSON(http.StatusOK, M{

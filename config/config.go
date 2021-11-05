@@ -61,6 +61,12 @@ func InitDBSQL() *sql.DB {
 	)
 	db, err := sql.Open("mysql", connStr)
 	if err != nil {
+		// db.Close()
+		fmt.Println("cannot use '.env' files for db-connections -> using docker CONN_STRING")
+	}
+	err = db.Ping()
+	if err != nil {
+		db.Close()
 		fmt.Println("cannot use '.env' files for db-connections -> using docker CONN_STRING")
 
 		connStrDocker := os.Getenv("CONN_STRING")
