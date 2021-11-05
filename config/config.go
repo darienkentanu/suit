@@ -2,11 +2,12 @@ package config
 
 import (
 	"database/sql"
+	"log"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/darienkentanu/suit/models"
@@ -21,6 +22,7 @@ func GetConfig() (config map[string]string) {
 		conf2, err := godotenv.Read("../../suit/.env")
 		if err != nil {
 			log.Fatal(err)
+			// fmt.Println("cannot read '.env' files -> reading docker CONN_STRING")
 			return nil
 		}
 		return conf2
@@ -37,7 +39,15 @@ func InitDB() *gorm.DB {
 
 	db, err := gorm.Open(mysql.Open(connStr), &gorm.Config{})
 	if err != nil {
-		panic(err)
+		fmt.Println("cannot read '.env' files -> reading docker CONN_STRING")
+
+		connStrDocker := os.Getenv("CONN_STRING")
+		db, err2 := gorm.Open(mysql.Open(connStrDocker), &gorm.Config{})
+		if err2 != nil {
+			panic(err2)
+		}
+		initMigration(db)
+		return db
 	}
 	initMigration(db)
 	return db
@@ -51,7 +61,17 @@ func InitDBSQL() *sql.DB {
 	)
 	db, err := sql.Open("mysql", connStr)
 	if err != nil {
-		panic(err)
+		fmt.Println("cannot use '.env' files for db-connections -> using docker CONN_STRING")
+
+		connStrDocker := os.Getenv("CONN_STRING")
+		db, err2 := sql.Open("mysql", connStrDocker)
+		if err2 != nil {
+			panic(err2)
+		}
+		db.SetConnMaxLifetime(time.Minute * 3)
+		db.SetMaxOpenConns(10)
+		db.SetMaxIdleConns(10)
+		return db
 	}
 	db.SetConnMaxLifetime(time.Minute * 3)
 	db.SetMaxOpenConns(10)

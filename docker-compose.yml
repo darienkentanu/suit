@@ -1,0 +1,33 @@
+services:
+  db:
+    image: mysql:8.0.27
+    container_name: db-container
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: suit
+    healthcheck:
+      test: ["CMD", "mysql", "-u", "root", "-ppassword", "-e", "show databases"]
+      interval: 10s
+    ports:
+    - "3307:3306"
+
+  app:
+    container_name: go-app
+    build: .
+    restart: always
+    environment:
+      CONN_STRING: root:password@tcp(db-container)/suit?charset=utf8&parseTime=True&loc=Local
+    ports:
+     - 8000:8000
+    depends_on:
+      db:
+        condition: service_healthy
+
+  adminer:
+    image: adminer
+    restart: always
+    ports: # host:container
+      - 8081:8080
+    depends_on:
+      db:
+        condition: service_healthy
