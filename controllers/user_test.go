@@ -70,6 +70,13 @@ func InsertDataUser(db *gorm.DB) error {
 	if err := db.Select("email", "username", "password", "role", "user_id").Create(&login).Error; err != nil {
 		return err
 	}
+
+	var cart models.Cart
+	cart.UserID = 1
+	err = db.Select("user_id").Create(&cart).Error
+	if err != nil {
+		return err
+	}
 	
 	return nil	
 }

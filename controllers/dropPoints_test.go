@@ -78,59 +78,6 @@ func TestGetDropPoints(t *testing.T) {
 	}
 }
 
-// func TestAddDropPointslama(t *testing.T) {
-// 	var testCases = []struct {
-// 		name       string
-// 		path       string
-// 		expectCode int
-// 		response   string
-// 	}{
-// 		{
-// 			name:       "AddDropPoints",
-// 			path:       "/droppoints",
-// 			expectCode: http.StatusCreated,
-// 			response:   "success",
-// 		},
-// 	}
-
-// 	e, db, _ := InitEcho()
-// 	DPSetup(db)
-// 	dpdb := database.NewDropPointsDB(db)
-// 	dpc := NewDropPointsController(dpdb)
-// 	InsertDataDropPoints(db)
-// 	reqBody, err := json.Marshal(M{
-// 		"address": "universitas padjadjaran",
-// 	})
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
-
-// 	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
-// 	w := httptest.NewRecorder()
-// 	ctx := e.NewContext(r, w)
-
-// 	for _, testCase := range testCases {
-// 		ctx.SetPath(testCase.path)
-
-// 		t.Run(testCase.name, func(t *testing.T) {
-// 			if assert.NoError(t, dpc.AddDropPoints(ctx)) {
-// 				assert.Equal(t, testCase.expectCode, w.Code)
-// 				body := w.Body.String()
-
-// 				var response = struct {
-// 					Status string `json:"status"`
-// 					Data   M      `json:"data"`
-// 				}{}
-// 				err := json.Unmarshal([]byte(body), &response)
-// 				if err != nil {
-// 					assert.Error(t, err, "error")
-// 				}
-// 				assert.Equal(t, testCase.response, response.Status)
-// 			}
-// 		})
-// 	}
-// }
-
 func TestAddDropPoints(t *testing.T) {
 	var testCases = []struct {
 		name       	string
@@ -186,62 +133,6 @@ func TestAddDropPoints(t *testing.T) {
 		})
 	}
 }
-
-// func TestEditDropPoints(t *testing.T) {
-// 	var testCases = []struct {
-// 		name       string
-// 		path       string
-// 		expectCode int
-// 		response   string
-// 	}{
-// 		{
-// 			name:       "EditDropPoints",
-// 			path:       "/droppoints/:id",
-// 			expectCode: http.StatusCreated,
-// 			response:   "success",
-// 		},
-// 	}
-
-// 	e, db, _ := InitEcho()
-// 	DPSetup(db)
-// 	dpdb := database.NewDropPointsDB(db)
-// 	dpc := NewDropPointsController(dpdb)
-// 	InsertDataDropPoints(db)
-
-// 	reqBody, err := json.Marshal(M{
-// 		"address": "universitas brawijaya",
-// 	})
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
-
-// 	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
-// 	w := httptest.NewRecorder()
-// 	ctx := e.NewContext(r, w)
-
-// 	for _, testCase := range testCases {
-// 		ctx.SetPath(testCase.path)
-// 		ctx.SetParamNames("id")
-// 		ctx.SetParamValues("1")
-
-// 		t.Run(testCase.name, func(t *testing.T) {
-// 			if assert.NoError(t, dpc.EditDropPoints(ctx)) {
-// 				assert.Equal(t, testCase.expectCode, w.Code)
-// 				body := w.Body.String()
-
-// 				var response = struct {
-// 					Status string `json:"status"`
-// 					Data   M      `json:"data"`
-// 				}{}
-// 				err := json.Unmarshal([]byte(body), &response)
-// 				if err != nil {
-// 					assert.Error(t, err, "error")
-// 				}
-// 				assert.Equal(t, testCase.response, response.Status)
-// 			}
-// 		})
-// 	}
-// }
 
 func TestEditDropPoints(t *testing.T) {
 	var testCases = []struct {
@@ -318,12 +209,13 @@ func TestDeleteDropPoints(t *testing.T) {
 	}
 
 	e, db, _ := InitEcho()
-	DPSetup(db)
+	CartSetup(db)
+	// DPSetup(db)
 	dpdb := database.NewDropPointsDB(db)
 	dpc := NewDropPointsController(dpdb)
 	InsertDataDropPoints(db)
 
-	r := httptest.NewRequest(http.MethodPost, "/", nil)
+	r := httptest.NewRequest(http.MethodDelete, "/", nil)
 	w := httptest.NewRecorder()
 	ctx := e.NewContext(r, w)
 
