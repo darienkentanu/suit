@@ -19,6 +19,6 @@ func userVoucherRoute(e *echo.Echo, db *gorm.DB, dbSQL *sql.DB) {
 	uvc := controllers.NewUserVoucherController(uvdb, udb, vdb)
 
 	e.POST("/claim/:id", uvc.ClaimVoucher, middlewares.IsLoggedIn, middlewares.IsUser)
-	e.POST("/redeem/:id", uvc.RedeemVoucher, middlewares.IsLoggedIn, middlewares.IsUser)
+	e.PUT("/redeem/:id", uvc.RedeemVoucher, middlewares.IsLoggedIn, middlewares.IsUser)
 	e.GET("/uservouchers", uvc.GetUserVoucher, middlewares.IsLoggedIn, middlewares.IsUser)
 }

@@ -45,6 +45,7 @@ func TestGetVoucher(t *testing.T) {
 		},
 	}
 	e, db, _ := InitEcho()
+	UserVoucherSetup(db)
 	VcSetup(db)
 	cdb := database.NewVoucherDB(db)
 	cc := NewVoucherController(cdb)
