@@ -3,7 +3,7 @@ Turn your trash into rewards
 
 [![Go.Dev reference](https://img.shields.io/badge/gorm-reference-blue?logo=go&logoColor=blue)](https://pkg.go.dev/gorm.io/gorm?tab=doc)
 [![Go.Dev reference](https://img.shields.io/badge/echo-reference-blue?logo=go&logoColor=blue)](https://github.com/labstack/echo)
-
+![ERD](./erd.png)
 
 # Table of Content
 - [Description](#description)
@@ -33,44 +33,48 @@ after that import the file-insert.sql to your database
 | Method | Endpoint | Description| Authentication | Authorization
 |:-----|:--------|:----------| :----------:| :----------:|
 | POST  | /register | Register a new user | No | No
-| POST | /login | Login existing user | No | No
+| POST  | /registerstaff | Register a new staff | No | No
+| POST | /login | Login existing user or staff| No | No
 |---|---|---|---|---|
 | GET | /users | Get list of all user | Yes | Yes
-| PUT | /users | Update user profile | Yes | Yes
+| GET | /staff | Get list of all staff | Yes | Yes
 |---|---|---|---|---|
-| POST | /registeradmin | Register a new admin | No | No
-| PUT | /admin | Update admin profile | Yes | Yes
+| PUT | /profile | Update user profile or staff | Yes | No
+| GET | /profile | Get user profile or staff | Yes | No
 |---|---|---|---|---|
-| GET | /category | Get list of all category | No | No
-| POST | /category | Add category by admin | Yes | Yes
-| PUT | /category/:id | Update category by admin | Yes | Yes
-| DELETE | /category/:id | Delete category by admin | Yes | Yes
+| GET | /droppoints | Get list of all drop point | No | No
+| POST | /droppoints | Add list of drop point | Yes | Yes
+| PUT | /droppoints/:id | Update drop point | Yes | Yes
+| DELETE | /droppoints/:id | Delete drop point | Yes | Yes
+|---|---|---|---|---|
+| GET | /categories | Get list of all category | No | No
+| POST | /categories | Add category by staff | Yes | Yes
+| PUT | /categories/:id | Update category by staff | Yes | Yes
+| DELETE | /categories/:id | Delete category by staff | Yes | Yes
 |---|---|---|---|---|
 | GET | /vouchers | Get list of all voucher | No | No
-| POST | /voucher | Add voucher by admin | Yes | Yes
-| PUT | /voucher/:id | Update voucher by admin | Yes | Yes
-| DELETE | /voucher/:id | Delete voucher by admin | Yes | Yes
+| POST | /vouchers | Add voucher by staff | Yes | Yes
+| PUT | /vouchers/:id | Update voucher by staff | Yes | Yes
+| DELETE | /vouchers/:id | Delete voucher by staff | Yes | Yes
 |---|---|---|---|---|
-| GET | /uservouchers | Get list of all user voucher | Yes | Yes
-| POST | /claimvoucher/:id | Claim voucher by voucher id | Yes | Yes
-| POST | /redeemvoucher/:id | Redeem voucher by voucher id | Yes | Yes
+| GET | /uservouchers | Get list of all user voucher | Yes | No
+| POST | /claim/:id | Claim voucher by voucher id | Yes | No
+| POST | /redeem/:id | Redeem voucher by voucher id | Yes | No
 |---|---|---|---|---|
-| POST | /carts | Add category list to cart | Yes | Yes
-| GET | /carts | Get list of all cart item | Yes | Yes
-| PUT | /cartitems/:id | Update cart item by id | Yes | Yes
-| DELETE | /cartitems/:id | Delete cart item by id | Yes | Yes
+| POST | /cart | Add category list to user cart | Yes | No
+| GET | /cart | Get list of user all cart item | Yes | No
+| PUT | /cartitems/:id | Update user cart item by id | Yes | No
+| DELETE | /cartitems/:id | Delete user cart item by id | Yes | No
 |---|---|---|---|---|
-| POST | /checkout/:param | List of product on request pickup | Yes | Yes
+| POST | /checkoutbypickup | Checkout by request pickup | Yes | No
+| POST | /checkoutbydropoff | Checkout by dropoff on drop point | Yes | No
+| POST | /verification/:id | Verification by transaction id | Yes | Yes
 |---|---|---|---|---|
-| GET | /droppoint | Get list of all drop point | Yes | Yes
-| POST | /droppoint | Add list of drop point | Yes | Yes
-| PUT | /droppoint/:id | Update drop point | Yes | Yes
-| DELETE | /droppoint/:id | Delete drop point | Yes | Yes
-|---|---|---|---|---|
-| GET | /transactions | Get list of all transaction | Yes | Yes
-| GET | /transactionreport?range={range} | Get transactions with range date | Yes | Yes
-|---|---|---|---|---|
-| GET | /transactionsqty | Get total history of all transaction quantity | Yes | Yes
+| GET | /transactions | Get list of all transaction | Yes | No
+| GET | /transactionbydroppoint/:id | Get list of all transaction by drop points id (staff only) | Yes | Yes
+| GET | /transactionreport/:range | Get list of all transaction -daily - weekly -monthly | Yes | No
+| GET | /totaltransaction | Get list of all total weight of transaction | Yes | No
+| GET | /totaltransaction/:range | Get list of all total weight of transaction -daily - weekly -monthly | Yes | No
 |---|---|---|---|---|
 
 
