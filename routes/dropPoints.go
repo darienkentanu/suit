@@ -16,7 +16,7 @@ func dropPointsRoute(e *echo.Echo, db *gorm.DB, dbSQL *sql.DB) {
 	dpdb := database.NewDropPointsDB(db)
 	dpc := controllers.NewDropPointsController(dpdb)
 	e.GET("/droppoints", dpc.GetDropPoints)
-	e.POST("/droppoints", dpc.AddDropPoints, middlewares.IsLoggedIn)
-	e.PUT("/droppoints/:id", dpc.EditDropPoints, middlewares.IsLoggedIn)
-	e.DELETE("/droppoints/:id", dpc.DeleteDropPoints, middlewares.IsLoggedIn)
+	e.POST("/droppoints", dpc.AddDropPoints, middlewares.IsLoggedIn, middlewares.IsStaff) // untuk insert pertama kali middleware is staff perlu dihapus terlebih dahulu.
+	e.PUT("/droppoints/:id", dpc.EditDropPoints, middlewares.IsLoggedIn, middlewares.IsStaff)
+	e.DELETE("/droppoints/:id", dpc.DeleteDropPoints, middlewares.IsLoggedIn, middlewares.IsStaff)
 }

@@ -54,9 +54,9 @@ func (dpdb *DropPointsDB) EditDropPointsById(id int, newDropPoints models.Drop_P
 }
 
 func (dpdb *DropPointsDB) DeleteDropPointsById(id int) error {
-	rows := dpdb.db.Delete(&models.Drop_Point{}, id).RowsAffected
-	if rows == 0 {
-		err := errors.New("drop points to be deleted is not found")
+	err := dpdb.db.Delete(&models.Drop_Point{}, id).Error
+	if err != nil {
+		err := errors.New("bad request")
 		return err
 	}
 	return nil

@@ -86,7 +86,7 @@ func (dpc *DropPointsController) DeleteDropPoints(c echo.Context) error {
 
 	err = dpc.db.DeleteDropPointsById(id)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, M{

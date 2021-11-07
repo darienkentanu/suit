@@ -21,9 +21,9 @@ func userRoute(e *echo.Echo, db *gorm.DB, dbSQL *sql.DB) {
 	uc := controllers.NewUserController(udb, ldb, cdb)
 	lc := controllers.NewLoginController(udb, ldb, sdb, dpdb)
 	e.POST("/register", uc.RegisterUsers)
-	e.POST("/login", lc.Login)
+	e.POST("/login", lc.Login) // sekalian buat route login staff
 
 	e.GET("/users", uc.GetAllUsers, middlewares.IsLoggedIn, middlewares.IsStaff)
-	e.GET("/profile", lc.GetProfile, middlewares.IsLoggedIn)
-	e.PUT("/profile", lc.UpdateProfile, middlewares.IsLoggedIn)
+	e.GET("/profile", lc.GetProfile, middlewares.IsLoggedIn)    // bisa untuk staff juga
+	e.PUT("/profile", lc.UpdateProfile, middlewares.IsLoggedIn) // bisa untuk staff juga
 }
