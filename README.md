@@ -15,17 +15,16 @@ Turn your trash into rewards
 This is final project of alterra academy
 
 # How to use
-- Install Go and MySQL
+- Install Go and MySQL or (install docker and docker-compose)
 - Clone this repository in your $PATH:
 ```
 $ git clone https://github.com/darienkentanu/suit
 ```
+$ go run main.go or $ docker-compose up --build -d
 
-To run this project first you must insert the following query to mysql
-
-Run `main.go`
 ```
-$ go run main.go
+after that import the file-insert.sql to your database
+
 ```
 
 
