@@ -21,7 +21,7 @@ type TransactionModel interface {
 	GetTransactionsByUserID(userID int) ([]models.Transaction, error)
 	CreateTransaction(transaction models.Transaction) (models.Transaction, error)
 	UpdateStatusTransaction(transactionID int) (models.Transaction, error)
-	GetTransationsRangeDate(rangeDate string) ([]models.TransactionSQL, error)
+	GetTransationsRangeDate(id int, role, rangeDate string) ([]models.TransactionSQL, error)
 	GetTransationTotalRangeDate(id int, role, rangeDate string) ([]models.ResponseCategoryReport, error)
 	GetTransationTotal(id int, role string) ([]models.ResponseCategoryReport, error)
 	GetTransactionsByDropPointID(dropPointID int) ([]models.Transaction, error)
@@ -74,17 +74,27 @@ func (m *TransactionDB) UpdateStatusTransaction(transactionID int) (models.Trans
 	return transaction, nil
 }
 
-func (m *TransactionDB) GetTransationsRangeDate(rangeDate string) ([]models.TransactionSQL, error) {
+func (m *TransactionDB) GetTransationsRangeDate(id int, role, rangeDate string) ([]models.TransactionSQL, error) {
 	var transactions []models.TransactionSQL
 	var rows *sql.Rows
 	var err error
 	
-	if rangeDate == "daily" {
-		rows, err = m.dbSQL.Query("SELECT * FROM transactions WHERE created_at >= DATE_ADD(CURDATE(), INTERVAL -1 DAY)")
-	} else if rangeDate == "weekly" {
-		rows, err = m.dbSQL.Query("SELECT * FROM transactions WHERE created_at >= DATE_ADD(CURDATE(), INTERVAL -7 DAY)")
-	} else if rangeDate == "monthly" {
-		rows, err = m.dbSQL.Query("SELECT * FROM transactions WHERE created_at >= DATE_ADD(CURDATE(), INTERVAL -30 DAY)")
+	if role == "staff" {
+		if rangeDate == "daily" {
+			rows, err = m.dbSQL.Query("SELECT * FROM transactions WHERE created_at >= DATE_ADD(CURDATE(), INTERVAL -1 DAY)")
+		} else if rangeDate == "weekly" {
+			rows, err = m.dbSQL.Query("SELECT * FROM transactions WHERE created_at >= DATE_ADD(CURDATE(), INTERVAL -7 DAY)")
+		} else if rangeDate == "monthly" {
+			rows, err = m.dbSQL.Query("SELECT * FROM transactions WHERE created_at >= DATE_ADD(CURDATE(), INTERVAL -30 DAY)")
+		}
+	} else if role == "user" {
+		if rangeDate == "daily" {
+			rows, err = m.dbSQL.Query("SELECT * FROM transactions WHERE created_at >= DATE_ADD(CURDATE(), INTERVAL -1 DAY) AND user_id = ?", id)
+		} else if rangeDate == "weekly" {
+			rows, err = m.dbSQL.Query("SELECT * FROM transactions WHERE created_at >= DATE_ADD(CURDATE(), INTERVAL -7 DAY) AND user_id = ?", id)
+		} else if rangeDate == "monthly" {
+			rows, err = m.dbSQL.Query("SELECT * FROM transactions WHERE created_at >= DATE_ADD(CURDATE(), INTERVAL -30 DAY) AND user_id = ?", id)
+		}
 	}
 
 	if err != nil {
@@ -119,11 +129,11 @@ func (m *TransactionDB) GetTransationTotalRangeDate(id int, role, rangeDate stri
 		}
 	} else if role == "user" {
 		if rangeDate == "daily" {
-			rows, err = m.dbSQL.Query("SELECT ci.category_id, c.name, SUM(ci.weight) FROM cart_items ci JOIN categories c ON ci.category_id = c.id WHERE ci.created_at >= DATE_ADD(CURDATE(), INTERVAL -1 DAY) AND ci.cart_user_id = ? AND ci.checkout_id IS NOT NULL AND t.status = 1 GROUP BY ci.category_id ORDER BY ci.category_id", id)
+			rows, err = m.dbSQL.Query("SELECT ci.category_id, c.name, SUM(ci.weight) FROM cart_items ci JOIN categories c ON ci.category_id = c.id JOIN transactions t ON ci.checkout_id = t.checkout_id WHERE ci.created_at >= DATE_ADD(CURDATE(), INTERVAL -1 DAY) AND ci.checkout_id IS NOT NULL AND t.status = 1 AND ci.cart_user_id = ? GROUP BY ci.category_id ORDER BY ci.category_id", id)
 		} else if rangeDate == "weekly" {
-			rows, err = m.dbSQL.Query("SELECT ci.category_id, c.name, SUM(ci.weight) FROM cart_items ci JOIN categories c ON ci.category_id = c.id WHERE ci.created_at >= DATE_ADD(CURDATE(), INTERVAL -7 DAY) AND ci.cart_user_id = ? AND ci.checkout_id IS NOT NULL AND t.status = 1 GROUP BY ci.category_id ORDER BY ci.category_id", id)
+			rows, err = m.dbSQL.Query("SELECT ci.category_id, c.name, SUM(ci.weight) FROM cart_items ci JOIN categories c ON ci.category_id = c.id JOIN transactions t ON ci.checkout_id = t.checkout_id WHERE ci.created_at >= DATE_ADD(CURDATE(), INTERVAL -7 DAY) AND ci.checkout_id IS NOT NULL AND t.status = 1 AND ci.cart_user_id = ? GROUP BY ci.category_id ORDER BY ci.category_id", id)
 		} else if rangeDate == "monthly" {
-			rows, err = m.dbSQL.Query("SELECT ci.category_id, c.name, SUM(ci.weight) FROM cart_items ci JOIN categories c ON ci.category_id = c.id WHERE ci.created_at >= DATE_ADD(CURDATE(), INTERVAL -30 DAY) AND ci.cart_user_id = ? AND ci.checkout_id IS NOT NULL AND t.status = 1 GROUP BY ci.category_id ORDER BY ci.category_id", id)
+			rows, err = m.dbSQL.Query("SELECT ci.category_id, c.name, SUM(ci.weight) FROM cart_items ci JOIN categories c ON ci.category_id = c.id JOIN transactions t ON ci.checkout_id = t.checkout_id WHERE ci.created_at >= DATE_ADD(CURDATE(), INTERVAL -30 DAY) AND ci.checkout_id IS NOT NULL AND t.status = 1 AND ci.cart_user_id = ? GROUP BY ci.category_id ORDER BY ci.category_id", id)
 		}
 	}
 
