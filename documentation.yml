@@ -8,8 +8,8 @@ paths:
   /register:
     post:
       tags:
-        - Users & Staff
-      summary: User registration
+        - Auth
+      summary: Register a new user	
       requestBody:
         required: true
         content:
@@ -45,8 +45,8 @@ paths:
   /registerstaff:
     post:
       tags:
-        - Users & Staff
-      summary: Register Staff
+        - Auth
+      summary: Register a new staff
       requestBody:
         required: true
         content:
@@ -79,8 +79,8 @@ paths:
   /login:
     post:
       tags:
-        - Users & Staff
-      summary: Login
+        - Auth
+      summary: Login existing user or staff
       requestBody:
         required: true
         content:
@@ -102,13 +102,43 @@ paths:
         '500':
           $ref: "#/components/responses/ServerError"
 
-  /profile:
+  /users:
     get:
       security:
         - bearerAuth: []
       tags:
         - Users & Staff
-      summary: Get current login user data
+      summary: 	Get list of all user (staff only)
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseGetAllUsers"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          $ref: "#/components/responses/ServerError"
+
+  /staff:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Users & Staff
+      summary: 	Get list of all staff (staff only)
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseGetAllStaff"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '500':
+          $ref: "#/components/responses/ServerError"
+
+  /profile:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Profile
+      summary: Get user profile or staff
       responses:
         '200':
           $ref: "#/components/responses/ResponseGetProfile"
@@ -120,8 +150,8 @@ paths:
       security:
         - bearerAuth: []
       tags:
-        - Users & Staff
-      summary: Edit current login user data
+        - Profile
+      summary: Update user profile or staff
       requestBody:
         required: true
         content:
@@ -154,41 +184,11 @@ paths:
         '500':
           $ref: "#/components/responses/ServerError" 
   
-  /users:
-    get:
-      security:
-        - bearerAuth: []
-      tags:
-        - Users & Staff
-      summary: Get all users (staff only)
-      responses:
-        '200':
-          $ref: "#/components/responses/ResponseGetAllUsers"
-        '401':
-          $ref: "#/components/responses/UnauthorizedError"
-        '500':
-          $ref: "#/components/responses/ServerError"
-
-  /staff:
-    get:
-      security:
-        - bearerAuth: []
-      tags:
-        - Users & Staff
-      summary: Get all Staff (staff only)
-      responses:
-        '200':
-          $ref: "#/components/responses/ResponseGetAllStaff"
-        '400':
-          $ref: "#/components/responses/BadRequest"
-        '500':
-          $ref: "#/components/responses/ServerError"
-  
   /droppoints:
     get:
       tags:
         - Drop Points
-      summary: Get all drop points
+      summary: Get list of all drop point
       responses:
         '200':
           $ref: "#/components/responses/ResponseGetAllDropPoint"
@@ -201,7 +201,7 @@ paths:
         - bearerAuth: []
       tags:
         - Drop Points
-      summary: Add drop points (staff only)
+      summary: Add drop point (staff only)
       requestBody:
         required: true
         content:
@@ -225,7 +225,7 @@ paths:
         - bearerAuth: []
       tags:
         - Drop Points
-      summary: Edit drop points by id (staff only)
+      summary: Update drop point by id (staff only)
       parameters:
         - name: id
           in: path
@@ -256,7 +256,7 @@ paths:
         - bearerAuth: []
       tags:
         - Drop Points
-      summary: Delete drop points by id (staff only)
+      summary: Delete drop point by id (staff only)
       parameters:
         - name: id
           in: path
@@ -278,7 +278,7 @@ paths:
     get:
       tags:
         - Categories
-      summary: Get all categories
+      summary: Get list of all category
       responses:
         '200':
           $ref: "#/components/responses/ResponseGetAllCategories"
@@ -291,7 +291,7 @@ paths:
         - bearerAuth: []
       tags:
         - Categories
-      summary: Add categories (staff only)
+      summary: Add category (staff only)
       requestBody:
         required: true
         content:
@@ -317,7 +317,7 @@ paths:
         - bearerAuth: []
       tags:
         - Categories
-      summary: Edit category by id (staff only)
+      summary: Update category by id (staff only)
       parameters:
         - name: id
           in: path
@@ -372,7 +372,7 @@ paths:
     get:
       tags:
         - Vouchers
-      summary: Get all vouchers
+      summary: Get list of all voucher
       responses:
         '200':
           $ref: "#/components/responses/ResponseGetAllVouchers"
@@ -385,7 +385,7 @@ paths:
         - bearerAuth: []
       tags:
         - Vouchers
-      summary: Add vouchers (staff only)
+      summary: Add voucher (staff only)
       requestBody:
         required: true
         content:
@@ -411,7 +411,7 @@ paths:
         - bearerAuth: []
       tags:
         - Vouchers
-      summary: Edit vouchers by id (staff only)
+      summary: Edit voucher by id (staff only)
       parameters:
         - name: id
           in: path
@@ -444,7 +444,7 @@ paths:
         - bearerAuth: []
       tags:
         - Vouchers
-      summary: Delete vouchers by id (staff only)
+      summary: Delete voucher by id (staff only)
       parameters:
         - name: id
           in: path
@@ -467,8 +467,8 @@ paths:
       security:
         - bearerAuth: []
       tags:
-        - User's Vouchers
-      summary: Get all user's vouchers
+        - User Vouchers
+      summary: Get list of all user voucher
       responses:
         '200':
           $ref: "#/components/responses/ResponseGetUserVouchers"
@@ -483,7 +483,7 @@ paths:
         - bearerAuth: []
       tags:
         - User's Vouchers
-      summary: Claim vouchers by voucher id
+      summary: Claim voucher by voucher id
       parameters:
         - name: id
           in: path
@@ -505,7 +505,7 @@ paths:
         - bearerAuth: []
       tags:
         - User's Vouchers
-      summary: Redeem vouchers by voucher id
+      summary: Redeem voucher by voucher id
       parameters:
         - name: id
           in: path
@@ -527,7 +527,7 @@ paths:
         - bearerAuth: []
       tags:
         - Carts
-      summary: Add item to current login user cart
+      summary: Add category list to user cart
       requestBody:
         required: true
         content:
@@ -553,7 +553,7 @@ paths:
         - bearerAuth: []
       tags:
         - Carts
-      summary: Get current login user cart items
+      summary: Get list of all cart item
       responses:
         '200': 
           $ref: "#/components/responses/ResponseGetCart"
@@ -568,7 +568,7 @@ paths:
         - bearerAuth: []
       tags:
         - Carts
-      summary: Edit cart item by cart item id (current login user)
+      summary: Update user cart item by id
       parameters:
         - name: id
           in: path
@@ -603,7 +603,7 @@ paths:
         - bearerAuth: []
       tags:
         - Carts
-      summary: Delete cart item by cart item id (current login user)
+      summary: Delete user cart item by id
       parameters:
         - name: id
           in: path
@@ -629,7 +629,7 @@ paths:
         - bearerAuth: []
       tags:
         - Checkout
-      summary: Add checkout by pickup
+      summary: Checkout by request pickup
       requestBody:
         required: true
         content:
@@ -658,7 +658,7 @@ paths:
         - bearerAuth: []
       tags:
         - Checkout
-      summary: Add checkout by drop off
+      summary: Checkout by drop off on drop point
       requestBody:
         required: true
         content:
@@ -690,7 +690,7 @@ paths:
         - bearerAuth: []
       tags:
         - Checkout
-      summary: Verification checkout (staff only)
+      summary: Verification by transaction id (staff only)
       parameters:
         - name: id
           in: path
@@ -716,7 +716,7 @@ paths:
         - bearerAuth: []
       tags:
         - Transactions
-      summary: Get all transactions
+      summary: Get list of all transaction
       description: staff can view all transactions, while user can view only her/his transactions
       responses:
         '200': 
@@ -732,7 +732,7 @@ paths:
         - bearerAuth: []
       tags:
         - Transactions
-      summary: Get transaction by drop point id (staff only)
+      summary: Get list of all transaction by drop points id (staff only)
       parameters:
         - name: id
           in: path
@@ -756,7 +756,7 @@ paths:
         - bearerAuth: []
       tags:
         - Transactions
-      summary: Get transaction report with range date
+      summary: Get list of all transaction (daily, weekly, monthly)
       parameters:
         - name: range
           in: path
@@ -781,7 +781,7 @@ paths:
         - bearerAuth: []
       tags:
         - Transactions
-      summary: Get total weight of transactions
+      summary: Get list of all total weight of transaction
       responses:
         '200': 
           $ref: "#/components/responses/ResponseGetTotalTransactions"
@@ -798,7 +798,7 @@ paths:
         - bearerAuth: []
       tags:
         - Transactions
-      summary: Get total weight of transactions with range date
+      summary: Get list of all total weight of transaction (daily, weekly, monthly)
       parameters:
         - name: range
           in: path
@@ -818,7 +818,6 @@ paths:
           $ref: "#/components/responses/ServerError"
 
   
-            
 components:
   securitySchemes:
     bearerAuth:
