@@ -9,7 +9,7 @@ paths:
     post:
       tags:
         - Auth
-      summary: Register a new user	
+      summary: Register a new user  
       requestBody:
         required: true
         content:
@@ -108,7 +108,7 @@ paths:
         - bearerAuth: []
       tags:
         - Users & Staff
-      summary: 	Get list of all user (staff only)
+      summary:   Get list of all user (staff only)
       responses:
         '200':
           $ref: "#/components/responses/ResponseGetAllUsers"
@@ -123,7 +123,7 @@ paths:
         - bearerAuth: []
       tags:
         - Users & Staff
-      summary: 	Get list of all staff (staff only)
+      summary:   Get list of all staff (staff only)
       responses:
         '200':
           $ref: "#/components/responses/ResponseGetAllStaff"
