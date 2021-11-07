@@ -8,7 +8,7 @@ paths:
   /register:
     post:
       tags:
-        - Users
+        - Users & Staff
       summary: User registration
       requestBody:
         required: true
@@ -41,10 +41,45 @@ paths:
           $ref: "#/components/responses/BadRequest"
         '500':
           $ref: "#/components/responses/ServerError"
+  
+  /registerstaff:
+    post:
+      tags:
+        - Users & Staff
+      summary: Register Staff
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullname:
+                  type: string
+                username:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                phone_number:
+                  type: string
+                drop_point_id:
+                  type: number
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseCreateStaff"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          $ref: "#/components/responses/ServerError"
+  
   /login:
     post:
       tags:
-        - Users
+        - Users & Staff
       summary: Login
       requestBody:
         required: true
@@ -65,28 +100,14 @@ paths:
         '400':
           $ref: "#/components/responses/BadRequest"
         '500':
-          $ref: "#/components/responses/ServerError"   
-  
-  /users:
-    get:
-      security:
-        - bearerAuth: []
-      tags:
-        - Users
-      summary: Get all users (admin only)
-      responses:
-        '200':
-          $ref: "#/components/responses/ResponseGetAllUsers"
-        '401':
-          $ref: "#/components/responses/UnauthorizedError"
-        '500':
           $ref: "#/components/responses/ServerError"
+
   /profile:
     get:
       security:
         - bearerAuth: []
       tags:
-        - Users
+        - Users & Staff
       summary: Get current login user data
       responses:
         '200':
@@ -99,7 +120,7 @@ paths:
       security:
         - bearerAuth: []
       tags:
-        - Users
+        - Users & Staff
       summary: Edit current login user data
       requestBody:
         required: true
@@ -131,8 +152,38 @@ paths:
         '400':
           $ref: "#/components/responses/BadRequest"
         '500':
+          $ref: "#/components/responses/ServerError" 
+  
+  /users:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Users & Staff
+      summary: Get all users (staff only)
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseGetAllUsers"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
           $ref: "#/components/responses/ServerError"
 
+  /staff:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Users & Staff
+      summary: Get all Staff (staff only)
+      responses:
+        '200':
+          $ref: "#/components/responses/ResponseGetAllStaff"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '500':
+          $ref: "#/components/responses/ServerError"
+  
   /droppoints:
     get:
       tags:
@@ -150,7 +201,7 @@ paths:
         - bearerAuth: []
       tags:
         - Drop Points
-      summary: Add drop points (admin only)
+      summary: Add drop points (staff only)
       requestBody:
         required: true
         content:
@@ -174,7 +225,7 @@ paths:
         - bearerAuth: []
       tags:
         - Drop Points
-      summary: Edit drop points by id (admin only)
+      summary: Edit drop points by id (staff only)
       parameters:
         - name: id
           in: path
@@ -205,7 +256,7 @@ paths:
         - bearerAuth: []
       tags:
         - Drop Points
-      summary: Delete drop points by id (admin only)
+      summary: Delete drop points by id (staff only)
       parameters:
         - name: id
           in: path
@@ -220,53 +271,6 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         '404':
           $ref: "#/components/responses/NotFound"
-        '500':
-          $ref: "#/components/responses/ServerError" 
-
-  /administrators:
-    post:
-      tags:
-        - Administrators
-      summary: Add administrators
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                fullname:
-                  type: string
-                username:
-                  type: string
-                email:
-                  type: string
-                  format: email
-                password:
-                  type: string
-                  format: password
-                phone_number:
-                  type: string
-                drop_point_id:
-                  type: number
-      responses:
-        '200':
-          $ref: "#/components/responses/ResponseCreateAdmin"
-        '401':
-          $ref: "#/components/responses/UnauthorizedError"
-        '500':
-          $ref: "#/components/responses/ServerError"   
-    get:
-      security:
-        - bearerAuth: []
-      tags:
-        - Administrators
-      summary: Get all administrators (admin only)
-      responses:
-        '200':
-          $ref: "#/components/responses/ResponseGetAllAdmin"
-        '400':
-          $ref: "#/components/responses/BadRequest"
         '500':
           $ref: "#/components/responses/ServerError"
           
@@ -287,7 +291,7 @@ paths:
         - bearerAuth: []
       tags:
         - Categories
-      summary: Add categories (admin only)
+      summary: Add categories (staff only)
       requestBody:
         required: true
         content:
@@ -313,7 +317,7 @@ paths:
         - bearerAuth: []
       tags:
         - Categories
-      summary: Edit category by id (admin only)
+      summary: Edit category by id (staff only)
       parameters:
         - name: id
           in: path
@@ -346,7 +350,7 @@ paths:
         - bearerAuth: []
       tags:
         - Categories
-      summary: Delete category by id (admin only)
+      summary: Delete category by id (staff only)
       parameters:
         - name: id
           in: path
@@ -381,7 +385,7 @@ paths:
         - bearerAuth: []
       tags:
         - Vouchers
-      summary: Add vouchers (admin only)
+      summary: Add vouchers (staff only)
       requestBody:
         required: true
         content:
@@ -407,7 +411,7 @@ paths:
         - bearerAuth: []
       tags:
         - Vouchers
-      summary: Edit vouchers by id (admin only)
+      summary: Edit vouchers by id (staff only)
       parameters:
         - name: id
           in: path
@@ -440,7 +444,7 @@ paths:
         - bearerAuth: []
       tags:
         - Vouchers
-      summary: Delete vouchers by id (admin only)
+      summary: Delete vouchers by id (staff only)
       parameters:
         - name: id
           in: path
@@ -463,7 +467,7 @@ paths:
       security:
         - bearerAuth: []
       tags:
-        - Vouchers
+        - User's Vouchers
       summary: Get all user's vouchers
       responses:
         '200':
@@ -478,7 +482,7 @@ paths:
       security:
         - bearerAuth: []
       tags:
-        - Vouchers
+        - User's Vouchers
       summary: Claim vouchers by voucher id
       parameters:
         - name: id
@@ -500,7 +504,7 @@ paths:
       security:
         - bearerAuth: []
       tags:
-        - Vouchers
+        - User's Vouchers
       summary: Redeem vouchers by voucher id
       parameters:
         - name: id
@@ -619,21 +623,42 @@ paths:
         '500':
           $ref: "#/components/responses/ServerError"
   
-  /checkout/{param}:
+  /checkoutbypickup:
     post:
       security:
         - bearerAuth: []
       tags:
         - Checkout
-      summary: Add checkout
-      parameters:
-        - name: param
-          in: path
-          required: true
-          description: param for add request drop off or pickup
-          schema:
-            type: string
-            enum: [dropoff, pickup]
+      summary: Add checkout by pickup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                category_id:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        '201': 
+          $ref: "#/components/responses/ResponseCreateCheckoutPickup"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          $ref: "#/components/responses/ServerError"
+        '502':
+          $ref: "#/components/responses/BadGateway"
+  /checkoutbydropoff:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Checkout
+      summary: Add checkout by drop off
       requestBody:
         required: true
         content:
@@ -649,7 +674,7 @@ paths:
                     type: integer
       responses:
         '201': 
-          $ref: "#/components/responses/ResponseCreateCheckout"
+          $ref: "#/components/responses/ResponseCreateCheckoutDropOff"
         '400':
           $ref: "#/components/responses/BadRequest"
         '401':
@@ -665,7 +690,7 @@ paths:
         - bearerAuth: []
       tags:
         - Checkout
-      summary: Verification checkout (admin only)
+      summary: Verification checkout (staff only)
       parameters:
         - name: id
           in: path
@@ -692,7 +717,7 @@ paths:
       tags:
         - Transactions
       summary: Get all transactions
-      description: admin can view all transactions, while user can view only her/his transactions
+      description: staff can view all transactions, while user can view only her/his transactions
       responses:
         '200': 
           $ref: "#/components/responses/ResponseGetAllTransactions"
@@ -701,16 +726,40 @@ paths:
         '500':
           $ref: "#/components/responses/ServerError"
   
-  /transactionreport?range={range}:
+  /transactionsbydroppoint/{id}:
     get:
       security:
         - bearerAuth: []
       tags:
         - Transactions
-      summary: Get transaction report (admin only)
+      summary: Get transaction by drop point id (staff only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id for get specific drop point
+          schema:
+            type: number
+      responses:
+        '200': 
+          $ref: "#/components/responses/ResponseGetAllTransactions"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          $ref: "#/components/responses/ServerError"
+
+  /transactionreport/{range}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Transactions
+      summary: Get transaction report with range date
       parameters:
         - name: range
-          in: query
+          in: path
           required: true
           description: range for get daily, weekly or monthly transactions
           schema:
@@ -726,13 +775,38 @@ paths:
         '500':
           $ref: "#/components/responses/ServerError"
 
-  /transactionsqty:
+  /totaltransaction:
     get:
       security:
         - bearerAuth: []
       tags:
         - Transactions
-      summary: Get total quantity of all transaction
+      summary: Get total weight of transactions
+      responses:
+        '200': 
+          $ref: "#/components/responses/ResponseGetTotalTransactions"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '500':
+          $ref: "#/components/responses/ServerError"
+
+  /totaltransaction/{range}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Transactions
+      summary: Get total weight of transactions with range date
+      parameters:
+        - name: range
+          in: path
+          required: true
+          description: range for get daily, weekly or monthly transactions
+          schema:
+            type: string
+            enum: [daily, weekly, monthly]
       responses:
         '200': 
           $ref: "#/components/responses/ResponseGetTotalTransactions"
@@ -771,131 +845,157 @@ components:
       content:
         application/json:
           example:
-            status: user created successfully
-    ResponseCreateAdmin:
+            data:
+              id: 1
+              fullname: User
+              email: user@gmail.com
+              username: user1
+              point: 0
+              phone_number: 08123456789
+              gender: male
+              address: jakarta
+              role: user
+            status: success
+    ResponseCreateStaff:
       description: Created
       content:
         application/json:
           example:
-            status: admin created successfully
+            data:
+              id: 1
+              fullname: Staff
+              email: staff1@gmail.com
+              username: staff1
+              role: staff
+              phone_number: 08123456789
+              drop_point_id: 1
+              drop_point_address: drop point address 1
+            status: success
     ResponseEditUser:
       description: OK
       content:
         application/json:
           example:
-            status: success
             data: 
+              id: 1
               fullname: User
-              username: user1
               email: user@gmail.com
+              username: user1
+              point: 0
               phone_number: 08123456789
               gender: male
-              address: earth
+              address: jakarta
+              role: user
+            status: success
     ResponseLoginUser:
       description: OK
       content:
         application/json:
           example:
-            status: success
             data:
               username: user1
               email: user@gmail.com
               role: user
               token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+            status: success
     ResponseGetAllUsers:
       description: OK
       content:
         application/json:
           example:
-            status: success
             data:
             - id: 1
               fullname: User
-              username: user1
               email: user@gmail.com
+              username: user1
+              point: 0
               phone_number: 08123456789
               gender: male
-              address: earth
+              address: jakarta
               role: user
             - id: 2
               fullname: User 2
-              username: user2
               email: user2@gmail.com
-              phone_number: 08123456789
+              username: user2
+              point: 0
+              phone_number: 082187837122
               gender: female
-              address: earth
+              address: bandung
               role: user
-    ResponseGetAllAdmin:
+            status: success
+    ResponseGetAllStaff:
       description: OK
       content:
         application/json:
           example:
-            status: success
             data:
             - id: 1
-              fullname: Admin
-              username: admin1
-              email: admin@gmail.com
+              fullname: Staff
+              email: staff1@gmail.com
+              username: staff1
+              role: staff
               phone_number: 08123456789
               drop_point_id: 1
-              role: admin
-            - id: 2
-              fullname: Admin 2
-              username: admin2
-              email: admin2@gmail.com
-              phone_number: 08127372643
+              drop_point_address: drop point address 1
+            - id: 1
+              fullname: Staff
+              email: staff1@gmail.com
+              username: staff1
+              role: staff
+              phone_number: 08123456789
               drop_point_id: 2
-              role: admin
+              drop_point_address: drop point address 2
+            status: success
     ResponseGetProfile:
       description: OK
       content:
         application/json:
           example:
-            status: success
             data:
               id: 1
               fullname: User
-              username: user1
               email: user@gmail.com
+              username: user1
+              point: 0
               phone_number: 08123456789
               gender: male
-              address: earth
+              address: jakarta
               role: user
+            status: success
     ResponseGetAllDropPoint:
       description: OK
       content:
         application/json:
           example:
-            status: success
             data:
             - id: 1
               address: Jakarta
             - id: 2
               address: Bandung
+            status: success
     ResponseCreateDropPoint:
       description: Created
       content:
         application/json:
           example:
-            status: success
             data:
               id: 1
               address: Jakarta
+            status: success
     ResponseEditDropPoint:
       description: OK
       content:
         application/json:
           example:
-            status: success
             data:
               id: 1
               address: Jakarta
+            status: success
     ResponseGetAllCategories:
       description: OK
       content:
         application/json:
           example:
-            status: success
             data:
             - id: 1
               name: Plastik
@@ -903,32 +1003,32 @@ components:
             - id: 2
               name: Kaca
               point: 20
+            status: success
     ResponseCreateCategory:
       description: Created
       content:
         application/json:
           example:
-            status: success
             data:
               id: 1
               name: Plastik
               point: 10
+            status: success
     ResponseEditCategory:
       description: OK
       content:
         application/json:
           example:
-            status: success
             data:
               id: 1
               name: Plastik
               point: 10
+            status: success
     ResponseGetAllVouchers:
       description: OK
       content:
         application/json:
           example:
-            status: success
             data:
             - id: 1
               name: Voucher 1
@@ -936,135 +1036,155 @@ components:
             - id: 2
               name: Voucher 2
               point: 200
+            status: success
     ResponseCreateVoucher:
       description: Created
       content:
         application/json:
           example:
-            status: success
             data:
               id: 1
               name: Voucher 1
               point: 150
+            status: success
     ResponseEditVoucher:
       description: OK
       content:
         application/json:
           example:
-            status: success
             data:
               id: 1
               name: Voucher 1
               point: 150
+            status: success
     ResponseGetUserVouchers:
       description: OK
       content:
         application/json:
           example:
-            status: success
             data:
             - id: 1
-              name: Voucher 1
-              point: 150
+              user_id: 1
+              voucher_id: 1
+              voucher_name: Pulsa 10rb
+              point: 10
               status: used
             - id: 2
-              name: Voucher 2
-              point: 200
+              user_id: 1
+              voucher_id: 2
+              voucher_name: Pulsa 20rb
+              point: 20
               status: available
+            status: success
     ResponseGetCart:
       description: OK
       content:
         application/json:
           example:
-            status: success
             data:
-            - cart_item_id: 1
+            - id: 1
               category_id: 1
-              category_name: Plastik
               weight: 3
-            - cart_item_id: 2
+              checkout_id: 0
+              cart_user_id: 1
+              created_at: "2021-11-04 01:06:18.619"
+            - id: 2
               category_id: 2
-              category_name: Kaca
               weight: 1
+              checkout_id: 0
+              cart_user_id: 1
+              created_at: "2021-11-04 01:06:18.619"
+            status: success
     ResponseCreateCartItem:
       description: Created
       content:
         application/json:
           example:
-            status: success
             data:
               id: 1
-              user_id: 1
               category_id: 1
-              category_name: Plastik
               weight: 3
-    ResponseEditCartItem:
-      description: OK
-      content:
-        application/json:
-          example:
+              checkout_id: 0
+              cart_user_id: 1
+              created_at: "2021-11-04 01:06:18.619"
             status: success
-            data:
-              id: 1
-              user_id: 1
-              category_id: 2
-              category_name: Kaca
-              weight: 2
-    ResponseCreateCheckout:
+    ResponseEditCartItem:
       description: Created
       content:
         application/json:
           example:
-            id: 1
             data:
-              categories:
-              - category_id: 1
-                category_name: Plastik
-                category_point: 10
-                weight: 1
-              - category_id: 2
-                category_name: Kaca
-                category_point: 20
-                weight: 2
-            total_points: 50
-            drop_point_id: 1
-    ResponseEditCheckout:
-      description: OK
+              id: 1
+              category_id: 1
+              weight: 3
+              checkout_id: 0
+              cart_user_id: 1
+              created_at: "2021-11-04 01:06:18.619"
+            status: success
+    ResponseCreateCheckoutPickup:
+      description: Created
       content:
         application/json:
           example:
-            id: 1
             data:
+              transaction_id: 1
+              method: pickup
+              drop_point_id: 1
+              drop_point_address: Drop point address 1
+              distance: 2
+              duration: 15
+              total_received_points: 13
               categories:
               - category_id: 1
                 category_name: Plastik
-                category_point: 10
+                point: 3
                 weight: 1
+                received_points: 3
               - category_id: 2
                 category_name: Kaca
-                category_point: 20
+                point: 5
                 weight: 2
-            total_points: 50
-            drop_point_id: 1
+                received_points: 10
+            status: success
+    ResponseCreateCheckoutDropOff:
+      description: Created
+      content:
+        application/json:
+          example:
+            data:
+              transaction_id: 1
+              method: dropoff
+              drop_point_id: 1
+              drop_point_address: Drop point address 1
+              total_received_points: 13
+              categories:
+              - category_id: 1
+                category_name: Plastik
+                point: 3
+                weight: 1
+                received_points: 3
+              - category_id: 2
+                category_name: Kaca
+                point: 5
+                weight: 2
+                received_points: 10
+            status: success
     ResponseVerificationCheckout:
       description: OK
       content:
         application/json:
           example:
-            id: 1
             data:
-              categories:
-              - category_id: 1
-                category_name: Plastik
-                category_point: 10
-                weight: 1
-              - category_id: 2
-                category_name: Kaca
-                category_point: 20
-                weight: 2
-            status: Verified
-            total_points: 50     
-            drop_point_id: 1 
+              id: 1
+              user_id: 1
+              status: 1
+              point: 13
+              method: dropoff
+              drop_point_id: 1
+              checkout_id: 1
+              created_at: "2021-11-04 01:06:18.619"
+              updated_at: "2021-11-04 01:06:18.619"
+            status: success
     ResponseGetAllTransactions:
       description: OK
       content:
@@ -1074,40 +1194,45 @@ components:
             data:
             - id: 1
               user_id: 1
-              method: drop off
+              method: dropoff
               drop_point_id: 1
-              point: 50
+              drop_point_address: drop point address 1
               categories:
               - category_id: 1
                 category_name: Plastik
-                category_point: 10
+                point: 3
                 weight: 1
+                received_points: 3
               - category_id: 2
                 category_name: Kaca
-                category_point: 20
+                point: 5
                 weight: 2
+                received_points: 10
               created_at: "2021-09-01 20:49:51.428"
-            - id: 1
+              updated_at: "2021-09-01 20:49:51.428"
+            - id: 2
               user_id: 1
-              method: pickup
+              method: dropoff
               drop_point_id: 1
-              point: 60
+              drop_point_address: drop point address 1
               categories:
               - category_id: 1
                 category_name: Plastik
-                category_point: 10
-                weight: 2
+                point: 3
+                weight: 1
+                received_points: 3
               - category_id: 2
                 category_name: Kaca
-                category_point: 20
+                point: 5
                 weight: 2
+                received_points: 10
               created_at: "2021-09-01 20:49:51.428"
+              updated_at: "2021-09-01 20:49:51.428"
     ResponseGetTotalTransactions:
       description: OK
       content:
         application/json:
           example:
-            status: success
             data:
             - category_id: 1
               category_name: Plastik
@@ -1115,6 +1240,7 @@ components:
             - category_id: 2
               category_name: Kaca
               weight: 3
+            status: success
     ResponseDeleteCategory:
       description: OK
       content:
@@ -1144,11 +1270,24 @@ components:
       content:
         application/json:
           example:
-            "message": claim voucher success
+            data:
+              id: 1
+              user_id: 1
+              voucher_id: 1
+              voucher_name: Pulsa 10rb
+              point: 10
+              status: available
+            status: success
     ResponseRedeemVoucher:
       description: OK
       content:
         application/json:
           example:
-            "message": redeem voucher success
-    
+            data:
+              id: 1
+              user_id: 1
+              voucher_id: 1
+              voucher_name: Pulsa 10rb
+              point: 10
+              status: available
+            status: success
