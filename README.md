@@ -66,12 +66,12 @@ after that import the file-insert.sql to your database
 | PUT | /cartitems/:id | Update user cart item by id | Yes | No
 | DELETE | /cartitems/:id | Delete user cart item by id | Yes | No
 |---|---|---|---|---|
-| POST | /checkoutbypickup | List of product on request pickup | Yes | No
-| POST | /checkoutbydropoff | List of product on request pickup | Yes | No
+| POST | /checkoutbypickup | Checkout by request pickup | Yes | No
+| POST | /checkoutbydropoff | Checkout by dropoff on drop point | Yes | No
 | POST | /verification/:id | Verification by transaction id | Yes | Yes
 |---|---|---|---|---|
 | GET | /transactions | Get list of all transaction | Yes | No
-| GET | /transactionbydroppoint/:id | Get list of all transaction by drop points id | Yes | Yes
+| GET | /transactionbydroppoint/:id | Get list of all transaction by drop points id (staff only) | Yes | Yes
 | GET | /transactionreport/:range | Get list of all transaction -daily - weekly -monthly | Yes | No
 | GET | /totaltransaction | Get list of all total weight of transaction | Yes | No
 | GET | /totaltransaction/:range | Get list of all total weight of transaction -daily - weekly -monthly | Yes | No
