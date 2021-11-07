@@ -166,7 +166,10 @@ func (controllers *TransactionController) GetTransactionsWithRangeDate(c echo.Co
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid range")
 	}
 	
-	transactions, err := controllers.transactionModel.GetTransationsRangeDate(rangeDate)
+	role := middlewares.CurrentRoleLoginUser(c)
+	id := middlewares.CurrentLoginUser(c)
+
+	transactions, err := controllers.transactionModel.GetTransationsRangeDate(id, role, rangeDate)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}

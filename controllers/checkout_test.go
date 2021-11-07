@@ -52,6 +52,42 @@ func InsertDataCheckout(db *gorm.DB) error {
 	return nil	
 }
 
+func InsertDataCheckoutVerification(db *gorm.DB) error {
+	checkoutInput := models.Checkout_Input_DropOff{
+		CategoryID	: []int{1},
+		DropPointID	: 1,
+	}
+
+	var checkout models.Checkout
+	if err := db.Save(&checkout).Error; err != nil {
+		return err
+	}
+
+	var cartItem models.CartItem
+
+	if err := db.Where("cart_user_id = ? and category_id = ? and checkout_id IS NULL", 1, 1).First(&cartItem).Error; err != nil {
+		return err
+	}
+
+	if err := db.Model(&cartItem).Update("checkout_id", 1).Error; err != nil {
+		return err
+	}
+
+	var transaction models.Transaction
+	transaction.UserID = 1
+	transaction.Point = 30
+	transaction.Method = "dropoff"
+	transaction.Drop_PointID = checkoutInput.DropPointID
+	transaction.CheckoutID = 1
+	transaction.Status = 1
+
+	if err := db.Save(&transaction).Error; err != nil {
+		return err
+	}
+	
+	return nil	
+}
+
 func TestCreateCheckoutDropoff(t *testing.T) {
 	var testCases = []struct {
 		name       		string
