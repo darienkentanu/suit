@@ -171,7 +171,7 @@ func (controllers *TransactionController) GetTransactionsWithRangeDate(c echo.Co
 
 	transactions, err := controllers.transactionModel.GetTransationsRangeDate(id, role, rangeDate)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error 1")
 	}
 
 	var resAllTransactions []models.ResponseGetTransactions
@@ -179,14 +179,14 @@ func (controllers *TransactionController) GetTransactionsWithRangeDate(c echo.Co
 	for _, transaction := range transactions {
 		cartItems, err := controllers.cartModel.GetCartItemByCheckoutID(transaction.CheckoutID)
 		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+			return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error 2")
 		}
 
 		var categories []models.ResponseGetCategory
 		for _, item := range cartItems {
 			category, err := controllers.categoryModel.GetCategoryById(item.CategoryID)
 			if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+				return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error 3")
 			}
 
 			var resCategory models.ResponseGetCategory
@@ -201,7 +201,7 @@ func (controllers *TransactionController) GetTransactionsWithRangeDate(c echo.Co
 
 		dropPoint, err := controllers.dropPointModel.GetDropPointsByID(transaction.Drop_PointID)
 		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+			return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error 4")
 		}
 
 		var resTransaction models.ResponseGetTransactions
