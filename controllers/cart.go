@@ -26,7 +26,7 @@ func (cc *CartController) AddToCart(c echo.Context) error {
 	if !exist {
 		newItem, err := cc.db.AddToCart(userID, input)
 		if err != nil {
-			echo.NewHTTPError(http.StatusInternalServerError, err)
+			echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 		}
 		return c.JSON(http.StatusCreated, M{
 			"status": "success",
@@ -35,7 +35,7 @@ func (cc *CartController) AddToCart(c echo.Context) error {
 	}
 	newItem, err := cc.db.AddCartWeight(userID, input)
 	if err != nil {
-		echo.NewHTTPError(http.StatusInternalServerError, err)
+		echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}
 	return c.JSON(http.StatusCreated, M{
 		"status": "success",
@@ -47,7 +47,7 @@ func (cc *CartController) GetCartItem(c echo.Context) error {
 	userID := middlewares.CurrentLoginUser(c)
 	cartItems, err := cc.db.GetCartItem(userID)
 	if err != nil {
-		echo.NewHTTPError(http.StatusInternalServerError, err)
+		echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}
 	return c.JSON(http.StatusOK, M{
 		"status": "success",
@@ -64,7 +64,7 @@ func (cc *CartController) EditCartItem(c echo.Context) error {
 	}
 	newCartItem, err := cc.db.EditCartItem(id, input)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}
 	return c.JSON(http.StatusOK, M{
 		"status": "success",
@@ -79,7 +79,7 @@ func (cc *CartController) DeleteCartItem(c echo.Context) error {
 	}
 	err = cc.db.DeleteCartItem(id)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}
 	return c.JSON(http.StatusOK, M{
 		"message": "cart item succesfully deleted",

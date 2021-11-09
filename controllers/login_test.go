@@ -279,7 +279,7 @@ func TestUpdateProfile(t *testing.T) {
 		reqBody		map[string]interface{}
 	}{
 		{
-			name:       "Get Profile User",
+			name:       "Update Profile User",
 			path:       "/profile",
 			loginPath:	"/login",
 			expectCode: http.StatusOK,
@@ -299,7 +299,7 @@ func TestUpdateProfile(t *testing.T) {
 			},
 		},
 		{
-			name:       "Get Profile Staff",
+			name:       "Update Profile Staff",
 			path:       "/profile",
 			loginPath:	"/login",
 			expectCode: http.StatusOK,
@@ -387,6 +387,123 @@ func TestUpdateProfile(t *testing.T) {
 						assert.Error(t, err, "error")
 					}
 					assert.Equal(t, testCase.response, response.Status)
+				}
+			})
+		}
+	}
+}
+
+func TestUpdateProfileError(t *testing.T) {
+	var testCases = []struct {
+		name       	string
+		path       	string
+		loginPath	string
+		expectCodeLogin int
+		expectCode 	int
+		expectError string
+		login		map[string]interface{}
+		reqBody		map[string]interface{}
+	}{
+		{
+			name:       "Update Profile User Invalid Input",
+			path:       "/profile",
+			loginPath:	"/login",
+			expectCodeLogin: http.StatusOK,
+			expectCode: http.StatusBadRequest,
+			expectError:   "Invalid input",
+			login:		map[string]interface{}{
+				"email"			: "alikatania@gmail.com",
+				"password"		: "alika123",
+			},
+			reqBody: 	map[string]interface{}{
+				"fullname"		: "Alika Tania P.",
+				"email"			: "alikataniap@gmail.com",
+				"username"		: "alikap",
+				"password"		: "alika123",
+				"phone_number"	: 812783781,
+				"gender"		: "female",
+				"address"		: "Jl. Kebon Jeruk Raya No. 27, Kebon Jeruk, Jakarta Barat 11530",
+			},
+		},
+		{
+			name:       "Update Profile Staff Invalid Input",
+			path:       "/profile",
+			loginPath:	"/login",
+			expectCodeLogin: http.StatusOK,
+			expectCode: http.StatusBadRequest,
+			expectError:   "Invalid input",
+			login:		map[string]interface{}{
+				"email"			: "azkam@gmail.com",
+				"password"		: "azka123",
+			},
+			reqBody: 	map[string]interface{}{
+				"fullname": "Muhammad Azka R.",
+				"email": 	"azkamr@gmail.com",
+				"username": "mazkar",
+				"password": "azka1234",
+				"phone_number": 8126736171,
+				"drop_point_id": 1,
+			},
+		},
+	}
+	
+	e, db, dbSQL := InitEcho()
+	UserSetup(db)
+	userDB := database.NewUserDB(db, dbSQL)
+	loginDB := database.NewLoginDB(db)
+	staffDB := database.NewStaffDB(db, dbSQL)
+	dropPointDB := database.NewDropPointsDB(db)
+	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
+	InsertDataUser(db)
+	InsertDataDropPoints(db)
+	InsertDataStaff(db)
+
+	for _, testCase := range testCases {
+		login, err := json.Marshal(testCase.login)
+		if err != nil {
+			t.Error(err)
+		}
+
+		loginReq := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(login))
+		loginReq.Header.Set("Content-Type", "application/json")
+		loginRec := httptest.NewRecorder()
+		loginC := e.NewContext(loginReq, loginRec)
+		
+		loginC.SetPath(testCase.loginPath)
+
+		if assert.NoError(t, loginControllers.Login(loginC)) {
+			assert.Equal(t, testCase.expectCodeLogin, loginRec.Code)
+			body := loginRec.Body.String()
+
+			var responseLogin = struct {
+				Status string					`json:"status"`
+				Data   models.ResponseLogin 	`json:"data"`
+			}{}
+			err := json.Unmarshal([]byte(body), &responseLogin)
+			if err != nil {
+				assert.Error(t, err, "error")
+			}
+
+			assert.NotEmpty(t, responseLogin.Data.Token)
+			token := responseLogin.Data.Token
+
+			reqBody, err := json.Marshal(testCase.reqBody)
+			if err != nil {
+				t.Error(err)
+			}
+
+			req := httptest.NewRequest(http.MethodPut, "/", bytes.NewBuffer(reqBody))
+			req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", token))
+			req.Header.Set("Content-Type", "application/json")
+			rec := httptest.NewRecorder()
+			c := e.NewContext(req, rec)
+			
+			c.SetPath(testCase.path)
+
+			t.Run(testCase.name, func(t *testing.T) {
+				err := echoMiddleware.JWT([]byte(constants.JWT_SECRET))(loginControllers.UpdateProfile)(c)
+				if assert.Error(t, err){
+					assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
 				}
 			})
 		}

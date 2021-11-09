@@ -112,7 +112,6 @@ func TestRegisterUser(t *testing.T) {
 	loginDB := database.NewLoginDB(db)
 	cartDB := database.NewCartDB(db)
 	controllers := NewUserController(userDB, loginDB, cartDB)
-	InsertDataUser(db)
 
 	for _, testCase := range testCases {
 		register, err := json.Marshal(testCase.reqBody)
@@ -141,6 +140,106 @@ func TestRegisterUser(t *testing.T) {
 					assert.Error(t, err, "error")
 				}
 				assert.Equal(t, testCase.response, response.Status)
+			}
+		})
+	}
+}
+
+func TestRegisterUserError(t *testing.T) {
+	var testCases = []struct {
+		name       	string
+		path       	string
+		expectCode 	int
+		expectError string
+		reqBody		map[string]interface{}
+	}{
+		{
+			name:       "Register User Invalid input",
+			path:       "/register",
+			expectCode: http.StatusBadRequest,
+			expectError:   "Invalid input",
+			reqBody: 	map[string]interface{}{
+				"fullname"		: "Ara Alifia",
+				"email"			: "araalifia@gmail.com",
+				"username"		: "alifia",
+				"password"		: "alifia123",
+				"phone_number"	: 827873486,
+				"gender"		: "female",
+				"address"		: "Jl. Kebon Jeruk Raya No. 27, Kebon Jeruk, Jakarta Barat 11530",
+			},
+		},
+		{
+			name:       "Register User Duplicate Email",
+			path:       "/register",
+			expectCode: http.StatusBadRequest,
+			expectError:   "Email is already registered",
+			reqBody: 	map[string]interface{}{
+				"fullname"		: "Ara Alifia",
+				"email"			: "alikatania@gmail.com",
+				"username"		: "alifia",
+				"password"		: "alifia123",
+				"phone_number"	: "0827873486",
+				"gender"		: "female",
+				"address"		: "Jl. Kebon Jeruk Raya No. 27, Kebon Jeruk, Jakarta Barat 11530",
+			},
+		},
+		{
+			name:       "Register User Duplicate Phone Number",
+			path:       "/register",
+			expectCode: http.StatusBadRequest,
+			expectError:   "Phone number is already registered",
+			reqBody: 	map[string]interface{}{
+				"fullname"		: "Ara Alifia",
+				"email"			: "araalifia@gmail.com",
+				"username"		: "alifia",
+				"password"		: "alifia123",
+				"phone_number"	: "08123456789",
+				"gender"		: "female",
+				"address"		: "Jl. Kebon Jeruk Raya No. 27, Kebon Jeruk, Jakarta Barat 11530",
+			},
+		},
+		{
+			name:       "Register User Duplicate Username",
+			path:       "/register",
+			expectCode: http.StatusBadRequest,
+			expectError:   "Username is already registered",
+			reqBody: 	map[string]interface{}{
+				"fullname"		: "Ara Alifia",
+				"email"			: "araalifia@gmail.com",
+				"username"		: "alika",
+				"password"		: "alifia123",
+				"phone_number"	: "0827873486",
+				"gender"		: "female",
+				"address"		: "Jl. Kebon Jeruk Raya No. 27, Kebon Jeruk, Jakarta Barat 11530",
+			},
+		},
+	}
+
+	e, db, dbSQL := InitEcho()
+	UserSetup(db)
+	userDB := database.NewUserDB(db, dbSQL)
+	loginDB := database.NewLoginDB(db)
+	cartDB := database.NewCartDB(db)
+	controllers := NewUserController(userDB, loginDB, cartDB)
+	InsertDataUser(db)
+
+	for _, testCase := range testCases {
+		register, err := json.Marshal(testCase.reqBody)
+		if err != nil {
+			t.Error(err)
+		}
+
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(register))
+		req.Header.Set("Content-Type", "application/json")
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		
+		c.SetPath(testCase.path)
+
+		t.Run(testCase.name, func(t *testing.T) {
+			err := controllers.RegisterUsers(c)
+			if assert.Error(t, err){
+				assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
 			}
 		})
 	}

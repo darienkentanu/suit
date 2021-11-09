@@ -117,6 +117,102 @@ func TestRegisterStaff(t *testing.T) {
 	}
 }
 
+func TestRegisterStaffError(t *testing.T) {
+	var testCases = []struct {
+		name       	string
+		path       	string
+		expectCode 	int
+		expectError string
+		reqBody		map[string]interface{}
+	}{
+		{
+			name:       "Register Staff Invalid Input",
+			path:       "/registerstaff",
+			expectCode: http.StatusBadRequest,
+			expectError:   "Invalid input",
+			reqBody: 	map[string]interface{}{
+				"fullname": 1234,
+				"email": "mhaikal@gmail.com",
+				"username": "mhaikal",
+				"password": "haikal123",
+				"phone_number": "0812676718",
+				"drop_point_id": 1,
+			},
+		},
+		{
+			name:       "Register Staff Duplicate Email",
+			path:       "/registerstaff",
+			expectCode: http.StatusBadRequest,
+			expectError:   "Email is already registered",
+			reqBody: 	map[string]interface{}{
+				"fullname": "Muhammad Haikal",
+				"email": "azkam@gmail.com",
+				"username": "mhaikal",
+				"password": "haikal123",
+				"phone_number": "0812676718",
+				"drop_point_id": 1,
+			},
+		},
+		{
+			name:       "Register Staff Duplicate Phone Number",
+			path:       "/registerstaff",
+			expectCode: http.StatusBadRequest,
+			expectError:   "Phone number is already registered",
+			reqBody: 	map[string]interface{}{
+				"fullname": "Muhammad Haikal",
+				"email": "mhaikal@gmail.com",
+				"username": "mhaikal",
+				"password": "haikal123",
+				"phone_number": "08126736271",
+				"drop_point_id": 1,
+			},
+		},
+		{
+			name:       "Register Staff Duplicate Username",
+			path:       "/registerstaff",
+			expectCode: http.StatusBadRequest,
+			expectError:   "Username is already registered",
+			reqBody: 	map[string]interface{}{
+				"fullname": "Muhammad Haikal",
+				"email": "mhaikal@gmail.com",
+				"username": "mazka",
+				"password": "haikal123",
+				"phone_number": "08126736718",
+				"drop_point_id": 1,
+			},
+		},
+	}
+
+	e, db, dbSQL := InitEcho()
+	UserSetup(db)
+	staffDB := database.NewStaffDB(db, dbSQL)
+	loginDB := database.NewLoginDB(db)
+	controllers := NewStaffController(staffDB, loginDB)
+	InsertDataDropPoints(db)
+	InsertDataStaff(db)
+
+	for _, testCase := range testCases {
+		register, err := json.Marshal(testCase.reqBody)
+		if err != nil {
+			t.Error(err)
+		}
+
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(register))
+		req.Header.Set("Content-Type", "application/json")
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		
+		c.SetPath(testCase.path)
+
+		t.Run(testCase.name, func(t *testing.T) {
+			err := controllers.AddStaff(c)
+			if assert.Error(t, err){
+				assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
+			}
+		})
+	}
+}
+
 func TestGetAllStaff(t *testing.T) {
 	var testCases = []struct {
 		name       string
