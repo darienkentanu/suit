@@ -12,8 +12,8 @@ import (
 	. "github.com/darienkentanu/suit/controllers"
 	"github.com/darienkentanu/suit/lib/database"
 	"github.com/darienkentanu/suit/models"
-	"github.com/stretchr/testify/assert"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLogin(t *testing.T) {
@@ -87,6 +87,79 @@ func TestLogin(t *testing.T) {
 					assert.Error(t, err, "error")
 				}
 				assert.Equal(t, testCase.response, response.Status)
+			}
+		})
+		
+	}
+}
+
+func TestLoginError(t *testing.T) {
+	var testCases = []struct {
+		name       	string
+		path       	string
+		loginPath	string
+		expectCode 	int
+		expectError	string
+		reqBody		map[string]interface{}
+	}{
+		{
+			name:       "Login Bind Error",
+			path:       "/login",
+			expectCode: http.StatusBadRequest,
+			expectError: "Invalid input",
+			reqBody:	map[string]interface{}{
+				"email"			: "alikataniaaa@gmail.com",
+				"password"		: 12345,
+			},
+		},
+		{
+			name:       "Login Incorrect Email",
+			path:       "/login",
+			expectCode: http.StatusBadRequest,
+			expectError: "Incorrect email or username",
+			reqBody:	map[string]interface{}{
+				"email"			: "alikataniaaa@gmail.com",
+				"password"		: "alika123",
+			},
+		},
+		{
+			name:       "Login Incorrect Password",
+			path:       "/login",
+			expectCode: http.StatusBadRequest,
+			expectError: "Incorrect password",
+			reqBody:	map[string]interface{}{
+				"email"			: "alikatania@gmail.com",
+				"password"		: "alika12345",
+			},
+		},
+	}
+	
+	e, db, dbSQL := InitEcho()
+	UserSetup(db)
+	userDB := database.NewUserDB(db, dbSQL)
+	loginDB := database.NewLoginDB(db)
+	staffDB := database.NewStaffDB(db, dbSQL)
+	dropPointDB := database.NewDropPointsDB(db)
+	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
+	InsertDataUser(db)
+
+	for _, testCase := range testCases {
+		login, err := json.Marshal(testCase.reqBody)
+		if err != nil {
+			t.Error(err)
+		}
+
+		loginReq := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(login))
+		loginReq.Header.Set("Content-Type", "application/json")
+		loginRec := httptest.NewRecorder()
+		loginC := e.NewContext(loginReq, loginRec)
+		
+		loginC.SetPath(testCase.loginPath)
+
+		t.Run(testCase.name, func(t *testing.T) {
+			err := loginControllers.Login(loginC)
+			if assert.Error(t, err){
+				assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
 			}
 		})
 		

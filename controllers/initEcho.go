@@ -11,6 +11,6 @@ import (
 func InitEcho() (*echo.Echo, *gorm.DB, *sql.DB) {
 	e := echo.New()
 	db_test := config.InitDBTest()
-	dbSQL_test := config.InitDBSQL()
+	dbSQL_test := config.InitDBSQLTest()
 	return e, db_test, dbSQL_test
 }
