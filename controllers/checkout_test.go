@@ -1,4 +1,4 @@
-package controllers_test
+package controllers
 
 import (
 	"bytes"
@@ -9,18 +9,18 @@ import (
 	"testing"
 
 	"github.com/darienkentanu/suit/constants"
-	. "github.com/darienkentanu/suit/controllers"
+	// . "github.com/darienkentanu/suit/controllers"
 	"github.com/darienkentanu/suit/lib/database"
 	"github.com/darienkentanu/suit/models"
+	echoMiddleware "github.com/labstack/echo/v4/middleware"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
-	echoMiddleware "github.com/labstack/echo/v4/middleware"
 )
 
 func InsertDataCheckout(db *gorm.DB) error {
 	checkoutInput := models.Checkout_Input_DropOff{
-		CategoryID	: []int{1},
-		DropPointID	: 1,
+		CategoryID:  []int{1},
+		DropPointID: 1,
 	}
 
 	var checkout models.Checkout
@@ -48,14 +48,14 @@ func InsertDataCheckout(db *gorm.DB) error {
 	if err := db.Save(&transaction).Error; err != nil {
 		return err
 	}
-	
-	return nil	
+
+	return nil
 }
 
 func InsertDataCheckoutVerification(db *gorm.DB) error {
 	checkoutInput := models.Checkout_Input_DropOff{
-		CategoryID	: []int{1},
-		DropPointID	: 1,
+		CategoryID:  []int{1},
+		DropPointID: 1,
 	}
 
 	var checkout models.Checkout
@@ -84,39 +84,39 @@ func InsertDataCheckoutVerification(db *gorm.DB) error {
 	if err := db.Save(&transaction).Error; err != nil {
 		return err
 	}
-	
-	return nil	
+
+	return nil
 }
 
 func TestCreateCheckoutDropoff(t *testing.T) {
 	var testCases = []struct {
-		name       		string
-		path       		string
-		loginPath		string
-		expectCodeLogin	int
-		expectCode 		int
-		response   		string
-		login			map[string]interface{}
-		reqBody			models.Checkout_Input_DropOff
+		name            string
+		path            string
+		loginPath       string
+		expectCodeLogin int
+		expectCode      int
+		response        string
+		login           map[string]interface{}
+		reqBody         models.Checkout_Input_DropOff
 	}{
 		{
-			name:       "CreateCheckoutDropoff",
-			path:       "/checkoutbydropoff",
-			loginPath:	"/login",
+			name:            "CreateCheckoutDropoff",
+			path:            "/checkoutbydropoff",
+			loginPath:       "/login",
 			expectCodeLogin: http.StatusOK,
-			expectCode: http.StatusOK,
-			response:   "success",
-			login:		map[string]interface{}{
-				"email"			: "alikatania@gmail.com",
-				"password"		: "alika123",
+			expectCode:      http.StatusOK,
+			response:        "success",
+			login: map[string]interface{}{
+				"email":    "alikatania@gmail.com",
+				"password": "alika123",
 			},
-			reqBody: 	models.Checkout_Input_DropOff{
-				CategoryID: []int{1},
+			reqBody: models.Checkout_Input_DropOff{
+				CategoryID:  []int{1},
 				DropPointID: 1,
 			},
 		},
 	}
-	
+
 	e, db, dbSQL := InitEcho()
 	UserSetup(db)
 	Setup(db)
@@ -146,7 +146,7 @@ func TestCreateCheckoutDropoff(t *testing.T) {
 		loginReq.Header.Set("Content-Type", "application/json")
 		loginRec := httptest.NewRecorder()
 		loginC := e.NewContext(loginReq, loginRec)
-		
+
 		loginC.SetPath(testCase.loginPath)
 
 		if assert.NoError(t, loginControllers.Login(loginC)) {
@@ -154,8 +154,8 @@ func TestCreateCheckoutDropoff(t *testing.T) {
 			body := loginRec.Body.String()
 
 			var responseLogin = struct {
-				Status string					`json:"status"`
-				Data   models.ResponseLogin 	`json:"data"`
+				Status string               `json:"status"`
+				Data   models.ResponseLogin `json:"data"`
 			}{}
 			err := json.Unmarshal([]byte(body), &responseLogin)
 			if err != nil {
@@ -175,17 +175,17 @@ func TestCreateCheckoutDropoff(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)
-			
+
 			c.SetPath(testCase.path)
 
 			t.Run(testCase.name, func(t *testing.T) {
-				if assert.NoError(t, echoMiddleware.JWT([]byte(constants.JWT_SECRET))(checkoutController.CreateCheckoutDropOff)(c)){
+				if assert.NoError(t, echoMiddleware.JWT([]byte(constants.JWT_SECRET))(checkoutController.CreateCheckoutDropOff)(c)) {
 					assert.Equal(t, testCase.expectCode, rec.Code)
 					body := rec.Body.String()
 
 					var response = struct {
-						Status string					`json:"status"`
-						Data   models.ResponseGetUser 	`json:"data"`
+						Status string                 `json:"status"`
+						Data   models.ResponseGetUser `json:"data"`
 					}{}
 					err := json.Unmarshal([]byte(body), &response)
 
@@ -201,33 +201,33 @@ func TestCreateCheckoutDropoff(t *testing.T) {
 
 func TestCreateCheckoutDropoffError(t *testing.T) {
 	var testCases = []struct {
-		name       		string
-		path       		string
-		loginPath		string
-		expectCodeLogin	int
-		expectCode 		int
-		expectError   	string
-		login			map[string]interface{}
-		reqBody			map[string]interface{}
+		name            string
+		path            string
+		loginPath       string
+		expectCodeLogin int
+		expectCode      int
+		expectError     string
+		login           map[string]interface{}
+		reqBody         map[string]interface{}
 	}{
 		{
-			name:       "Create Checkout Dropoff cart is empty",
-			path:       "/checkoutbydropoff",
-			loginPath:	"/login",
+			name:            "Create Checkout Dropoff cart is empty",
+			path:            "/checkoutbydropoff",
+			loginPath:       "/login",
 			expectCodeLogin: http.StatusOK,
-			expectCode: http.StatusBadRequest,
-			expectError:   "Category is not exist in cart",
-			login:		map[string]interface{}{
-				"email"			: "alikatania@gmail.com",
-				"password"		: "alika123",
+			expectCode:      http.StatusBadRequest,
+			expectError:     "Category is not exist in cart",
+			login: map[string]interface{}{
+				"email":    "alikatania@gmail.com",
+				"password": "alika123",
 			},
-			reqBody: 	map[string]interface{}{
-				"category_id": []int{2, 3},
+			reqBody: map[string]interface{}{
+				"category_id":   []int{2, 3},
 				"drop_point_id": 1,
 			},
 		},
 	}
-	
+
 	e, db, dbSQL := InitEcho()
 	UserSetup(db)
 	Setup(db)
@@ -256,7 +256,7 @@ func TestCreateCheckoutDropoffError(t *testing.T) {
 		loginReq.Header.Set("Content-Type", "application/json")
 		loginRec := httptest.NewRecorder()
 		loginC := e.NewContext(loginReq, loginRec)
-		
+
 		loginC.SetPath(testCase.loginPath)
 
 		if assert.NoError(t, loginControllers.Login(loginC)) {
@@ -264,8 +264,8 @@ func TestCreateCheckoutDropoffError(t *testing.T) {
 			body := loginRec.Body.String()
 
 			var responseLogin = struct {
-				Status string					`json:"status"`
-				Data   models.ResponseLogin 	`json:"data"`
+				Status string               `json:"status"`
+				Data   models.ResponseLogin `json:"data"`
 			}{}
 			err := json.Unmarshal([]byte(body), &responseLogin)
 			if err != nil {
@@ -285,12 +285,12 @@ func TestCreateCheckoutDropoffError(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)
-			
+
 			c.SetPath(testCase.path)
 
 			t.Run(testCase.name, func(t *testing.T) {
 				err := echoMiddleware.JWT([]byte(constants.JWT_SECRET))(checkoutController.CreateCheckoutDropOff)(c)
-				if assert.Error(t, err){
+				if assert.Error(t, err) {
 					assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
 				}
 			})
@@ -300,32 +300,32 @@ func TestCreateCheckoutDropoffError(t *testing.T) {
 
 func TestCreateCheckoutPickup(t *testing.T) {
 	var testCases = []struct {
-		name       		string
-		path       		string
-		loginPath		string
-		expectCodeLogin	int
-		expectCode 		int
-		response   		string
-		login			map[string]interface{}
-		reqBody			models.Checkout_Input_PickUp
+		name            string
+		path            string
+		loginPath       string
+		expectCodeLogin int
+		expectCode      int
+		response        string
+		login           map[string]interface{}
+		reqBody         models.Checkout_Input_PickUp
 	}{
 		{
-			name:       "CreateCheckoutPickup",
-			path:       "/checkoutbypickup",
-			loginPath:	"/login",
+			name:            "CreateCheckoutPickup",
+			path:            "/checkoutbypickup",
+			loginPath:       "/login",
 			expectCodeLogin: http.StatusOK,
-			expectCode: http.StatusOK,
-			response:   "success",
-			login:		map[string]interface{}{
-				"email"			: "alikatania@gmail.com",
-				"password"		: "alika123",
+			expectCode:      http.StatusOK,
+			response:        "success",
+			login: map[string]interface{}{
+				"email":    "alikatania@gmail.com",
+				"password": "alika123",
 			},
-			reqBody: 	models.Checkout_Input_PickUp{
+			reqBody: models.Checkout_Input_PickUp{
 				CategoryID: []int{1},
 			},
 		},
 	}
-	
+
 	e, db, dbSQL := InitEcho()
 	UserSetup(db)
 	Setup(db)
@@ -355,7 +355,7 @@ func TestCreateCheckoutPickup(t *testing.T) {
 		loginReq.Header.Set("Content-Type", "application/json")
 		loginRec := httptest.NewRecorder()
 		loginC := e.NewContext(loginReq, loginRec)
-		
+
 		loginC.SetPath(testCase.loginPath)
 
 		if assert.NoError(t, loginControllers.Login(loginC)) {
@@ -363,8 +363,8 @@ func TestCreateCheckoutPickup(t *testing.T) {
 			body := loginRec.Body.String()
 
 			var responseLogin = struct {
-				Status string					`json:"status"`
-				Data   models.ResponseLogin 	`json:"data"`
+				Status string               `json:"status"`
+				Data   models.ResponseLogin `json:"data"`
 			}{}
 			err := json.Unmarshal([]byte(body), &responseLogin)
 			if err != nil {
@@ -384,17 +384,17 @@ func TestCreateCheckoutPickup(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)
-			
+
 			c.SetPath(testCase.path)
 
 			t.Run(testCase.name, func(t *testing.T) {
-				if assert.NoError(t, echoMiddleware.JWT([]byte(constants.JWT_SECRET))(checkoutController.CreateCheckoutPickup)(c)){
+				if assert.NoError(t, echoMiddleware.JWT([]byte(constants.JWT_SECRET))(checkoutController.CreateCheckoutPickup)(c)) {
 					assert.Equal(t, testCase.expectCode, rec.Code)
 					body := rec.Body.String()
 
 					var response = struct {
-						Status string					`json:"status"`
-						Data   models.ResponseGetUser 	`json:"data"`
+						Status string                 `json:"status"`
+						Data   models.ResponseGetUser `json:"data"`
 					}{}
 					err := json.Unmarshal([]byte(body), &response)
 
@@ -410,47 +410,47 @@ func TestCreateCheckoutPickup(t *testing.T) {
 
 func TestCreateCheckoutPickupError(t *testing.T) {
 	var testCases = []struct {
-		name       		string
-		path       		string
-		loginPath		string
-		expectCodeLogin	int
-		expectCode 		int
-		expectError   	string
-		login			map[string]interface{}
-		reqBody			map[string]interface{}
+		name            string
+		path            string
+		loginPath       string
+		expectCodeLogin int
+		expectCode      int
+		expectError     string
+		login           map[string]interface{}
+		reqBody         map[string]interface{}
 	}{
 		{
-			name:       "Create Checkout Pickup Invalid Input",
-			path:       "/checkoutbypickup",
-			loginPath:	"/login",
+			name:            "Create Checkout Pickup Invalid Input",
+			path:            "/checkoutbypickup",
+			loginPath:       "/login",
 			expectCodeLogin: http.StatusOK,
-			expectCode: http.StatusBadRequest,
-			expectError:   "Invalid input",
-			login:		map[string]interface{}{
-				"email"			: "alikatania@gmail.com",
-				"password"		: "alika123",
+			expectCode:      http.StatusBadRequest,
+			expectError:     "Invalid input",
+			login: map[string]interface{}{
+				"email":    "alikatania@gmail.com",
+				"password": "alika123",
 			},
-			reqBody: 	map[string]interface{}{
+			reqBody: map[string]interface{}{
 				"category_id": "a",
 			},
 		},
 		{
-			name:       "Create Checkout Pickup cart is empty",
-			path:       "/checkoutbypickup",
-			loginPath:	"/login",
+			name:            "Create Checkout Pickup cart is empty",
+			path:            "/checkoutbypickup",
+			loginPath:       "/login",
 			expectCodeLogin: http.StatusOK,
-			expectCode: http.StatusBadRequest,
-			expectError:   "Category is not exist in cart",
-			login:		map[string]interface{}{
-				"email"			: "alikatania@gmail.com",
-				"password"		: "alika123",
+			expectCode:      http.StatusBadRequest,
+			expectError:     "Category is not exist in cart",
+			login: map[string]interface{}{
+				"email":    "alikatania@gmail.com",
+				"password": "alika123",
 			},
-			reqBody: 	map[string]interface{}{
+			reqBody: map[string]interface{}{
 				"category_id": []int{2, 3},
 			},
 		},
 	}
-	
+
 	e, db, dbSQL := InitEcho()
 	UserSetup(db)
 	Setup(db)
@@ -479,7 +479,7 @@ func TestCreateCheckoutPickupError(t *testing.T) {
 		loginReq.Header.Set("Content-Type", "application/json")
 		loginRec := httptest.NewRecorder()
 		loginC := e.NewContext(loginReq, loginRec)
-		
+
 		loginC.SetPath(testCase.loginPath)
 
 		if assert.NoError(t, loginControllers.Login(loginC)) {
@@ -487,8 +487,8 @@ func TestCreateCheckoutPickupError(t *testing.T) {
 			body := loginRec.Body.String()
 
 			var responseLogin = struct {
-				Status string					`json:"status"`
-				Data   models.ResponseLogin 	`json:"data"`
+				Status string               `json:"status"`
+				Data   models.ResponseLogin `json:"data"`
 			}{}
 			err := json.Unmarshal([]byte(body), &responseLogin)
 			if err != nil {
@@ -508,12 +508,12 @@ func TestCreateCheckoutPickupError(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)
-			
+
 			c.SetPath(testCase.path)
 
 			t.Run(testCase.name, func(t *testing.T) {
 				err := echoMiddleware.JWT([]byte(constants.JWT_SECRET))(checkoutController.CreateCheckoutPickup)(c)
-				if assert.Error(t, err){
+				if assert.Error(t, err) {
 					assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
 				}
 			})
@@ -523,28 +523,28 @@ func TestCreateCheckoutPickupError(t *testing.T) {
 
 func TestVerification(t *testing.T) {
 	var testCases = []struct {
-		name       		string
-		path       		string
-		loginPath		string
-		expectCodeLogin	int
-		expectCode 		int
-		response   		string
-		login			map[string]interface{}
+		name            string
+		path            string
+		loginPath       string
+		expectCodeLogin int
+		expectCode      int
+		response        string
+		login           map[string]interface{}
 	}{
 		{
-			name:       "Verification",
-			path:       "/verification/:id",
-			loginPath:	"/login",
+			name:            "Verification",
+			path:            "/verification/:id",
+			loginPath:       "/login",
 			expectCodeLogin: http.StatusOK,
-			expectCode: http.StatusOK,
-			response:   "success",
-			login:		map[string]interface{}{
-				"email"			: "alikatania@gmail.com",
-				"password"		: "alika123",
+			expectCode:      http.StatusOK,
+			response:        "success",
+			login: map[string]interface{}{
+				"email":    "alikatania@gmail.com",
+				"password": "alika123",
 			},
 		},
 	}
-	
+
 	e, db, dbSQL := InitEcho()
 	UserSetup(db)
 	Setup(db)
@@ -575,7 +575,7 @@ func TestVerification(t *testing.T) {
 		loginReq.Header.Set("Content-Type", "application/json")
 		loginRec := httptest.NewRecorder()
 		loginC := e.NewContext(loginReq, loginRec)
-		
+
 		loginC.SetPath(testCase.loginPath)
 
 		if assert.NoError(t, loginControllers.Login(loginC)) {
@@ -583,8 +583,8 @@ func TestVerification(t *testing.T) {
 			body := loginRec.Body.String()
 
 			var responseLogin = struct {
-				Status string					`json:"status"`
-				Data   models.ResponseLogin 	`json:"data"`
+				Status string               `json:"status"`
+				Data   models.ResponseLogin `json:"data"`
 			}{}
 			err := json.Unmarshal([]byte(body), &responseLogin)
 			if err != nil {
@@ -599,19 +599,19 @@ func TestVerification(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)
-			
+
 			c.SetPath(testCase.path)
 			c.SetParamNames("id")
 			c.SetParamValues("1")
 
 			t.Run(testCase.name, func(t *testing.T) {
-				if assert.NoError(t, echoMiddleware.JWT([]byte(constants.JWT_SECRET))(checkoutController.Verification)(c)){
+				if assert.NoError(t, echoMiddleware.JWT([]byte(constants.JWT_SECRET))(checkoutController.Verification)(c)) {
 					assert.Equal(t, testCase.expectCode, rec.Code)
 					body := rec.Body.String()
 
 					var response = struct {
-						Status string					`json:"status"`
-						Data   models.ResponseGetUser 	`json:"data"`
+						Status string                 `json:"status"`
+						Data   models.ResponseGetUser `json:"data"`
 					}{}
 					err := json.Unmarshal([]byte(body), &response)
 
@@ -627,30 +627,30 @@ func TestVerification(t *testing.T) {
 
 func TestVerificationError(t *testing.T) {
 	var testCases = []struct {
-		name       		string
-		path       		string
-		loginPath		string
-		expectCodeLogin	int
-		expectCode 		int
-		expectError   	string
-		paramValues		string
-		login			map[string]interface{}
+		name            string
+		path            string
+		loginPath       string
+		expectCodeLogin int
+		expectCode      int
+		expectError     string
+		paramValues     string
+		login           map[string]interface{}
 	}{
 		{
-			name:       "Verification Invalid ID",
-			path:       "/verification/:id",
-			loginPath:	"/login",
+			name:            "Verification Invalid ID",
+			path:            "/verification/:id",
+			loginPath:       "/login",
 			expectCodeLogin: http.StatusOK,
-			expectCode: http.StatusBadRequest,
-			expectError:   "Invalid id",
-			paramValues: "a",
-			login:		map[string]interface{}{
-				"email"			: "alikatania@gmail.com",
-				"password"		: "alika123",
+			expectCode:      http.StatusBadRequest,
+			expectError:     "Invalid id",
+			paramValues:     "a",
+			login: map[string]interface{}{
+				"email":    "alikatania@gmail.com",
+				"password": "alika123",
 			},
 		},
 	}
-	
+
 	e, db, dbSQL := InitEcho()
 	UserSetup(db)
 	Setup(db)
@@ -681,7 +681,7 @@ func TestVerificationError(t *testing.T) {
 		loginReq.Header.Set("Content-Type", "application/json")
 		loginRec := httptest.NewRecorder()
 		loginC := e.NewContext(loginReq, loginRec)
-		
+
 		loginC.SetPath(testCase.loginPath)
 
 		if assert.NoError(t, loginControllers.Login(loginC)) {
@@ -689,8 +689,8 @@ func TestVerificationError(t *testing.T) {
 			body := loginRec.Body.String()
 
 			var responseLogin = struct {
-				Status string					`json:"status"`
-				Data   models.ResponseLogin 	`json:"data"`
+				Status string               `json:"status"`
+				Data   models.ResponseLogin `json:"data"`
 			}{}
 			err := json.Unmarshal([]byte(body), &responseLogin)
 			if err != nil {
@@ -705,14 +705,14 @@ func TestVerificationError(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)
-			
+
 			c.SetPath(testCase.path)
 			c.SetParamNames("id")
 			c.SetParamValues(testCase.paramValues)
 
 			t.Run(testCase.name, func(t *testing.T) {
 				err := echoMiddleware.JWT([]byte(constants.JWT_SECRET))(checkoutController.Verification)(c)
-				if assert.Error(t, err){
+				if assert.Error(t, err) {
 					assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
 				}
 			})

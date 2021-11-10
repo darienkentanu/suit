@@ -1,4 +1,4 @@
-package controllers_test
+package controllers
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	. "github.com/darienkentanu/suit/controllers"
+	// . "github.com/darienkentanu/suit/controllers"
 	"github.com/darienkentanu/suit/lib/database"
 	"github.com/darienkentanu/suit/models"
 	"github.com/stretchr/testify/assert"
@@ -191,26 +191,26 @@ func TestEditCategories(t *testing.T) {
 
 func TestEditCategoriesError(t *testing.T) {
 	var testCases = []struct {
-		name       		string
-		path       		string
-		expectCode 		int
-		expectError   	string
-		paramValues		string
-		reqBody			map[string]interface{}
+		name        string
+		path        string
+		expectCode  int
+		expectError string
+		paramValues string
+		reqBody     map[string]interface{}
 	}{
 		{
-			name:       "Edit Categories Invalid ID",
-			path:       "/categories/:id",
-			expectCode: http.StatusBadRequest,
+			name:        "Edit Categories Invalid ID",
+			path:        "/categories/:id",
+			expectCode:  http.StatusBadRequest,
 			expectError: "Invalid id",
 			paramValues: "a",
-			reqBody: 	map[string]interface{}{
+			reqBody: map[string]interface{}{
 				"name":  "botol plastik",
 				"point": 10,
 			},
 		},
 	}
-	
+
 	e, db, _ := InitEcho()
 	Setup(db)
 	categoryDB := database.NewCategoryDB(db)
@@ -227,18 +227,18 @@ func TestEditCategoriesError(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
-		
+
 		c.SetPath(testCase.path)
 		c.SetParamNames("id")
 		c.SetParamValues(testCase.paramValues)
 
 		t.Run(testCase.name, func(t *testing.T) {
 			err := categoryControllers.EditCategories(c)
-			if assert.Error(t, err){
+			if assert.Error(t, err) {
 				assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
 			}
 		})
-		
+
 	}
 }
 
@@ -293,21 +293,21 @@ func TestDeleteCategories(t *testing.T) {
 
 func TestDeleteCategoriesError(t *testing.T) {
 	var testCases = []struct {
-		name       		string
-		path       		string
-		expectCode 		int
-		expectError   	string
-		paramValues		string
+		name        string
+		path        string
+		expectCode  int
+		expectError string
+		paramValues string
 	}{
 		{
-			name:       "Delete Categories Invalid ID",
-			path:       "/categories/:id",
-			expectCode: http.StatusBadRequest,
+			name:        "Delete Categories Invalid ID",
+			path:        "/categories/:id",
+			expectCode:  http.StatusBadRequest,
 			expectError: "Invalid id",
 			paramValues: "a",
 		},
 	}
-	
+
 	e, db, _ := InitEcho()
 	Setup(db)
 	categoryDB := database.NewCategoryDB(db)
@@ -318,17 +318,17 @@ func TestDeleteCategoriesError(t *testing.T) {
 		req := httptest.NewRequest(http.MethodDelete, "/", nil)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
-		
+
 		c.SetPath(testCase.path)
 		c.SetParamNames("id")
 		c.SetParamValues(testCase.paramValues)
 
 		t.Run(testCase.name, func(t *testing.T) {
 			err := categoryControllers.DeleteCategories(c)
-			if assert.Error(t, err){
+			if assert.Error(t, err) {
 				assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
 			}
 		})
-		
+
 	}
 }

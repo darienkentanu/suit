@@ -108,7 +108,19 @@ func InitDBTest() *gorm.DB {
 
 	db, err := gorm.Open(mysql.Open(connStr), &gorm.Config{})
 	if err != nil {
-		panic(err)
+		fmt.Println("cannot use '.env' files for db-connections -> using docker CONN_STRING")
+
+		connStrDocker := "root:password@tcp(db-container)/suit_test?charset=utf8&parseTime=True&loc=Local"
+		fmt.Println("==============================================")
+		fmt.Println(connStrDocker)
+		fmt.Println("==============================================")
+
+		db, err2 := gorm.Open(mysql.Open(connStrDocker), &gorm.Config{})
+		if err2 != nil {
+			panic(err2)
+		}
+		// initMigration(db)
+		return db
 	}
 	// initMigrationTest(db)
 	return db
@@ -122,7 +134,27 @@ func InitDBSQLTest() *sql.DB {
 	)
 	db, err := sql.Open("mysql", connStr)
 	if err != nil {
-		panic(err)
+		// db.Close()
+		fmt.Println("cannot use '.env' files for db-connections -> using docker CONN_STRING")
+	}
+	err = db.Ping()
+	if err != nil {
+		db.Close()
+		fmt.Println("cannot use '.env' files for db-connections -> using docker CONN_STRING")
+
+		connStrDocker := "root:password@tcp(db-container)/suit_test?charset=utf8&parseTime=True&loc=Local"
+		fmt.Println("==============================================")
+		fmt.Println(connStrDocker)
+		fmt.Println("==============================================")
+
+		db, err2 := sql.Open("mysql", connStrDocker)
+		if err2 != nil {
+			panic(err2)
+		}
+		db.SetConnMaxLifetime(time.Minute * 3)
+		db.SetMaxOpenConns(10)
+		db.SetMaxIdleConns(10)
+		return db
 	}
 	db.SetConnMaxLifetime(time.Minute * 3)
 	db.SetMaxOpenConns(10)

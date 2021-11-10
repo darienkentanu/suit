@@ -24,4 +24,4 @@ RUN go build -o suit .
 
 ## Our start command which kicks off
 ## our newly created binary executable
-CMD ["/app/suit"]
+# CMD ["/app/suit"]

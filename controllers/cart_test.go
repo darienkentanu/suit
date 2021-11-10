@@ -1,4 +1,4 @@
-package controllers_test
+package controllers
 
 import (
 	"bytes"
@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/darienkentanu/suit/constants"
-	. "github.com/darienkentanu/suit/controllers"
+	// . "github.com/darienkentanu/suit/controllers"
 	"github.com/darienkentanu/suit/lib/database"
 	"github.com/darienkentanu/suit/models"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
@@ -464,35 +464,35 @@ func TestEditCartItem(t *testing.T) {
 
 func TestEditCartItemError(t *testing.T) {
 	var testCases = []struct {
-		name       		string
-		path       		string
-		loginPath		string
+		name            string
+		path            string
+		loginPath       string
 		expectCodeLogin int
-		expectCode 		int
-		expectError   	string
-		paramValues		string
-		login			map[string]interface{}
-		reqBody			map[string]interface{}
+		expectCode      int
+		expectError     string
+		paramValues     string
+		login           map[string]interface{}
+		reqBody         map[string]interface{}
 	}{
 		{
-			name:       "Edit Cart Item Invalid ID",
-			path:       "/cart",
-			loginPath:	"/login",
+			name:            "Edit Cart Item Invalid ID",
+			path:            "/cart",
+			loginPath:       "/login",
 			expectCodeLogin: http.StatusOK,
-			expectCode: http.StatusBadRequest,
-			expectError:   "invalid cart item id",
-			paramValues: "a",
-			login:		map[string]interface{}{
-				"email"			: "alikatania@gmail.com",
-				"password"		: "alika123",
+			expectCode:      http.StatusBadRequest,
+			expectError:     "invalid cart item id",
+			paramValues:     "a",
+			login: map[string]interface{}{
+				"email":    "alikatania@gmail.com",
+				"password": "alika123",
 			},
-			reqBody: 	map[string]interface{}{
-				"category_id"	: 1,
-				"weight"		: 5,
+			reqBody: map[string]interface{}{
+				"category_id": 1,
+				"weight":      5,
 			},
 		},
 	}
-	
+
 	e, db, dbSQL := InitEcho()
 	Setup(db)
 	UserSetup(db)
@@ -518,7 +518,7 @@ func TestEditCartItemError(t *testing.T) {
 		loginReq.Header.Set("Content-Type", "application/json")
 		loginRec := httptest.NewRecorder()
 		loginC := e.NewContext(loginReq, loginRec)
-		
+
 		loginC.SetPath(testCase.loginPath)
 
 		if assert.NoError(t, loginControllers.Login(loginC)) {
@@ -526,8 +526,8 @@ func TestEditCartItemError(t *testing.T) {
 			body := loginRec.Body.String()
 
 			var responseLogin = struct {
-				Status string					`json:"status"`
-				Data   models.ResponseLogin 	`json:"data"`
+				Status string               `json:"status"`
+				Data   models.ResponseLogin `json:"data"`
 			}{}
 			err := json.Unmarshal([]byte(body), &responseLogin)
 			if err != nil {
@@ -547,14 +547,14 @@ func TestEditCartItemError(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)
-			
+
 			c.SetPath(testCase.path)
 			c.SetParamNames("id")
 			c.SetParamValues(testCase.paramValues)
 
 			t.Run(testCase.name, func(t *testing.T) {
 				err := echoMiddleware.JWT([]byte(constants.JWT_SECRET))(cartController.EditCartItem)(c)
-				if assert.Error(t, err){
+				if assert.Error(t, err) {
 					assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
 				}
 			})
@@ -660,30 +660,30 @@ func TestDeleteCartItem(t *testing.T) {
 
 func TestDeleteCartItemError(t *testing.T) {
 	var testCases = []struct {
-		name       	string
-		path       	string
-		loginPath	string
+		name            string
+		path            string
+		loginPath       string
 		expectCodeLogin int
-		expectCode	int
-		expectError string
-		paramValues string
-		login		map[string]interface{}
+		expectCode      int
+		expectError     string
+		paramValues     string
+		login           map[string]interface{}
 	}{
 		{
-			name:       "Delete Cart Item Invalid ID",
-			path:       "/cart",
-			loginPath:	"/login",
+			name:            "Delete Cart Item Invalid ID",
+			path:            "/cart",
+			loginPath:       "/login",
 			expectCodeLogin: http.StatusOK,
-			expectCode: http.StatusBadRequest,
-			expectError:   "invalid cart item id",
-			paramValues: "a",
-			login:		map[string]interface{}{
-				"email"			: "alikatania@gmail.com",
-				"password"		: "alika123",
+			expectCode:      http.StatusBadRequest,
+			expectError:     "invalid cart item id",
+			paramValues:     "a",
+			login: map[string]interface{}{
+				"email":    "alikatania@gmail.com",
+				"password": "alika123",
 			},
 		},
 	}
-	
+
 	e, db, dbSQL := InitEcho()
 	UserSetup(db)
 	Setup(db)
@@ -709,7 +709,7 @@ func TestDeleteCartItemError(t *testing.T) {
 		loginReq.Header.Set("Content-Type", "application/json")
 		loginRec := httptest.NewRecorder()
 		loginC := e.NewContext(loginReq, loginRec)
-		
+
 		loginC.SetPath(testCase.loginPath)
 
 		if assert.NoError(t, loginControllers.Login(loginC)) {
@@ -717,8 +717,8 @@ func TestDeleteCartItemError(t *testing.T) {
 			body := loginRec.Body.String()
 
 			var responseLogin = struct {
-				Status string					`json:"status"`
-				Data   models.ResponseLogin 	`json:"data"`
+				Status string               `json:"status"`
+				Data   models.ResponseLogin `json:"data"`
 			}{}
 			err := json.Unmarshal([]byte(body), &responseLogin)
 			if err != nil {
@@ -740,7 +740,7 @@ func TestDeleteCartItemError(t *testing.T) {
 
 			t.Run(testCase.name, func(t *testing.T) {
 				err := echoMiddleware.JWT([]byte(constants.JWT_SECRET))(cartController.DeleteCartItem)(c)
-				if assert.Error(t, err){
+				if assert.Error(t, err) {
 					assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
 				}
 			})
