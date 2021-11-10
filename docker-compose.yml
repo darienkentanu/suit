@@ -5,7 +5,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: suit
-    command: ["BASH", "mysql", "-u", "root", "-ppassword", "-e", "create database if not exists suit_test;"]
     healthcheck:
       test: ["CMD", "mysql", "-u", "root", "-ppassword", "-e", "show databases"]
       interval: 10s
@@ -17,23 +16,6 @@ services:
   app:
     container_name: go-app
     build: .
-    # command: go test -v ./controllers/
-    # restart: always
-    healthcheck:
-      test: ["CMD", "go", "test", "-v", "./controllers/"]
-    environment:
-      CONN_STRING_TEST: root:password@tcp(db-container)/suit_test?charset=utf8&parseTime=True&loc=Local
-    ports:
-     - 8001:8000
-    depends_on:
-      db:
-        condition: service_healthy
-
-  app2:
-    container_name: go-app-2
-    build: .
-    command: go run ./main.go
-    restart: always
     environment:
       CONN_STRING: root:password@tcp(db-container)/suit?charset=utf8&parseTime=True&loc=Local
     ports:

@@ -1,27 +1,13 @@
-FROM golang:1.17
+FROM golang:alpine
 
-## We create an /app directory within our
-## image that will hold our application source
-## files
-RUN mkdir /app
+RUN apk update && apk add --no-cache git
 
-## We specify that we now wish to execute 
-## any further commands inside our /app
-## directory
 WORKDIR /app
 
-COPY go.mod /app
-COPY go.sum /app
-RUN go mod download
+COPY . .
 
-## We copy everything in the root directory
-## into our /app directory
-ADD . /app
+RUN go mod tidy
 
-## we run go build to compile the binary
-## executable of our Go program
-RUN go build -o suit .
+RUN go build -o binary
 
-## Our start command which kicks off
-## our newly created binary executable
-# CMD ["/app/suit"]
+ENTRYPOINT ["/app/binary"]
