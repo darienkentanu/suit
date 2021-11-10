@@ -110,7 +110,7 @@ func InitDBTest() *gorm.DB {
 	if err != nil {
 		fmt.Println("cannot use '.env' files for db-connections -> using docker CONN_STRING")
 
-		connStrDocker := "root:password@tcp(db-container)/suit_test?charset=utf8&parseTime=True&loc=Local"
+		connStrDocker := "root:password@tcp(172.17.0.2:3306)/suit_test?charset=utf8&parseTime=True&loc=Local"
 		fmt.Println("==============================================")
 		fmt.Println(connStrDocker)
 		fmt.Println("==============================================")
@@ -142,7 +142,7 @@ func InitDBSQLTest() *sql.DB {
 		db.Close()
 		fmt.Println("cannot use '.env' files for db-connections -> using docker CONN_STRING")
 
-		connStrDocker := "root:password@tcp(db-container)/suit_test?charset=utf8&parseTime=True&loc=Local"
+		connStrDocker := "root:password@tcp(172.17.0.2:3306)/suit_test?charset=utf8&parseTime=True&loc=Local"
 		fmt.Println("==============================================")
 		fmt.Println(connStrDocker)
 		fmt.Println("==============================================")
