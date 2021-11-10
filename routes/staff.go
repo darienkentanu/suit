@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"database/sql"
+	// "database/sql"
 
 	"github.com/darienkentanu/suit/controllers"
 	"github.com/darienkentanu/suit/lib/database"
@@ -10,8 +10,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func staffRoute(e *echo.Echo, db *gorm.DB, dbSQL *sql.DB) {
-	sdb := database.NewStaffDB(db, dbSQL)
+func staffRoute(e *echo.Echo, db *gorm.DB) {
+	sdb := database.NewStaffDB(db)
 	ldb := database.NewLoginDB(db)
 	sc := controllers.NewStaffController(sdb, ldb)
 

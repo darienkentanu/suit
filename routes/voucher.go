@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"database/sql"
-
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/darienkentanu/suit/controllers"
@@ -12,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func voucherRoute(e *echo.Echo, db *gorm.DB, dbSQL *sql.DB) {
+func voucherRoute(e *echo.Echo, db *gorm.DB) {
 	vdb := database.NewVoucherDB(db)
 	vc := controllers.NewVoucherController(vdb)
 	e.GET("/vouchers", vc.GetVouchers)

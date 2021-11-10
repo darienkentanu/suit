@@ -86,7 +86,7 @@ func (cc *CategoryController) DeleteCategories(c echo.Context) error {
 
 	err = cc.db.DeleteCategoriesById(id)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, "Internal server error")
+		return echo.NewHTTPError(http.StatusNotFound, err)
 	}
 
 	return c.JSON(http.StatusOK, M{

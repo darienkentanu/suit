@@ -173,15 +173,15 @@ func TestClaimVoucher(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db := InitEcho()
 	UserSetup(db)
 	VcSetup(db)
 	UserVoucherSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
-	userVoucherDB := database.NewUserVoucherDB(db, dbSQL)
+	userVoucherDB := database.NewUserVoucherDB(db)
 	voucherDB := database.NewVoucherDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	userVoucherControllers := NewUserVoucherController(userVoucherDB, userDB, voucherDB)
@@ -300,15 +300,15 @@ func TestClaimVoucherErrorID(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db := InitEcho()
 	UserSetup(db)
 	VcSetup(db)
 	UserVoucherSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
-	userVoucherDB := database.NewUserVoucherDB(db, dbSQL)
+	userVoucherDB := database.NewUserVoucherDB(db)
 	voucherDB := database.NewVoucherDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	userVoucherControllers := NewUserVoucherController(userVoucherDB, userDB, voucherDB)
@@ -389,15 +389,15 @@ func TestRedeemVoucher(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	UserSetup(db)
 	VcSetup(db)
 	UserVoucherSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
-	userVoucherDB := database.NewUserVoucherDB(db, dbSQL)
+	userVoucherDB := database.NewUserVoucherDB(db)
 	voucherDB := database.NewVoucherDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	userVoucherControllers := NewUserVoucherController(userVoucherDB, userDB, voucherDB)
@@ -502,15 +502,15 @@ func TestRedeemVoucherError(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	UserSetup(db)
 	VcSetup(db)
 	UserVoucherSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
-	userVoucherDB := database.NewUserVoucherDB(db, dbSQL)
+	userVoucherDB := database.NewUserVoucherDB(db)
 	voucherDB := database.NewVoucherDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	userVoucherControllers := NewUserVoucherController(userVoucherDB, userDB, voucherDB)
@@ -590,15 +590,15 @@ func TestGetUserVoucher(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	UserSetup(db)
 	VcSetup(db)
 	UserVoucherSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
-	userVoucherDB := database.NewUserVoucherDB(db, dbSQL)
+	userVoucherDB := database.NewUserVoucherDB(db)
 	voucherDB := database.NewVoucherDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	userVoucherControllers := NewUserVoucherController(userVoucherDB, userDB, voucherDB)

@@ -45,7 +45,7 @@ func TestGetDropPoints(t *testing.T) {
 			response:   "Success",
 		},
 	}
-	e, db, _ := InitEcho()
+	e, db  := InitEcho()
 	DPSetup(db)
 	dpdb := database.NewDropPointsDB(db)
 	dpc := NewDropPointsController(dpdb)
@@ -97,7 +97,7 @@ func TestAddDropPoints(t *testing.T) {
 		},
 	}
 
-	e, db, _ := InitEcho()
+	e, db  := InitEcho()
 	DPSetup(db)
 	dpdb := database.NewDropPointsDB(db)
 	dpc := NewDropPointsController(dpdb)
@@ -153,7 +153,7 @@ func TestEditDropPoints(t *testing.T) {
 		},
 	}
 
-	e, db, _ := InitEcho()
+	e, db  := InitEcho()
 	DPSetup(db)
 	dpdb := database.NewDropPointsDB(db)
 	dpc := NewDropPointsController(dpdb)
@@ -214,7 +214,7 @@ func TestEditDropPointError(t *testing.T) {
 		},
 	}
 	
-	e, db, _ := InitEcho()
+	e, db  := InitEcho()
 	DPSetup(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	dropPointControllers := NewDropPointsController(dropPointDB)
@@ -261,7 +261,7 @@ func TestDeleteDropPoints(t *testing.T) {
 		},
 	}
 
-	e, db, _ := InitEcho()
+	e, db  := InitEcho()
 	CartSetup(db)
 	// DPSetup(db)
 	dpdb := database.NewDropPointsDB(db)
@@ -312,7 +312,7 @@ func TestDeleteDropPointError(t *testing.T) {
 		},
 	}
 	
-	e, db, _ := InitEcho()
+	e, db  := InitEcho()
 	DPSetup(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	dropPointControllers := NewDropPointsController(dropPointDB)

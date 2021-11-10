@@ -76,13 +76,13 @@ func TestAddToCart(t *testing.T) {
 		},
 	}
 
-	e, db, dbSQL := InitEcho()
+	e, db := InitEcho()
 	UserSetup(db)
 	Setup(db)
 	CartSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	cartDB := database.NewCartDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
@@ -182,13 +182,13 @@ func TestAddWeightCartItem(t *testing.T) {
 		},
 	}
 
-	e, db, dbSQL := InitEcho()
+	e, db := InitEcho()
 	UserSetup(db)
 	Setup(db)
 	CartSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	cartDB := database.NewCartDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
@@ -282,13 +282,13 @@ func TestGetCartItem(t *testing.T) {
 		},
 	}
 
-	e, db, dbSQL := InitEcho()
+	e, db := InitEcho()
 	UserSetup(db)
 	Setup(db)
 	CartSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	cartDB := database.NewCartDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
@@ -382,13 +382,13 @@ func TestEditCartItem(t *testing.T) {
 		},
 	}
 
-	e, db, dbSQL := InitEcho()
+	e, db := InitEcho()
 	Setup(db)
 	UserSetup(db)
 	CartSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	cartDB := database.NewCartDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
@@ -493,13 +493,13 @@ func TestEditCartItemError(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db := InitEcho()
 	Setup(db)
 	UserSetup(db)
 	CartSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	cartDB := database.NewCartDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
@@ -584,13 +584,13 @@ func TestDeleteCartItem(t *testing.T) {
 		},
 	}
 
-	e, db, dbSQL := InitEcho()
+	e, db := InitEcho()
 	UserSetup(db)
 	Setup(db)
 	CartSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	cartDB := database.NewCartDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
@@ -684,13 +684,13 @@ func TestDeleteCartItemError(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db := InitEcho()
 	UserSetup(db)
 	Setup(db)
 	CartSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	cartDB := database.NewCartDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)

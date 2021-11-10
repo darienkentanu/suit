@@ -131,17 +131,12 @@ func (controllers *TransactionController) GetTransactionsDropPoint(c echo.Contex
 			categories = append(categories, resCategory)
 		}
 
-		dropPoint, err := controllers.dropPointModel.GetDropPointsByID(transaction.Drop_PointID)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
-		}
-
 		var resTransaction models.ResponseGetTransactions
 		resTransaction.ID = transaction.ID
 		resTransaction.UserID = transaction.UserID
 		resTransaction.Method = transaction.Method
 		resTransaction.DropPointID = transaction.Drop_PointID
-		resTransaction.DropPointAddress = dropPoint.Address
+		resTransaction.DropPointAddress = transaction.DropPointAddress
 		resTransaction.TotalReceivedPoints = transaction.Point
 		resTransaction.Categories = categories
 		if transaction.Status == 1 {
@@ -199,17 +194,12 @@ func (controllers *TransactionController) GetTransactionsWithRangeDate(c echo.Co
 			categories = append(categories, resCategory)
 		}
 
-		dropPoint, err := controllers.dropPointModel.GetDropPointsByID(transaction.Drop_PointID)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
-		}
-
 		var resTransaction models.ResponseGetTransactions
 		resTransaction.ID = transaction.ID
 		resTransaction.UserID = transaction.UserID
 		resTransaction.Method = transaction.Method
 		resTransaction.DropPointID = transaction.Drop_PointID
-		resTransaction.DropPointAddress = dropPoint.Address
+		resTransaction.DropPointAddress = transaction.DropPointAddress
 		resTransaction.TotalReceivedPoints = transaction.Point
 		resTransaction.Categories = categories
 		if transaction.Status == 1 {

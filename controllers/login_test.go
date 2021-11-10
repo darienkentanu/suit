@@ -37,11 +37,11 @@ func TestLogin(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	UserSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	InsertDataUser(db)
@@ -134,11 +134,11 @@ func TestLoginError(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	UserSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	InsertDataUser(db)
@@ -199,11 +199,11 @@ func TestGetProfile(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	UserSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	InsertDataUser(db)
@@ -319,11 +319,11 @@ func TestUpdateProfile(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	UserSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	InsertDataUser(db)
@@ -447,11 +447,11 @@ func TestUpdateProfileError(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	UserSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	InsertDataUser(db)

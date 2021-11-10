@@ -78,9 +78,9 @@ func TestRegisterStaff(t *testing.T) {
 		},
 	}
 
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	UserSetup(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	loginDB := database.NewLoginDB(db)
 	controllers := NewStaffController(staffDB, loginDB)
 	InsertDataDropPoints(db)
@@ -183,9 +183,9 @@ func TestRegisterStaffError(t *testing.T) {
 		},
 	}
 
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	UserSetup(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	loginDB := database.NewLoginDB(db)
 	controllers := NewStaffController(staffDB, loginDB)
 	InsertDataDropPoints(db)
@@ -228,9 +228,9 @@ func TestGetAllStaff(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	UserSetup(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	loginDB := database.NewLoginDB(db)
 	controllers := NewStaffController(staffDB, loginDB)
 	InsertDataDropPoints(db)

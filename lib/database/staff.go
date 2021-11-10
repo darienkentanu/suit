@@ -1,19 +1,16 @@
 package database
 
 import (
-	"database/sql"
-
 	"github.com/darienkentanu/suit/models"
 	"gorm.io/gorm"
 )
 
 type StaffDB struct {
 	db *gorm.DB
-	dbSQL *sql.DB
 }
 
-func NewStaffDB(db *gorm.DB, dbSQL *sql.DB) *StaffDB {
-	return &StaffDB{db: db, dbSQL: dbSQL}
+func NewStaffDB(db *gorm.DB) *StaffDB {
+	return &StaffDB{db: db}
 }
 
 type StaffModel interface {
@@ -41,18 +38,8 @@ func (m *StaffDB) GetPhoneNumberStaff(number string) int {
 func (m *StaffDB) GetAllStaff() ([]models.ResponseGetStaff, error) {
 	var allStaff []models.ResponseGetStaff
 
-	rows, err := m.dbSQL.Query("SELECT s.id, s.fullname, l.email, l.username, s.phone_number, l.role, s.drop_point_id, d.address FROM staffs s JOIN logins l ON s.id = l.staff_id JOIN drop_points d ON s.drop_point_id = d.id")
-	if err != nil {
+	if err := m.db.Raw("SELECT s.id, s.fullname, l.email, l.username, s.phone_number, l.role, s.drop_point_id, d.address FROM staffs s JOIN logins l ON s.id = l.staff_id JOIN drop_points d ON s.drop_point_id = d.id").Scan(&allStaff).Error; err != nil {
 		return nil, err
-	}
-	defer rows.Close()
-	
-	for rows.Next() {
-		var staff models.ResponseGetStaff
-		if err := rows.Scan(&staff.ID, &staff.Fullname, &staff.Email, &staff.Username, &staff.PhoneNumber, &staff.Role, &staff.DropPointID, &staff.DropPointAddress); err != nil {
-			return nil, err
-		}
-		allStaff = append(allStaff, staff)
 	}
 
 	return allStaff, nil
@@ -61,16 +48,8 @@ func (m *StaffDB) GetAllStaff() ([]models.ResponseGetStaff, error) {
 func (m *StaffDB) GetStaffByID(staffID int) (models.ResponseGetStaff, error) {
 	var staff models.ResponseGetStaff
 
-	rows, err := m.dbSQL.Query("SELECT s.id, s.fullname, l.email, l.username, s.phone_number, l.role, s.drop_point_id, d.address FROM staffs s JOIN logins l ON s.id = l.staff_id JOIN drop_points d ON s.drop_point_id = d.id WHERE l.staff_id = ?", staffID)
-	if err != nil {
+	if err := m.db.Raw("SELECT s.id, s.fullname, l.email, l.username, s.phone_number, l.role, s.drop_point_id, d.address as drop_point_address FROM staffs s JOIN logins l ON s.id = l.staff_id JOIN drop_points d ON s.drop_point_id = d.id WHERE l.staff_id = ?", staffID).Scan(&staff).Error; err != nil {
 		return staff, err
-	}
-	defer rows.Close()
-	
-	for rows.Next() {
-		if err := rows.Scan(&staff.ID, &staff.Fullname, &staff.Email, &staff.Username, &staff.PhoneNumber, &staff.Role, &staff.DropPointID, &staff.DropPointAddress); err != nil {
-			return staff, err
-		}
 	}
 
 	return staff, nil

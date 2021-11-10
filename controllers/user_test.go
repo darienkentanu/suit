@@ -106,9 +106,9 @@ func TestRegisterUser(t *testing.T) {
 		},
 	}
 
-	e, db, dbSQL := InitEcho()
+	e, db := InitEcho()
 	UserSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
 	cartDB := database.NewCartDB(db)
 	controllers := NewUserController(userDB, loginDB, cartDB)
@@ -215,9 +215,9 @@ func TestRegisterUserError(t *testing.T) {
 		},
 	}
 
-	e, db, dbSQL := InitEcho()
+	e, db := InitEcho()
 	UserSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
 	cartDB := database.NewCartDB(db)
 	controllers := NewUserController(userDB, loginDB, cartDB)
@@ -260,21 +260,19 @@ func TestGetAllUsers(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db := InitEcho()
 	UserSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
 	cartDB := database.NewCartDB(db)
 	controllers := NewUserController(userDB, loginDB, cartDB)
 	InsertDataUser(db)
 
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
 	for _, testCase := range testCases {
-		req := httptest.NewRequest(http.MethodGet, "/", nil)
-		rec := httptest.NewRecorder()
-		c := e.NewContext(req, rec)
-
-		c.SetPath(testCase.path)
-
 		t.Run(testCase.name, func(t *testing.T) {
 			if assert.NoError(t, controllers.GetAllUsers(c)) {
 				assert.Equal(t, testCase.expectCode, rec.Code)
@@ -294,3 +292,42 @@ func TestGetAllUsers(t *testing.T) {
 		})
 	}
 }
+
+func TestGetAllUsersError(t *testing.T) {
+	var testCases = []struct {
+		name       string
+		path       string
+		expectCode int
+		expectError   string
+	}{
+		{
+			name:       "Get All Users Error",
+			path:       "/users",
+			expectCode: http.StatusInternalServerError,
+			expectError:   "Internal server error",
+		},
+	}
+	
+	e, db := InitEcho()
+	UserSetup(db)
+	userDB := database.NewUserDB(db)
+	loginDB := database.NewLoginDB(db)
+	cartDB := database.NewCartDB(db)
+	controllers := NewUserController(userDB, loginDB, cartDB)
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	for _, testCase := range testCases {
+		c.SetPath(testCase.path)
+
+		t.Run(testCase.name, func(t *testing.T) {
+			err := controllers.GetAllUsers(c)
+			if assert.Error(t, err){
+				assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
+			}
+		})
+	}
+}
+
