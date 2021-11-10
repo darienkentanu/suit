@@ -98,7 +98,7 @@ func (controllers *TransactionController) GetTransactions(c echo.Context) error 
 func (controllers *TransactionController) GetTransactionsDropPoint(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid id")
 	}
 
 	transactions, err := controllers.transactionModel.GetTransactionsByDropPointID(id)

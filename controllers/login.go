@@ -124,21 +124,6 @@ func (controllers *LoginController) UpdateProfile(c echo.Context) error {
 			return echo.NewHTTPError(http.StatusBadRequest, "Invalid input")
 		}
 
-		row := controllers.loginModel.GetEmail(newUserProfile.Email)
-		if row > 1 {
-			return echo.NewHTTPError(http.StatusBadRequest, "Email is already registered")
-		}
-
-		row = controllers.userModel.GetPhoneNumber(newUserProfile.PhoneNumber)
-		if row > 1 {
-			return echo.NewHTTPError(http.StatusBadRequest, "Phone number is already registered")
-		}
-
-		row = controllers.loginModel.GetUsername(newUserProfile.Username)
-		if row > 1 {
-			return echo.NewHTTPError(http.StatusBadRequest, "Username is already registered")
-		}
-
 		hashPassword, err := GenerateHashPassword(newUserProfile.Password)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "error in password hash")
@@ -189,21 +174,6 @@ func (controllers *LoginController) UpdateProfile(c echo.Context) error {
 
 	if err := c.Bind(&newStaffProfile); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid input")
-	}
-
-	row := controllers.loginModel.GetEmail(newStaffProfile.Email)
-	if row > 1 {
-		return echo.NewHTTPError(http.StatusBadRequest, "Email is already registered")
-	}
-
-	row = controllers.loginModel.GetUsername(newStaffProfile.Username)
-	if row > 1 {
-		return echo.NewHTTPError(http.StatusBadRequest, "Username is already registered")
-	}
-
-	row = controllers.staffModel.GetPhoneNumberStaff(newStaffProfile.PhoneNumber)
-	if row > 1 {
-		return echo.NewHTTPError(http.StatusBadRequest, "Phone number is already registered")
 	}
 
 	hashPassword, err := GenerateHashPassword(newStaffProfile.Password)

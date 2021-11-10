@@ -261,31 +261,31 @@ func (controllers *CheckoutController) CreateCheckoutDropOff(c echo.Context) err
 func (controllers *CheckoutController) Verification(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid id")
 	}
 	transaction, err := controllers.transactionModel.UpdateStatusTransaction(id)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}
 	user, err := controllers.userModel.GetUserByID(transaction.UserID)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}
 	// var newPoint int
 	newPoint := user.Point + transaction.Point
 	_, err = controllers.userModel.UpdatePoint(transaction.UserID, newPoint)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}
 	userLogin, err := controllers.loginModel.GetLoginByUserID(user.ID)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}
 	message := fmt.Sprintf("transaksi anda telah di verifikasi detail transaksi:\nID=%d\nUserID=%d\nStatus=%d\nPoint=%d\nMethod=%s\nDrop_PointID=%d\nCheckoutID=%d\nCreatedAt=%v\nUpdatedAt=%v", transaction.ID, transaction.UserID, transaction.Status, transaction.Point, transaction.Method, transaction.Drop_PointID, transaction.CheckoutID, transaction.CreatedAt, transaction.UpdatedAt)
 
 	err = gomails.SendMail(userLogin.Email, message)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}
 	return c.JSON(http.StatusOK, M{
 		"status": "success",

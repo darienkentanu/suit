@@ -22,7 +22,7 @@ func (cc *CategoryController) GetCategories(c echo.Context) error {
 	categories, err := cc.db.GetCategories()
 
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}
 	var res models.Category_Response
 	var resSlc []models.Category_Response
@@ -44,7 +44,7 @@ func (cc *CategoryController) AddCategories(c echo.Context) error {
 
 	category, err := cc.db.AddCategories(category)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}
 
 	return c.JSON(http.StatusCreated, M{
@@ -60,13 +60,13 @@ func (cc *CategoryController) AddCategories(c echo.Context) error {
 func (cc *CategoryController) EditCategories(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid id")
 	}
 	var newCategory models.Category
 	c.Bind(&newCategory)
 	newCategory, err = cc.db.EditCategoriesById(id, newCategory)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}
 	return c.JSON(http.StatusCreated, M{
 		"status": "success",
@@ -81,12 +81,12 @@ func (cc *CategoryController) EditCategories(c echo.Context) error {
 func (cc *CategoryController) DeleteCategories(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid id")
 	}
 
 	err = cc.db.DeleteCategoriesById(id)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+		return echo.NewHTTPError(http.StatusNotFound, "Internal server error")
 	}
 
 	return c.JSON(http.StatusOK, M{

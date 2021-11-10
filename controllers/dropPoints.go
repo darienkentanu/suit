@@ -23,7 +23,7 @@ func (dpc *DropPointsController) GetDropPoints(c echo.Context) error {
 	dropPoints, err := dpc.db.GetDropPoints()
 
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}
 	var res models.Drop_Points_Response
 	var resSlc []models.Drop_Points_Response
@@ -45,7 +45,7 @@ func (dpc *DropPointsController) AddDropPoints(c echo.Context) error {
 
 	dropPoints, err := dpc.db.AddDropPoints(dropPoints)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}
 
 	return c.JSON(http.StatusCreated, M{
@@ -60,14 +60,14 @@ func (dpc *DropPointsController) AddDropPoints(c echo.Context) error {
 func (dpc *DropPointsController) EditDropPoints(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid id")
 	}
 	var newDropPoints models.Drop_Point
 	c.Bind(&newDropPoints)
 	newDropPoints.Latitude, newDropPoints.Longitude = gmaps.Geocoding(newDropPoints.Address)
 	newDropPoints, err = dpc.db.EditDropPointsById(id, newDropPoints)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}
 	return c.JSON(http.StatusOK, M{
 		"status": "success",
@@ -81,12 +81,12 @@ func (dpc *DropPointsController) EditDropPoints(c echo.Context) error {
 func (dpc *DropPointsController) DeleteDropPoints(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid id")
 	}
 
 	err = dpc.db.DeleteDropPointsById(id)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return echo.NewHTTPError(http.StatusBadRequest, "Internal server error")
 	}
 
 	return c.JSON(http.StatusOK, M{

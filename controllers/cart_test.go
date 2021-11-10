@@ -462,6 +462,106 @@ func TestEditCartItem(t *testing.T) {
 	}
 }
 
+func TestEditCartItemError(t *testing.T) {
+	var testCases = []struct {
+		name       		string
+		path       		string
+		loginPath		string
+		expectCodeLogin int
+		expectCode 		int
+		expectError   	string
+		paramValues		string
+		login			map[string]interface{}
+		reqBody			map[string]interface{}
+	}{
+		{
+			name:       "Edit Cart Item Invalid ID",
+			path:       "/cart",
+			loginPath:	"/login",
+			expectCodeLogin: http.StatusOK,
+			expectCode: http.StatusBadRequest,
+			expectError:   "invalid cart item id",
+			paramValues: "a",
+			login:		map[string]interface{}{
+				"email"			: "alikatania@gmail.com",
+				"password"		: "alika123",
+			},
+			reqBody: 	map[string]interface{}{
+				"category_id"	: 1,
+				"weight"		: 5,
+			},
+		},
+	}
+	
+	e, db, dbSQL := InitEcho()
+	Setup(db)
+	UserSetup(db)
+	CartSetup(db)
+	userDB := database.NewUserDB(db, dbSQL)
+	loginDB := database.NewLoginDB(db)
+	staffDB := database.NewStaffDB(db, dbSQL)
+	dropPointDB := database.NewDropPointsDB(db)
+	cartDB := database.NewCartDB(db)
+	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
+	cartController := NewCartController(cartDB)
+	InsertDataUser(db)
+	InsertDataCategory(db)
+	InsertDataCartItem(db)
+
+	for _, testCase := range testCases {
+		login, err := json.Marshal(testCase.login)
+		if err != nil {
+			t.Error(err)
+		}
+
+		loginReq := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(login))
+		loginReq.Header.Set("Content-Type", "application/json")
+		loginRec := httptest.NewRecorder()
+		loginC := e.NewContext(loginReq, loginRec)
+		
+		loginC.SetPath(testCase.loginPath)
+
+		if assert.NoError(t, loginControllers.Login(loginC)) {
+			assert.Equal(t, testCase.expectCodeLogin, loginRec.Code)
+			body := loginRec.Body.String()
+
+			var responseLogin = struct {
+				Status string					`json:"status"`
+				Data   models.ResponseLogin 	`json:"data"`
+			}{}
+			err := json.Unmarshal([]byte(body), &responseLogin)
+			if err != nil {
+				assert.Error(t, err, "error")
+			}
+
+			assert.NotEmpty(t, responseLogin.Data.Token)
+			token := responseLogin.Data.Token
+
+			reqBody, err := json.Marshal(testCase.reqBody)
+			if err != nil {
+				t.Error(err)
+			}
+
+			req := httptest.NewRequest(http.MethodPut, "/", bytes.NewBuffer(reqBody))
+			req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", token))
+			req.Header.Set("Content-Type", "application/json")
+			rec := httptest.NewRecorder()
+			c := e.NewContext(req, rec)
+			
+			c.SetPath(testCase.path)
+			c.SetParamNames("id")
+			c.SetParamValues(testCase.paramValues)
+
+			t.Run(testCase.name, func(t *testing.T) {
+				err := echoMiddleware.JWT([]byte(constants.JWT_SECRET))(cartController.EditCartItem)(c)
+				if assert.Error(t, err){
+					assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
+				}
+			})
+		}
+	}
+}
+
 func TestDeleteCartItem(t *testing.T) {
 	var testCases = []struct {
 		name       string
@@ -552,6 +652,96 @@ func TestDeleteCartItem(t *testing.T) {
 						assert.Error(t, err, "error")
 					}
 					assert.Equal(t, testCase.response, response.Message)
+				}
+			})
+		}
+	}
+}
+
+func TestDeleteCartItemError(t *testing.T) {
+	var testCases = []struct {
+		name       	string
+		path       	string
+		loginPath	string
+		expectCodeLogin int
+		expectCode	int
+		expectError string
+		paramValues string
+		login		map[string]interface{}
+	}{
+		{
+			name:       "Delete Cart Item Invalid ID",
+			path:       "/cart",
+			loginPath:	"/login",
+			expectCodeLogin: http.StatusOK,
+			expectCode: http.StatusBadRequest,
+			expectError:   "invalid cart item id",
+			paramValues: "a",
+			login:		map[string]interface{}{
+				"email"			: "alikatania@gmail.com",
+				"password"		: "alika123",
+			},
+		},
+	}
+	
+	e, db, dbSQL := InitEcho()
+	UserSetup(db)
+	Setup(db)
+	CartSetup(db)
+	userDB := database.NewUserDB(db, dbSQL)
+	loginDB := database.NewLoginDB(db)
+	staffDB := database.NewStaffDB(db, dbSQL)
+	dropPointDB := database.NewDropPointsDB(db)
+	cartDB := database.NewCartDB(db)
+	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
+	cartController := NewCartController(cartDB)
+	InsertDataUser(db)
+	InsertDataCategory(db)
+	InsertDataCartItem(db)
+
+	for _, testCase := range testCases {
+		login, err := json.Marshal(testCase.login)
+		if err != nil {
+			t.Error(err)
+		}
+
+		loginReq := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(login))
+		loginReq.Header.Set("Content-Type", "application/json")
+		loginRec := httptest.NewRecorder()
+		loginC := e.NewContext(loginReq, loginRec)
+		
+		loginC.SetPath(testCase.loginPath)
+
+		if assert.NoError(t, loginControllers.Login(loginC)) {
+			assert.Equal(t, testCase.expectCodeLogin, loginRec.Code)
+			body := loginRec.Body.String()
+
+			var responseLogin = struct {
+				Status string					`json:"status"`
+				Data   models.ResponseLogin 	`json:"data"`
+			}{}
+			err := json.Unmarshal([]byte(body), &responseLogin)
+			if err != nil {
+				assert.Error(t, err, "error")
+			}
+
+			assert.NotEmpty(t, responseLogin.Data.Token)
+			token := responseLogin.Data.Token
+
+			req := httptest.NewRequest(http.MethodDelete, "/", nil)
+			req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", token))
+			req.Header.Set("Content-Type", "application/json")
+			rec := httptest.NewRecorder()
+			c := e.NewContext(req, rec)
+
+			c.SetPath(testCase.path)
+			c.SetParamNames("id")
+			c.SetParamValues(testCase.paramValues)
+
+			t.Run(testCase.name, func(t *testing.T) {
+				err := echoMiddleware.JWT([]byte(constants.JWT_SECRET))(cartController.DeleteCartItem)(c)
+				if assert.Error(t, err){
+					assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
 				}
 			})
 		}
