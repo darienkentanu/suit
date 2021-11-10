@@ -1,6 +1,6 @@
-FROM golang:1.17
+FROM golang:alpine
 
-# RUN apt update && apt add --no-cache git
+RUN apk update && apk add --no-cache git
 
 WORKDIR /app
 
