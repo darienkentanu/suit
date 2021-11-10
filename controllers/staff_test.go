@@ -78,9 +78,9 @@ func TestRegisterStaff(t *testing.T) {
 		},
 	}
 
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	UserSetup(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	loginDB := database.NewLoginDB(db)
 	controllers := NewStaffController(staffDB, loginDB)
 	InsertDataDropPoints(db)
@@ -183,9 +183,9 @@ func TestRegisterStaffError(t *testing.T) {
 		},
 	}
 
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	UserSetup(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	loginDB := database.NewLoginDB(db)
 	controllers := NewStaffController(staffDB, loginDB)
 	InsertDataDropPoints(db)
@@ -228,9 +228,9 @@ func TestGetAllStaff(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	UserSetup(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	loginDB := database.NewLoginDB(db)
 	controllers := NewStaffController(staffDB, loginDB)
 	InsertDataDropPoints(db)
@@ -258,6 +258,44 @@ func TestGetAllStaff(t *testing.T) {
 					assert.Error(t, err, "error")
 				}
 				assert.Equal(t, testCase.response, response.Status)
+			}
+		})
+	}
+}
+
+func TestGetAllStaffError(t *testing.T) {
+	var testCases = []struct {
+		name       string
+		path       string
+		expectCode int
+		expectError   string
+	}{
+		{
+			name:       "Get All Staff Error",
+			path:       "/staff",
+			expectCode: http.StatusInternalServerError,
+			expectError:   "Internal server error",
+		},
+	}
+	
+	e, db  := InitEcho()
+	UserSetup(db)
+	staffDB := database.NewStaffDB(db)
+	loginDB := database.NewLoginDB(db)
+	controllers := NewStaffController(staffDB, loginDB)
+	InsertDataDropPoints(db)
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	for _, testCase := range testCases {
+		c.SetPath(testCase.path)
+
+		t.Run(testCase.name, func(t *testing.T) {
+			err := controllers.GetAllStaff(c)
+			if assert.Error(t, err){
+				assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
 			}
 		})
 	}

@@ -73,14 +73,14 @@ func TestGetTransaction(t *testing.T) {
 		},
 	}
 
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	// UserSetup(db)
 	// CartSetup(db)
 	TransactionSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
-	transDB := database.NewTransactionDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
+	transDB := database.NewTransactionDB(db)
 	cartDB := database.NewCartDB(db)
 	categoryDB := database.NewCategoryDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
@@ -175,14 +175,14 @@ func TestGetTransactionByDropPoints(t *testing.T) {
 		},
 	}
 
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	// UserSetup(db)
 	// CartSetup(db)
 	TransactionSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
-	transDB := database.NewTransactionDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
+	transDB := database.NewTransactionDB(db)
 	cartDB := database.NewCartDB(db)
 	categoryDB := database.NewCategoryDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
@@ -290,14 +290,14 @@ func TestGetTransactionWithRange(t *testing.T) {
 		},
 	}
 
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	// UserSetup(db)
 	// CartSetup(db)
 	TransactionSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
-	transDB := database.NewTransactionDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
+	transDB := database.NewTransactionDB(db)
 	cartDB := database.NewCartDB(db)
 	categoryDB := database.NewCategoryDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
@@ -348,7 +348,7 @@ func TestGetTransactionWithRange(t *testing.T) {
 
 			c.SetPath(testCase.path)
 			c.SetParamNames("range")
-			c.SetParamValues("weekly")
+			c.SetParamValues("daily")
 
 			t.Run(testCase.name, func(t *testing.T) {
 				if assert.NoError(t, echoMiddleware.JWT([]byte(constants.JWT_SECRET))(transControllers.GetTransactionsWithRangeDate)(c)) {
@@ -393,14 +393,14 @@ func TestGetTransactionWithRangeError(t *testing.T) {
 		},
 	}
 
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	// UserSetup(db)
 	// CartSetup(db)
 	TransactionSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
-	transDB := database.NewTransactionDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
+	transDB := database.NewTransactionDB(db)
 	cartDB := database.NewCartDB(db)
 	categoryDB := database.NewCategoryDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
@@ -497,14 +497,14 @@ func TestGetTransactionTotal(t *testing.T) {
 		},
 	}
 
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	// UserSetup(db)
 	// CartSetup(db)
 	TransactionSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
-	transDB := database.NewTransactionDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
+	transDB := database.NewTransactionDB(db)
 	cartDB := database.NewCartDB(db)
 	categoryDB := database.NewCategoryDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
@@ -610,14 +610,14 @@ func TestGetTransactionTotalWithRangeDate(t *testing.T) {
 		},
 	}
 
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	// UserSetup(db)
 	// CartSetup(db)
 	TransactionSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
-	transDB := database.NewTransactionDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
+	transDB := database.NewTransactionDB(db)
 	cartDB := database.NewCartDB(db)
 	categoryDB := database.NewCategoryDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
@@ -713,14 +713,14 @@ func TestGetTransactionTotalWithRangeDateError(t *testing.T) {
 		},
 	}
 
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	// UserSetup(db)
 	// CartSetup(db)
 	TransactionSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
-	transDB := database.NewTransactionDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
+	transDB := database.NewTransactionDB(db)
 	cartDB := database.NewCartDB(db)
 	categoryDB := database.NewCategoryDB(db)
 	dropPointDB := database.NewDropPointsDB(db)

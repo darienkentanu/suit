@@ -44,7 +44,7 @@ func TestGetVoucher(t *testing.T) {
 			response:   "Success",
 		},
 	}
-	e, db, _ := InitEcho()
+	e, db  := InitEcho()
 	UserVoucherSetup(db)
 	VcSetup(db)
 	cdb := database.NewVoucherDB(db)
@@ -93,7 +93,7 @@ func TestAddVoucher(t *testing.T) {
 		},
 	}
 
-	e, db, _ := InitEcho()
+	e, db  := InitEcho()
 	VcSetup(db)
 	cdb := database.NewVoucherDB(db)
 	cc := NewVoucherController(cdb)
@@ -148,7 +148,7 @@ func TestEditVoucher(t *testing.T) {
 		},
 	}
 
-	e, db, _ := InitEcho()
+	e, db  := InitEcho()
 	VcSetup(db)
 	cdb := database.NewVoucherDB(db)
 	cc := NewVoucherController(cdb)
@@ -212,7 +212,7 @@ func TestEditVoucherError(t *testing.T) {
 		},
 	}
 	
-	e, db, _ := InitEcho()
+	e, db  := InitEcho()
 	VcSetup(db)
 	voucherDB := database.NewVoucherDB(db)
 	voucherControllers := NewVoucherController(voucherDB)
@@ -258,7 +258,7 @@ func TestDeleteVoucher(t *testing.T) {
 		},
 	}
 
-	e, db, _ := InitEcho()
+	e, db  := InitEcho()
 	VcSetup(db)
 	cdb := database.NewVoucherDB(db)
 	cc := NewVoucherController(cdb)
@@ -308,7 +308,7 @@ func TestDeleteVoucherError(t *testing.T) {
 		},
 	}
 	
-	e, db, _ := InitEcho()
+	e, db  := InitEcho()
 	VcSetup(db)
 	voucherDB := database.NewVoucherDB(db)
 	voucherControllers := NewVoucherController(voucherDB)

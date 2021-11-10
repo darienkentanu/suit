@@ -8,8 +8,7 @@ import (
 
 func main() {
 	db := config.InitDB()
-	dbSQL := config.InitDBSQL()
-	e := routes.New(db, dbSQL)
+	e := routes.New(db)
 
 	middlewares.LogMiddlewares(e)
 	e.Logger.Fatal(e.Start(":8000"))

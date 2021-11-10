@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"database/sql"
-
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/darienkentanu/suit/controllers"
@@ -12,10 +10,10 @@ import (
 	"gorm.io/gorm"
 )
 
-func userVoucherRoute(e *echo.Echo, db *gorm.DB, dbSQL *sql.DB) {
-	udb := database.NewUserDB(db, dbSQL)
+func userVoucherRoute(e *echo.Echo, db *gorm.DB) {
+	udb := database.NewUserDB(db)
 	vdb := database.NewVoucherDB(db)
-	uvdb := database.NewUserVoucherDB(db, dbSQL)
+	uvdb := database.NewUserVoucherDB(db)
 	uvc := controllers.NewUserVoucherController(uvdb, udb, vdb)
 
 	e.POST("/claim/:id", uvc.ClaimVoucher, middlewares.IsLoggedIn, middlewares.IsUser)

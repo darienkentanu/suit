@@ -44,7 +44,7 @@ func TestGetCategories(t *testing.T) {
 			response:   "Success",
 		},
 	}
-	e, db, _ := InitEcho()
+	e, db := InitEcho()
 	Setup(db)
 	cdb := database.NewCategoryDB(db)
 	cc := NewCategoryController(cdb)
@@ -92,7 +92,7 @@ func TestAddCategories(t *testing.T) {
 		},
 	}
 
-	e, db, _ := InitEcho()
+	e, db := InitEcho()
 	Setup(db)
 	cdb := database.NewCategoryDB(db)
 	cc := NewCategoryController(cdb)
@@ -147,7 +147,7 @@ func TestEditCategories(t *testing.T) {
 		},
 	}
 
-	e, db, _ := InitEcho()
+	e, db := InitEcho()
 	Setup(db)
 	cdb := database.NewCategoryDB(db)
 	cc := NewCategoryController(cdb)
@@ -211,7 +211,7 @@ func TestEditCategoriesError(t *testing.T) {
 		},
 	}
 	
-	e, db, _ := InitEcho()
+	e, db := InitEcho()
 	Setup(db)
 	categoryDB := database.NewCategoryDB(db)
 	categoryControllers := NewCategoryController(categoryDB)
@@ -257,7 +257,7 @@ func TestDeleteCategories(t *testing.T) {
 		},
 	}
 
-	e, db, _ := InitEcho()
+	e, db := InitEcho()
 	CartSetup(db)
 	Setup(db)
 	cdb := database.NewCategoryDB(db)
@@ -308,7 +308,7 @@ func TestDeleteCategoriesError(t *testing.T) {
 		},
 	}
 	
-	e, db, _ := InitEcho()
+	e, db := InitEcho()
 	Setup(db)
 	categoryDB := database.NewCategoryDB(db)
 	categoryControllers := NewCategoryController(categoryDB)

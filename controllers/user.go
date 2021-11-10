@@ -108,7 +108,6 @@ func GenerateHashPassword(password string) (string, error) {
 
 func (controllers *UserController) GetAllUsers(c echo.Context) error {
 	users, err := controllers.userModel.GetAllUsers()
-
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}

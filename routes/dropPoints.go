@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"database/sql"
-
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/darienkentanu/suit/controllers"
@@ -12,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func dropPointsRoute(e *echo.Echo, db *gorm.DB, dbSQL *sql.DB) {
+func dropPointsRoute(e *echo.Echo, db *gorm.DB) {
 	dpdb := database.NewDropPointsDB(db)
 	dpc := controllers.NewDropPointsController(dpdb)
 	e.GET("/droppoints", dpc.GetDropPoints)

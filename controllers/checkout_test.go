@@ -12,9 +12,9 @@ import (
 	. "github.com/darienkentanu/suit/controllers"
 	"github.com/darienkentanu/suit/lib/database"
 	"github.com/darienkentanu/suit/models"
+	echoMiddleware "github.com/labstack/echo/v4/middleware"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
-	echoMiddleware "github.com/labstack/echo/v4/middleware"
 )
 
 func InsertDataCheckout(db *gorm.DB) error {
@@ -117,18 +117,18 @@ func TestCreateCheckoutDropoff(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db := InitEcho()
 	UserSetup(db)
 	Setup(db)
 	CartSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	cartDB := database.NewCartDB(db)
 	checkoutDB := database.NewCheckoutDB(db)
 	categoryDB := database.NewCategoryDB(db)
-	transactionDB := database.NewTransactionDB(db, dbSQL)
+	transactionDB := database.NewTransactionDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	checkoutController := NewCheckoutController(checkoutDB, cartDB, categoryDB, dropPointDB, userDB, transactionDB, loginDB)
 	InsertDataUser(db)
@@ -228,18 +228,18 @@ func TestCreateCheckoutDropoffError(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db := InitEcho()
 	UserSetup(db)
 	Setup(db)
 	CartSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	cartDB := database.NewCartDB(db)
 	checkoutDB := database.NewCheckoutDB(db)
 	categoryDB := database.NewCategoryDB(db)
-	transactionDB := database.NewTransactionDB(db, dbSQL)
+	transactionDB := database.NewTransactionDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	checkoutController := NewCheckoutController(checkoutDB, cartDB, categoryDB, dropPointDB, userDB, transactionDB, loginDB)
 	InsertDataUser(db)
@@ -326,18 +326,18 @@ func TestCreateCheckoutPickup(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	UserSetup(db)
 	Setup(db)
 	CartSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	cartDB := database.NewCartDB(db)
 	checkoutDB := database.NewCheckoutDB(db)
 	categoryDB := database.NewCategoryDB(db)
-	transactionDB := database.NewTransactionDB(db, dbSQL)
+	transactionDB := database.NewTransactionDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	checkoutController := NewCheckoutController(checkoutDB, cartDB, categoryDB, dropPointDB, userDB, transactionDB, loginDB)
 	InsertDataUser(db)
@@ -451,18 +451,18 @@ func TestCreateCheckoutPickupError(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	UserSetup(db)
 	Setup(db)
 	CartSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	cartDB := database.NewCartDB(db)
 	checkoutDB := database.NewCheckoutDB(db)
 	categoryDB := database.NewCategoryDB(db)
-	transactionDB := database.NewTransactionDB(db, dbSQL)
+	transactionDB := database.NewTransactionDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	checkoutController := NewCheckoutController(checkoutDB, cartDB, categoryDB, dropPointDB, userDB, transactionDB, loginDB)
 	InsertDataUser(db)
@@ -545,18 +545,18 @@ func TestVerification(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	UserSetup(db)
 	Setup(db)
 	CartSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	cartDB := database.NewCartDB(db)
 	checkoutDB := database.NewCheckoutDB(db)
 	categoryDB := database.NewCategoryDB(db)
-	transactionDB := database.NewTransactionDB(db, dbSQL)
+	transactionDB := database.NewTransactionDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	checkoutController := NewCheckoutController(checkoutDB, cartDB, categoryDB, dropPointDB, userDB, transactionDB, loginDB)
 	InsertDataUser(db)
@@ -649,20 +649,33 @@ func TestVerificationError(t *testing.T) {
 				"password"		: "alika123",
 			},
 		},
+		{
+			name:       "Verification Invalid Trans ID",
+			path:       "/verification/:id",
+			loginPath:	"/login",
+			expectCodeLogin: http.StatusOK,
+			expectCode: http.StatusInternalServerError,
+			expectError:   "Internal server error",
+			paramValues: "50",
+			login:		map[string]interface{}{
+				"email"			: "alikatania@gmail.com",
+				"password"		: "alika123",
+			},
+		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	UserSetup(db)
 	Setup(db)
 	CartSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	cartDB := database.NewCartDB(db)
 	checkoutDB := database.NewCheckoutDB(db)
 	categoryDB := database.NewCategoryDB(db)
-	transactionDB := database.NewTransactionDB(db, dbSQL)
+	transactionDB := database.NewTransactionDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	checkoutController := NewCheckoutController(checkoutDB, cartDB, categoryDB, dropPointDB, userDB, transactionDB, loginDB)
 	InsertDataUser(db)
