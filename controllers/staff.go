@@ -88,7 +88,7 @@ func (controllers *StaffController) GetAllStaff(c echo.Context) error {
 	staff, err := controllers.staffModel.GetAllStaff()
 
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}
 
 	return c.JSON(http.StatusOK, M{
