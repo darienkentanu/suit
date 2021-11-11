@@ -1,4 +1,4 @@
-package controllers_test
+package controllers
 
 import (
 	"bytes"
@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/darienkentanu/suit/constants"
-	. "github.com/darienkentanu/suit/controllers"
+	// . "github.com/darienkentanu/suit/controllers"
 	"github.com/darienkentanu/suit/lib/database"
 	"github.com/darienkentanu/suit/models"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
@@ -73,7 +73,7 @@ func TestGetTransaction(t *testing.T) {
 		},
 	}
 
-	e, db  := InitEcho()
+	e, db := InitEcho()
 	// UserSetup(db)
 	// CartSetup(db)
 	TransactionSetup(db)
@@ -175,7 +175,7 @@ func TestGetTransactionByDropPoints(t *testing.T) {
 		},
 	}
 
-	e, db  := InitEcho()
+	e, db := InitEcho()
 	// UserSetup(db)
 	// CartSetup(db)
 	TransactionSetup(db)
@@ -290,7 +290,7 @@ func TestGetTransactionWithRange(t *testing.T) {
 		},
 	}
 
-	e, db  := InitEcho()
+	e, db := InitEcho()
 	// UserSetup(db)
 	// CartSetup(db)
 	TransactionSetup(db)
@@ -373,19 +373,19 @@ func TestGetTransactionWithRange(t *testing.T) {
 
 func TestGetTransactionWithRangeError(t *testing.T) {
 	var testCases = []struct {
-		name       string
-		path       string
-		loginPath  string
-		expectCode int
-		expectError   string
-		login      map[string]interface{}
+		name        string
+		path        string
+		loginPath   string
+		expectCode  int
+		expectError string
+		login       map[string]interface{}
 	}{
 		{
-			name:       "Get Transaction With Range Invalid Param",
-			path:       "/transactionreport/:range",
-			loginPath:  "/login",
-			expectCode: http.StatusOK,
-			expectError:   "Invalid range",
+			name:        "Get Transaction With Range Invalid Param",
+			path:        "/transactionreport/:range",
+			loginPath:   "/login",
+			expectCode:  http.StatusOK,
+			expectError: "Invalid range",
 			login: map[string]interface{}{
 				"email":    "alikatania@gmail.com",
 				"password": "alika123",
@@ -393,7 +393,7 @@ func TestGetTransactionWithRangeError(t *testing.T) {
 		},
 	}
 
-	e, db  := InitEcho()
+	e, db := InitEcho()
 	// UserSetup(db)
 	// CartSetup(db)
 	TransactionSetup(db)
@@ -455,7 +455,7 @@ func TestGetTransactionWithRangeError(t *testing.T) {
 
 			t.Run(testCase.name, func(t *testing.T) {
 				err := echoMiddleware.JWT([]byte(constants.JWT_SECRET))(transControllers.GetTransactionsWithRangeDate)(c)
-				if assert.Error(t, err){
+				if assert.Error(t, err) {
 					assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
 				}
 			})
@@ -497,7 +497,7 @@ func TestGetTransactionTotal(t *testing.T) {
 		},
 	}
 
-	e, db  := InitEcho()
+	e, db := InitEcho()
 	// UserSetup(db)
 	// CartSetup(db)
 	TransactionSetup(db)
@@ -610,7 +610,7 @@ func TestGetTransactionTotalWithRangeDate(t *testing.T) {
 		},
 	}
 
-	e, db  := InitEcho()
+	e, db := InitEcho()
 	// UserSetup(db)
 	// CartSetup(db)
 	TransactionSetup(db)
@@ -693,19 +693,19 @@ func TestGetTransactionTotalWithRangeDate(t *testing.T) {
 
 func TestGetTransactionTotalWithRangeDateError(t *testing.T) {
 	var testCases = []struct {
-		name       string
-		path       string
-		loginPath  string
-		expectCode int
-		expectError   string
-		login      map[string]interface{}
+		name        string
+		path        string
+		loginPath   string
+		expectCode  int
+		expectError string
+		login       map[string]interface{}
 	}{
 		{
-			name:       "Get Transaction Total With Range Date User Invalid Param",
-			path:       "/totaltransaction/:range",
-			loginPath:  "/login",
-			expectCode: http.StatusOK,
-			expectError:   "Invalid range",
+			name:        "Get Transaction Total With Range Date User Invalid Param",
+			path:        "/totaltransaction/:range",
+			loginPath:   "/login",
+			expectCode:  http.StatusOK,
+			expectError: "Invalid range",
 			login: map[string]interface{}{
 				"email":    "alikatania@gmail.com",
 				"password": "alika123",
@@ -713,7 +713,7 @@ func TestGetTransactionTotalWithRangeDateError(t *testing.T) {
 		},
 	}
 
-	e, db  := InitEcho()
+	e, db := InitEcho()
 	// UserSetup(db)
 	// CartSetup(db)
 	TransactionSetup(db)
@@ -775,7 +775,7 @@ func TestGetTransactionTotalWithRangeDateError(t *testing.T) {
 
 			t.Run(testCase.name, func(t *testing.T) {
 				err := echoMiddleware.JWT([]byte(constants.JWT_SECRET))(transControllers.GetTransactionTotalWithRangeDate)(c)
-				if assert.Error(t, err){
+				if assert.Error(t, err) {
 					assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
 				}
 			})

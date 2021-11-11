@@ -1,7 +1,7 @@
 package routes
 
 import (
-	_ "github.com/go-sql-driver/mysql"
+	// _ "github.com/go-sql-driver/mysql"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -19,6 +19,6 @@ func New(db *gorm.DB) *echo.Echo {
 	userVoucherRoute(e, db)
 	transactionRoute(e, db)
 	checkout(e, db)
-  
+
 	return e
 }

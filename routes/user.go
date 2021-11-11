@@ -3,7 +3,7 @@ package routes
 import (
 	// "database/sql"
 
-	_ "github.com/go-sql-driver/mysql"
+	// _ "github.com/go-sql-driver/mysql"
 
 	"github.com/darienkentanu/suit/controllers"
 	"github.com/darienkentanu/suit/lib/database"

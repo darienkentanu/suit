@@ -1,4 +1,4 @@
-package controllers_test
+package controllers
 
 import (
 	"bytes"
@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/darienkentanu/suit/constants"
-	. "github.com/darienkentanu/suit/controllers"
+	// . "github.com/darienkentanu/suit/controllers"
 	"github.com/darienkentanu/suit/lib/database"
 	"github.com/darienkentanu/suit/models"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
@@ -18,26 +18,26 @@ import (
 
 func TestLogin(t *testing.T) {
 	var testCases = []struct {
-		name       	string
-		path       	string
-		loginPath	string
-		expectCode 	int
-		response   	string
-		reqBody		map[string]string
+		name       string
+		path       string
+		loginPath  string
+		expectCode int
+		response   string
+		reqBody    map[string]string
 	}{
 		{
 			name:       "Login",
 			path:       "/login",
 			expectCode: http.StatusOK,
 			response:   "success",
-			reqBody:	map[string]string{
-				"email"			: "alikatania@gmail.com",
-				"password"		: "alika123",
+			reqBody: map[string]string{
+				"email":    "alikatania@gmail.com",
+				"password": "alika123",
 			},
 		},
 	}
-	
-	e, db  := InitEcho()
+
+	e, db := InitEcho()
 	UserSetup(db)
 	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
@@ -56,15 +56,15 @@ func TestLogin(t *testing.T) {
 		loginReq.Header.Set("Content-Type", "application/json")
 		loginRec := httptest.NewRecorder()
 		loginC := e.NewContext(loginReq, loginRec)
-		
+
 		loginC.SetPath(testCase.loginPath)
 
 		assert.Equal(t, testCase.expectCode, loginRec.Code)
 		body := loginRec.Body.String()
 
 		var responseLogin = struct {
-			Status string					`json:"status"`
-			Data   models.ResponseLogin 	`json:"data"`
+			Status string               `json:"status"`
+			Data   models.ResponseLogin `json:"data"`
 		}{}
 
 		err = json.Unmarshal([]byte(body), &responseLogin)
@@ -73,13 +73,13 @@ func TestLogin(t *testing.T) {
 		}
 
 		t.Run(testCase.name, func(t *testing.T) {
-			if assert.NoError(t, loginControllers.Login(loginC)){
+			if assert.NoError(t, loginControllers.Login(loginC)) {
 				assert.Equal(t, testCase.expectCode, loginRec.Code)
 				body := loginRec.Body.String()
 
 				var response = struct {
-					Status string					`json:"status"`
-					Data   models.ResponseGetUser 	`json:"data"`
+					Status string                 `json:"status"`
+					Data   models.ResponseGetUser `json:"data"`
 				}{}
 				err := json.Unmarshal([]byte(body), &response)
 
@@ -89,52 +89,52 @@ func TestLogin(t *testing.T) {
 				assert.Equal(t, testCase.response, response.Status)
 			}
 		})
-		
+
 	}
 }
 
 func TestLoginError(t *testing.T) {
 	var testCases = []struct {
-		name       	string
-		path       	string
-		loginPath	string
-		expectCode 	int
-		expectError	string
-		reqBody		map[string]interface{}
+		name        string
+		path        string
+		loginPath   string
+		expectCode  int
+		expectError string
+		reqBody     map[string]interface{}
 	}{
 		{
-			name:       "Login Bind Error",
-			path:       "/login",
-			expectCode: http.StatusBadRequest,
+			name:        "Login Bind Error",
+			path:        "/login",
+			expectCode:  http.StatusBadRequest,
 			expectError: "Invalid input",
-			reqBody:	map[string]interface{}{
-				"email"			: "alikataniaaa@gmail.com",
-				"password"		: 12345,
+			reqBody: map[string]interface{}{
+				"email":    "alikataniaaa@gmail.com",
+				"password": 12345,
 			},
 		},
 		{
-			name:       "Login Incorrect Email",
-			path:       "/login",
-			expectCode: http.StatusBadRequest,
+			name:        "Login Incorrect Email",
+			path:        "/login",
+			expectCode:  http.StatusBadRequest,
 			expectError: "Incorrect email or username",
-			reqBody:	map[string]interface{}{
-				"email"			: "alikataniaaa@gmail.com",
-				"password"		: "alika123",
+			reqBody: map[string]interface{}{
+				"email":    "alikataniaaa@gmail.com",
+				"password": "alika123",
 			},
 		},
 		{
-			name:       "Login Incorrect Password",
-			path:       "/login",
-			expectCode: http.StatusBadRequest,
+			name:        "Login Incorrect Password",
+			path:        "/login",
+			expectCode:  http.StatusBadRequest,
 			expectError: "Incorrect password",
-			reqBody:	map[string]interface{}{
-				"email"			: "alikatania@gmail.com",
-				"password"		: "alika12345",
+			reqBody: map[string]interface{}{
+				"email":    "alikatania@gmail.com",
+				"password": "alika12345",
 			},
 		},
 	}
-	
-	e, db  := InitEcho()
+
+	e, db := InitEcho()
 	UserSetup(db)
 	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
@@ -153,53 +153,53 @@ func TestLoginError(t *testing.T) {
 		loginReq.Header.Set("Content-Type", "application/json")
 		loginRec := httptest.NewRecorder()
 		loginC := e.NewContext(loginReq, loginRec)
-		
+
 		loginC.SetPath(testCase.loginPath)
 
 		t.Run(testCase.name, func(t *testing.T) {
 			err := loginControllers.Login(loginC)
-			if assert.Error(t, err){
+			if assert.Error(t, err) {
 				assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
 			}
 		})
-		
+
 	}
 }
 
 func TestGetProfile(t *testing.T) {
 	var testCases = []struct {
-		name       	string
-		path       	string
-		loginPath	string
-		expectCode 	int
-		response   	string
-		login		map[string]interface{}
+		name       string
+		path       string
+		loginPath  string
+		expectCode int
+		response   string
+		login      map[string]interface{}
 	}{
 		{
 			name:       "Get Profile User",
 			path:       "/profile",
-			loginPath:	"/login",
+			loginPath:  "/login",
 			expectCode: http.StatusOK,
 			response:   "success",
-			login:		map[string]interface{}{
-				"email"			: "alikatania@gmail.com",
-				"password"		: "alika123",
+			login: map[string]interface{}{
+				"email":    "alikatania@gmail.com",
+				"password": "alika123",
 			},
 		},
 		{
 			name:       "Get Profile Staff",
 			path:       "/profile",
-			loginPath:	"/login",
+			loginPath:  "/login",
 			expectCode: http.StatusOK,
 			response:   "success",
-			login:		map[string]interface{}{
-				"email"			: "azkam@gmail.com",
-				"password"		: "azka123",
+			login: map[string]interface{}{
+				"email":    "azkam@gmail.com",
+				"password": "azka123",
 			},
 		},
 	}
-	
-	e, db  := InitEcho()
+
+	e, db := InitEcho()
 	UserSetup(db)
 	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
@@ -220,7 +220,7 @@ func TestGetProfile(t *testing.T) {
 		loginReq.Header.Set("Content-Type", "application/json")
 		loginRec := httptest.NewRecorder()
 		loginC := e.NewContext(loginReq, loginRec)
-		
+
 		loginC.SetPath(testCase.loginPath)
 
 		if assert.NoError(t, loginControllers.Login(loginC)) {
@@ -228,8 +228,8 @@ func TestGetProfile(t *testing.T) {
 			body := loginRec.Body.String()
 
 			var responseLogin = struct {
-				Status string					`json:"status"`
-				Data   models.ResponseLogin 	`json:"data"`
+				Status string               `json:"status"`
+				Data   models.ResponseLogin `json:"data"`
 			}{}
 			err := json.Unmarshal([]byte(body), &responseLogin)
 			if err != nil {
@@ -248,13 +248,13 @@ func TestGetProfile(t *testing.T) {
 			c.SetPath(testCase.path)
 
 			t.Run(testCase.name, func(t *testing.T) {
-				if assert.NoError(t, echoMiddleware.JWT([]byte(constants.JWT_SECRET))(loginControllers.GetProfile)(c)){
+				if assert.NoError(t, echoMiddleware.JWT([]byte(constants.JWT_SECRET))(loginControllers.GetProfile)(c)) {
 					assert.Equal(t, testCase.expectCode, rec.Code)
 					body := rec.Body.String()
 
 					var response = struct {
-						Status string					`json:"status"`
-						Data   models.ResponseGetUser 	`json:"data"`
+						Status string                 `json:"status"`
+						Data   models.ResponseGetUser `json:"data"`
 					}{}
 					err := json.Unmarshal([]byte(body), &response)
 
@@ -270,56 +270,56 @@ func TestGetProfile(t *testing.T) {
 
 func TestUpdateProfile(t *testing.T) {
 	var testCases = []struct {
-		name       	string
-		path       	string
-		loginPath	string
-		expectCode 	int
-		response   	string
-		login		map[string]interface{}
-		reqBody		map[string]interface{}
+		name       string
+		path       string
+		loginPath  string
+		expectCode int
+		response   string
+		login      map[string]interface{}
+		reqBody    map[string]interface{}
 	}{
 		{
 			name:       "Update Profile User",
 			path:       "/profile",
-			loginPath:	"/login",
+			loginPath:  "/login",
 			expectCode: http.StatusOK,
 			response:   "success",
-			login:		map[string]interface{}{
-				"email"			: "alikatania@gmail.com",
-				"password"		: "alika123",
+			login: map[string]interface{}{
+				"email":    "alikatania@gmail.com",
+				"password": "alika123",
 			},
-			reqBody: 	map[string]interface{}{
-				"fullname"		: "Alika Tania P.",
-				"email"			: "alikataniap@gmail.com",
-				"username"		: "alikap",
-				"password"		: "alika123",
-				"phone_number"	: "0812783781",
-				"gender"		: "female",
-				"address"		: "Jl. Kebon Jeruk Raya No. 27, Kebon Jeruk, Jakarta Barat 11530",
+			reqBody: map[string]interface{}{
+				"fullname":     "Alika Tania P.",
+				"email":        "alikataniap@gmail.com",
+				"username":     "alikap",
+				"password":     "alika123",
+				"phone_number": "0812783781",
+				"gender":       "female",
+				"address":      "Jl. Kebon Jeruk Raya No. 27, Kebon Jeruk, Jakarta Barat 11530",
 			},
 		},
 		{
 			name:       "Update Profile Staff",
 			path:       "/profile",
-			loginPath:	"/login",
+			loginPath:  "/login",
 			expectCode: http.StatusOK,
 			response:   "success",
-			login:		map[string]interface{}{
-				"email"			: "azkam@gmail.com",
-				"password"		: "azka123",
+			login: map[string]interface{}{
+				"email":    "azkam@gmail.com",
+				"password": "azka123",
 			},
-			reqBody: 	map[string]interface{}{
-				"fullname": "Muhammad Azka R.",
-				"email": 	"azkamr@gmail.com",
-				"username": "mazkar",
-				"password": "azka1234",
-				"phone_number": "08126736171",
+			reqBody: map[string]interface{}{
+				"fullname":      "Muhammad Azka R.",
+				"email":         "azkamr@gmail.com",
+				"username":      "mazkar",
+				"password":      "azka1234",
+				"phone_number":  "08126736171",
 				"drop_point_id": 1,
 			},
 		},
 	}
-	
-	e, db  := InitEcho()
+
+	e, db := InitEcho()
 	UserSetup(db)
 	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
@@ -340,7 +340,7 @@ func TestUpdateProfile(t *testing.T) {
 		loginReq.Header.Set("Content-Type", "application/json")
 		loginRec := httptest.NewRecorder()
 		loginC := e.NewContext(loginReq, loginRec)
-		
+
 		loginC.SetPath(testCase.loginPath)
 
 		if assert.NoError(t, loginControllers.Login(loginC)) {
@@ -348,8 +348,8 @@ func TestUpdateProfile(t *testing.T) {
 			body := loginRec.Body.String()
 
 			var responseLogin = struct {
-				Status string					`json:"status"`
-				Data   models.ResponseLogin 	`json:"data"`
+				Status string               `json:"status"`
+				Data   models.ResponseLogin `json:"data"`
 			}{}
 			err := json.Unmarshal([]byte(body), &responseLogin)
 			if err != nil {
@@ -369,17 +369,17 @@ func TestUpdateProfile(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)
-			
+
 			c.SetPath(testCase.path)
 
 			t.Run(testCase.name, func(t *testing.T) {
-				if assert.NoError(t, echoMiddleware.JWT([]byte(constants.JWT_SECRET))(loginControllers.UpdateProfile)(c)){
+				if assert.NoError(t, echoMiddleware.JWT([]byte(constants.JWT_SECRET))(loginControllers.UpdateProfile)(c)) {
 					assert.Equal(t, testCase.expectCode, rec.Code)
 					body := rec.Body.String()
 
 					var response = struct {
-						Status string					`json:"status"`
-						Data   models.ResponseGetUser 	`json:"data"`
+						Status string                 `json:"status"`
+						Data   models.ResponseGetUser `json:"data"`
 					}{}
 					err := json.Unmarshal([]byte(body), &response)
 
@@ -395,59 +395,59 @@ func TestUpdateProfile(t *testing.T) {
 
 func TestUpdateProfileError(t *testing.T) {
 	var testCases = []struct {
-		name       	string
-		path       	string
-		loginPath	string
+		name            string
+		path            string
+		loginPath       string
 		expectCodeLogin int
-		expectCode 	int
-		expectError string
-		login		map[string]interface{}
-		reqBody		map[string]interface{}
+		expectCode      int
+		expectError     string
+		login           map[string]interface{}
+		reqBody         map[string]interface{}
 	}{
 		{
-			name:       "Update Profile User Invalid Input",
-			path:       "/profile",
-			loginPath:	"/login",
+			name:            "Update Profile User Invalid Input",
+			path:            "/profile",
+			loginPath:       "/login",
 			expectCodeLogin: http.StatusOK,
-			expectCode: http.StatusBadRequest,
-			expectError:   "Invalid input",
-			login:		map[string]interface{}{
-				"email"			: "alikatania@gmail.com",
-				"password"		: "alika123",
+			expectCode:      http.StatusBadRequest,
+			expectError:     "Invalid input",
+			login: map[string]interface{}{
+				"email":    "alikatania@gmail.com",
+				"password": "alika123",
 			},
-			reqBody: 	map[string]interface{}{
-				"fullname"		: "Alika Tania P.",
-				"email"			: "alikataniap@gmail.com",
-				"username"		: "alikap",
-				"password"		: "alika123",
-				"phone_number"	: 812783781,
-				"gender"		: "female",
-				"address"		: "Jl. Kebon Jeruk Raya No. 27, Kebon Jeruk, Jakarta Barat 11530",
+			reqBody: map[string]interface{}{
+				"fullname":     "Alika Tania P.",
+				"email":        "alikataniap@gmail.com",
+				"username":     "alikap",
+				"password":     "alika123",
+				"phone_number": 812783781,
+				"gender":       "female",
+				"address":      "Jl. Kebon Jeruk Raya No. 27, Kebon Jeruk, Jakarta Barat 11530",
 			},
 		},
 		{
-			name:       "Update Profile Staff Invalid Input",
-			path:       "/profile",
-			loginPath:	"/login",
+			name:            "Update Profile Staff Invalid Input",
+			path:            "/profile",
+			loginPath:       "/login",
 			expectCodeLogin: http.StatusOK,
-			expectCode: http.StatusBadRequest,
-			expectError:   "Invalid input",
-			login:		map[string]interface{}{
-				"email"			: "azkam@gmail.com",
-				"password"		: "azka123",
+			expectCode:      http.StatusBadRequest,
+			expectError:     "Invalid input",
+			login: map[string]interface{}{
+				"email":    "azkam@gmail.com",
+				"password": "azka123",
 			},
-			reqBody: 	map[string]interface{}{
-				"fullname": "Muhammad Azka R.",
-				"email": 	"azkamr@gmail.com",
-				"username": "mazkar",
-				"password": "azka1234",
-				"phone_number": 8126736171,
+			reqBody: map[string]interface{}{
+				"fullname":      "Muhammad Azka R.",
+				"email":         "azkamr@gmail.com",
+				"username":      "mazkar",
+				"password":      "azka1234",
+				"phone_number":  8126736171,
 				"drop_point_id": 1,
 			},
 		},
 	}
-	
-	e, db  := InitEcho()
+
+	e, db := InitEcho()
 	UserSetup(db)
 	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
@@ -468,7 +468,7 @@ func TestUpdateProfileError(t *testing.T) {
 		loginReq.Header.Set("Content-Type", "application/json")
 		loginRec := httptest.NewRecorder()
 		loginC := e.NewContext(loginReq, loginRec)
-		
+
 		loginC.SetPath(testCase.loginPath)
 
 		if assert.NoError(t, loginControllers.Login(loginC)) {
@@ -476,8 +476,8 @@ func TestUpdateProfileError(t *testing.T) {
 			body := loginRec.Body.String()
 
 			var responseLogin = struct {
-				Status string					`json:"status"`
-				Data   models.ResponseLogin 	`json:"data"`
+				Status string               `json:"status"`
+				Data   models.ResponseLogin `json:"data"`
 			}{}
 			err := json.Unmarshal([]byte(body), &responseLogin)
 			if err != nil {
@@ -497,12 +497,12 @@ func TestUpdateProfileError(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)
-			
+
 			c.SetPath(testCase.path)
 
 			t.Run(testCase.name, func(t *testing.T) {
 				err := echoMiddleware.JWT([]byte(constants.JWT_SECRET))(loginControllers.UpdateProfile)(c)
-				if assert.Error(t, err){
+				if assert.Error(t, err) {
 					assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
 				}
 			})

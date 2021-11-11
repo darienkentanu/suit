@@ -1,7 +1,7 @@
 package routes
 
 import (
-	_ "github.com/go-sql-driver/mysql"
+	// _ "github.com/go-sql-driver/mysql"
 
 	"github.com/darienkentanu/suit/controllers"
 	"github.com/darienkentanu/suit/lib/database"
@@ -19,8 +19,8 @@ func transactionRoute(e *echo.Echo, db *gorm.DB) {
 
 	e.GET("/transactions", tvc.GetTransactions, middlewares.IsLoggedIn)
 	e.GET("/transactionsbydroppoint/:id", tvc.GetTransactionsDropPoint, middlewares.IsLoggedIn, middlewares.IsStaff)
-	e.GET("/transactionreport/:range", tvc.GetTransactionsWithRangeDate, middlewares.IsLoggedIn)	// daily, weekly, monthly
+	e.GET("/transactionreport/:range", tvc.GetTransactionsWithRangeDate, middlewares.IsLoggedIn) // daily, weekly, monthly
 
 	e.GET("/totaltransaction", tvc.GetTransactionTotal, middlewares.IsLoggedIn)
-	e.GET("/totaltransaction/:range", tvc.GetTransactionTotalWithRangeDate, middlewares.IsLoggedIn)	// daily, weekly, monthly
+	e.GET("/totaltransaction/:range", tvc.GetTransactionTotalWithRangeDate, middlewares.IsLoggedIn) // daily, weekly, monthly
 }
