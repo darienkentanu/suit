@@ -78,6 +78,44 @@ func TestGetDropPoints(t *testing.T) {
 	}
 }
 
+func TestGetDropPointsError(t *testing.T) {
+	var testCases = []struct {
+		name       		string
+		path       		string
+		expectCode 		int
+		expectError   	string
+	}{
+		{
+			name:       "Get Drop Point not found",
+			path:       "/droppoints/:id",
+			expectCode: http.StatusNotFound,
+			expectError: "Not found",
+		},
+	}
+	
+	e, db  := InitEcho()
+	DPSetup(db)
+	dropPointDB := database.NewDropPointsDB(db)
+	dropPointControllers := NewDropPointsController(dropPointDB)
+
+	for _, testCase := range testCases {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set("Content-Type", "application/json")
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		
+		c.SetPath(testCase.path)
+
+		t.Run(testCase.name, func(t *testing.T) {
+			err := dropPointControllers.GetDropPoints(c)
+			if assert.Error(t, err){
+				assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
+			}
+		})
+		
+	}
+}
+
 func TestAddDropPoints(t *testing.T) {
 	var testCases = []struct {
 		name       	string
@@ -131,6 +169,62 @@ func TestAddDropPoints(t *testing.T) {
 				assert.Equal(t, testCase.response, response.Status)
 			}
 		})
+	}
+}
+
+func TestAddDropPointError(t *testing.T) {
+	var testCases = []struct {
+		name       		string
+		path       		string
+		expectCode 		int
+		expectError   	string
+		reqBody			map[string]interface{}
+	}{
+		{
+			name:       "Add Drop Point invalid input",
+			path:       "/droppoints/:id",
+			expectCode: http.StatusBadRequest,
+			expectError: "Invalid input",
+			reqBody: 	map[string]interface{}{
+				"address": 928391,
+			},
+		},
+		{
+			name:       "Add Drop Point Internal server error",
+			path:       "/droppoints/:id",
+			expectCode: http.StatusInternalServerError,
+			expectError: "Internal server error",
+			reqBody: 	map[string]interface{}{
+				"address": "universitas brawijaya",
+			},
+		},
+	}
+	
+	e, db  := InitEcho()
+	db.Migrator().DropTable(&models.Drop_Point{})
+	dropPointDB := database.NewDropPointsDB(db)
+	dropPointControllers := NewDropPointsController(dropPointDB)
+
+	for _, testCase := range testCases {
+		reqBody, err := json.Marshal(testCase.reqBody)
+		if err != nil {
+			t.Error(err)
+		}
+
+		req := httptest.NewRequest(http.MethodPut, "/", bytes.NewBuffer(reqBody))
+		req.Header.Set("Content-Type", "application/json")
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		
+		c.SetPath(testCase.path)
+
+		t.Run(testCase.name, func(t *testing.T) {
+			err := dropPointControllers.AddDropPoints(c)
+			if assert.Error(t, err){
+				assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
+			}
+		})
+		
 	}
 }
 
@@ -212,13 +306,32 @@ func TestEditDropPointError(t *testing.T) {
 				"address": "universitas brawijaya",
 			},
 		},
+		{
+			name:       "Edit Drop Point invalid input",
+			path:       "/droppoints/:id",
+			expectCode: http.StatusBadRequest,
+			expectError: "Invalid input",
+			paramValues: "1",
+			reqBody: 	map[string]interface{}{
+				"address": 928391,
+			},
+		},
+		{
+			name:       "Edit Drop Point Not found",
+			path:       "/droppoints/:id",
+			expectCode: http.StatusNotFound,
+			expectError: "Not found",
+			paramValues: "1",
+			reqBody: 	map[string]interface{}{
+				"address": "universitas brawijaya",
+			},
+		},
 	}
 	
 	e, db  := InitEcho()
 	DPSetup(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	dropPointControllers := NewDropPointsController(dropPointDB)
-	InsertDataDropPoints(db)
 
 	for _, testCase := range testCases {
 		reqBody, err := json.Marshal(testCase.reqBody)
@@ -310,13 +423,19 @@ func TestDeleteDropPointError(t *testing.T) {
 			expectError: "Invalid id",
 			paramValues: "a",
 		},
+		{
+			name:       "Delete Drop Point Not found",
+			path:       "/droppoints/:id",
+			expectCode: http.StatusNotFound,
+			expectError: "Not found",
+			paramValues: "1",
+		},
 	}
 	
 	e, db  := InitEcho()
 	DPSetup(db)
 	dropPointDB := database.NewDropPointsDB(db)
 	dropPointControllers := NewDropPointsController(dropPointDB)
-	InsertDataDropPoints(db)
 
 	for _, testCase := range testCases {
 		req := httptest.NewRequest(http.MethodDelete, "/", nil)

@@ -180,12 +180,30 @@ func TestAddToCartError(t *testing.T) {
 				"weight"		: "5",
 			},
 		},
+		{
+			name:       "Add to Cart Internal server error",
+			path:       "/cart",
+			loginPath:	"/login",
+			expectCodeLogin: http.StatusOK,
+			expectCode: http.StatusInternalServerError,
+			expectError:   "Internal server error",
+			login:		map[string]interface{}{
+				"email"			: "alikatania@gmail.com",
+				"password"		: "alika123",
+			},
+			reqBody: 	map[string]interface{}{
+				"category_id"	: 1,
+				"weight"		: 5,
+			},
+		},
 	}
 	
 	e, db := InitEcho()
 	UserSetup(db)
 	Setup(db)
-	CartSetup(db)
+	db.Migrator().DropTable(&models.Transaction{})
+	db.Migrator().DropTable(&models.Drop_Point{})
+	db.Migrator().DropTable(&models.CartItem{})
 	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
 	staffDB := database.NewStaffDB(db)
@@ -444,6 +462,93 @@ func TestGetCartItem(t *testing.T) {
 						assert.Error(t, err, "error")
 					}
 					assert.Equal(t, testCase.response, response.Status)
+				}
+			})
+		}
+	}
+}
+
+func TestGetCartItemError(t *testing.T) {
+	var testCases = []struct {
+		name       		string
+		path       		string
+		loginPath		string
+		expectCodeLogin int
+		expectCode 		int
+		expectError   	string
+		login			map[string]interface{}
+	}{
+		{
+			name:       "Get Cart Item Internal Server Error",
+			path:       "/cart",
+			loginPath:	"/login",
+			expectCodeLogin: http.StatusOK,
+			expectCode: http.StatusInternalServerError,
+			expectError:   "Internal server error",
+			login:		map[string]interface{}{
+				"email"			: "alikatania@gmail.com",
+				"password"		: "alika123",
+			},
+		},
+	}
+	
+	e, db := InitEcho()
+	UserSetup(db)
+	Setup(db)
+	db.Migrator().DropTable(&models.Transaction{})
+	db.Migrator().DropTable(&models.Drop_Point{})
+	db.Migrator().DropTable(&models.CartItem{})
+	userDB := database.NewUserDB(db)
+	loginDB := database.NewLoginDB(db)
+	staffDB := database.NewStaffDB(db)
+	dropPointDB := database.NewDropPointsDB(db)
+	cartDB := database.NewCartDB(db)
+	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
+	cartController := NewCartController(cartDB)
+	InsertDataUser(db)
+	InsertDataCategory(db)
+
+	for _, testCase := range testCases {
+		login, err := json.Marshal(testCase.login)
+		if err != nil {
+			t.Error(err)
+		}
+
+		loginReq := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(login))
+		loginReq.Header.Set("Content-Type", "application/json")
+		loginRec := httptest.NewRecorder()
+		loginC := e.NewContext(loginReq, loginRec)
+		
+		loginC.SetPath(testCase.loginPath)
+
+		if assert.NoError(t, loginControllers.Login(loginC)) {
+			assert.Equal(t, testCase.expectCodeLogin, loginRec.Code)
+			body := loginRec.Body.String()
+
+			var responseLogin = struct {
+				Status string					`json:"status"`
+				Data   models.ResponseLogin 	`json:"data"`
+			}{}
+			err := json.Unmarshal([]byte(body), &responseLogin)
+			if err != nil {
+				assert.Error(t, err, "error")
+			}
+
+			assert.NotEmpty(t, responseLogin.Data.Token)
+			token := responseLogin.Data.Token
+
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", token))
+			req.Header.Set("Content-Type", "application/json")
+			rec := httptest.NewRecorder()
+			c := e.NewContext(req, rec)
+			
+			c.SetPath(testCase.path)
+
+			t.Run(testCase.name, func(t *testing.T) {
+				err := echoMiddleware.JWT([]byte(constants.JWT_SECRET))(cartController.GetCartItem)(c)
+				if assert.Error(t, err){
+					assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
 				}
 			})
 		}
