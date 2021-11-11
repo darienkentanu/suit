@@ -19,8 +19,8 @@ type CartModel interface {
 	CreateCart(cart models.Cart) error
 	AddToCart(userID int, input models.CartItem_Input) (models.CartItem, error)
 	GetCartItem(userID int) ([]models.CartItem, error)
-	EditCartItem(cartID int, input models.CartItem_Input) (models.CartItem, error)
-	DeleteCartItem(cardID int) error
+	EditCartItem(cartItemID int, input models.CartItem_Input) (models.CartItem, error)
+	DeleteCartItem(cartItemID int) error
 	GetCartItemByCheckoutID(checkoutID int) ([]models.CartItem, error)
 	CheckCartByCategoryID(Userid int, categoryID int) bool
 	AddCartWeight(int, models.CartItem_Input) (models.CartItem, error)
@@ -54,16 +54,19 @@ func (cdb *CartDB) GetCartItem(userID int) ([]models.CartItem, error) {
 	return cartItems, nil
 }
 
-func (cdb *CartDB) EditCartItem(cartID int, input models.CartItem_Input) (models.CartItem, error) {
+func (cdb *CartDB) EditCartItem(cartItemID int, input models.CartItem_Input) (models.CartItem, error) {
 	var cartItems models.CartItem
-	if err := cdb.db.First(&cartItems, cartID).Update("weight", input.Weight).Error; err != nil {
+	if err := cdb.db.First(&cartItems, cartItemID).Update("weight", input.Weight).Error; err != nil {
+		return cartItems, err
+	} else if cartItems.ID == 0 {
+		err := errors.New("not found")
 		return cartItems, err
 	}
 	return cartItems, nil
 }
 
-func (cdb *CartDB) DeleteCartItem(cardID int) error {
-	rows := cdb.db.Delete(&models.CartItem{}, cardID).RowsAffected
+func (cdb *CartDB) DeleteCartItem(cartItemID int) error {
+	rows := cdb.db.Delete(&models.CartItem{}, cartItemID).RowsAffected
 	if rows == 0 {
 		err := errors.New("cart item to be deleted is not found")
 		return err

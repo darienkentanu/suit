@@ -303,8 +303,8 @@ func TestGetAllUsersError(t *testing.T) {
 		{
 			name:       "Get All Users Error",
 			path:       "/users",
-			expectCode: http.StatusInternalServerError,
-			expectError:   "Internal server error",
+			expectCode: http.StatusNotFound,
+			expectError:   "Not found",
 		},
 	}
 	

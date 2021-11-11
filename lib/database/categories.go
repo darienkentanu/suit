@@ -26,8 +26,12 @@ func NewCategoryDB(db *gorm.DB) *CategoryDB {
 func (cdb *CategoryDB) GetCategories() ([]models.Category, error) {
 	var categories []models.Category
 	if err := cdb.db.Find(&categories).Error; err != nil {
-		return categories, err
+		return nil, err
+	} else if len(categories) == 0 {
+		err := errors.New("is empty")
+		return nil, err
 	}
+
 	return categories, nil
 }
 
@@ -47,6 +51,9 @@ func (cdb *CategoryDB) EditCategoriesById(id int, newCategories models.Category)
 	category.Point = newCategories.Point
 	if err := cdb.db.Save(&category).Error; err != nil {
 		return category, err
+	} else if category.ID == 0 {
+		err := errors.New("not found")
+		return category, err
 	}
 	return category, nil
 }
@@ -54,7 +61,7 @@ func (cdb *CategoryDB) EditCategoriesById(id int, newCategories models.Category)
 func (cdb *CategoryDB) DeleteCategoriesById(id int) error {
 	rows := cdb.db.Delete(&models.Category{}, id).RowsAffected
 	if rows == 0 {
-		err := errors.New("categories to be deleted is not found")
+		err := errors.New("not found")
 		return err
 	}
 	return nil
