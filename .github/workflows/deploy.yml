@@ -14,6 +14,7 @@ jobs:
         key: ${{ secrets.KEY }}
         port: ${{ secrets.PORT }}
         script: |
+          sudo chmod 777 /var/run/docker.sock
           cd suit
           git pull origin main
           docker-compose down && docker-compose up --build -d
