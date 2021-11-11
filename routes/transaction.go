@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"database/sql"
-
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/darienkentanu/suit/controllers"
@@ -12,8 +10,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func transactionRoute(e *echo.Echo, db *gorm.DB, dbSQL *sql.DB) {
-	tdb := database.NewTransactionDB(db, dbSQL)
+func transactionRoute(e *echo.Echo, db *gorm.DB) {
+	tdb := database.NewTransactionDB(db)
 	cdb := database.NewCategoryDB(db)
 	ccdb := database.NewCartDB(db)
 	dpdb := database.NewDropPointsDB(db)

@@ -44,7 +44,7 @@ func TestGetCategories(t *testing.T) {
 			response:   "Success",
 		},
 	}
-	e, db, _ := InitEcho()
+	e, db := InitEcho()
 	Setup(db)
 	cdb := database.NewCategoryDB(db)
 	cc := NewCategoryController(cdb)
@@ -77,46 +77,86 @@ func TestGetCategories(t *testing.T) {
 	}
 }
 
+func TestGetCategoriesError(t *testing.T) {
+	var testCases = []struct {
+		name       	string
+		path       	string
+		expectCode 	int
+		expectError string
+	}{
+		{
+			name:       "Get Categories empty",
+			path:       "/categories",
+			expectCode: http.StatusNotFound,
+			expectError:   "Not found",
+		},
+	}
+
+	e, db := InitEcho()
+	Setup(db)
+	db.Migrator().DropTable(&models.Category{})
+	categoryDB := database.NewCategoryDB(db)
+	controllers := NewCategoryController(categoryDB)
+
+	for _, testCase := range testCases {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set("Content-Type", "application/json")
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		
+		c.SetPath(testCase.path)
+
+		t.Run(testCase.name, func(t *testing.T) {
+			err := controllers.GetCategories(c)
+			if assert.Error(t, err){
+				assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
+			}
+		})
+	}
+}
+
 func TestAddCategories(t *testing.T) {
 	var testCases = []struct {
 		name       string
 		path       string
 		expectCode int
 		response   string
+		reqBody		map[string]interface{}
 	}{
 		{
 			name:       "AddCategories",
 			path:       "/categories",
 			expectCode: http.StatusCreated,
 			response:   "success",
+			reqBody: map[string]interface{}{
+				"name":  "botol plastik",
+				"point": 5,
+			},
 		},
 	}
 
-	e, db, _ := InitEcho()
+	e, db := InitEcho()
 	Setup(db)
-	cdb := database.NewCategoryDB(db)
-	cc := NewCategoryController(cdb)
-	InsertDataCategory(db)
-
-	reqBody, err := json.Marshal(M{
-		"name":  "botol plastik",
-		"point": 5,
-	})
-	if err != nil {
-		t.Error(err)
-	}
-
-	r := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
-	w := httptest.NewRecorder()
-	ctx := e.NewContext(r, w)
+	categoryDB := database.NewCategoryDB(db)
+	controllers := NewCategoryController(categoryDB)
 
 	for _, testCase := range testCases {
-		ctx.SetPath(testCase.path)
+		category, err := json.Marshal(testCase.reqBody)
+		if err != nil {
+			t.Error(err)
+		}
+
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(category))
+		req.Header.Set("Content-Type", "application/json")
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		
+		c.SetPath(testCase.path)
 
 		t.Run(testCase.name, func(t *testing.T) {
-			if assert.NoError(t, cc.AddCategories(ctx)) {
-				assert.Equal(t, testCase.expectCode, w.Code)
-				body := w.Body.String()
+			if assert.NoError(t, controllers.AddCategories(c)) {
+				assert.Equal(t, testCase.expectCode, rec.Code)
+				body := rec.Body.String()
 
 				var response = struct {
 					Status string `json:"status"`
@@ -132,48 +172,108 @@ func TestAddCategories(t *testing.T) {
 	}
 }
 
+func TestAddCategoriesError(t *testing.T) {
+	var testCases = []struct {
+		name       	string
+		path       	string
+		expectCode 	int
+		expectError string
+		reqBody		map[string]interface{}
+	}{
+		{
+			name:       "Add Categories Invalid Input",
+			path:       "/categories",
+			expectCode: http.StatusBadRequest,
+			expectError:   "Invalid input",
+			reqBody: map[string]interface{}{
+				"name":  "botol plastik",
+				"point": "5",
+			},
+		},
+		{
+			name:       "Add Categories Internal server error",
+			path:       "/categories",
+			expectCode: http.StatusInternalServerError,
+			expectError:   "Internal server error",
+			reqBody: map[string]interface{}{
+				"name":  "botol plastik",
+				"point": 5,
+			},
+		},
+	}
+
+	e, db := InitEcho()
+	db.Migrator().DropTable(&models.Category{})
+	categoryDB := database.NewCategoryDB(db)
+	controllers := NewCategoryController(categoryDB)
+
+	for _, testCase := range testCases {
+		category, err := json.Marshal(testCase.reqBody)
+		if err != nil {
+			t.Error(err)
+		}
+
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(category))
+		req.Header.Set("Content-Type", "application/json")
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		
+		c.SetPath(testCase.path)
+
+		t.Run(testCase.name, func(t *testing.T) {
+			err := controllers.AddCategories(c)
+			if assert.Error(t, err){
+				assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
+			}
+		})
+	}
+}
+
 func TestEditCategories(t *testing.T) {
 	var testCases = []struct {
 		name       string
 		path       string
 		expectCode int
 		response   string
+		reqBody		map[string]interface{}
 	}{
 		{
 			name:       "EditCategories",
 			path:       "/categories/:id",
-			expectCode: http.StatusCreated,
+			expectCode: http.StatusOK,
 			response:   "success",
+			reqBody: map[string]interface{}{
+				"name":  "botol plastik",
+				"point": 5,
+			},
 		},
 	}
 
-	e, db, _ := InitEcho()
+	e, db := InitEcho()
 	Setup(db)
-	cdb := database.NewCategoryDB(db)
-	cc := NewCategoryController(cdb)
+	categoryDB := database.NewCategoryDB(db)
+	controllers := NewCategoryController(categoryDB)
 	InsertDataCategory(db)
 
-	reqBody, err := json.Marshal(M{
-		"name":  "botol plastik",
-		"point": 10,
-	})
-	if err != nil {
-		t.Error(err)
-	}
-
-	r := httptest.NewRequest(http.MethodPut, "/", bytes.NewBuffer(reqBody))
-	w := httptest.NewRecorder()
-	ctx := e.NewContext(r, w)
-
 	for _, testCase := range testCases {
-		ctx.SetPath(testCase.path)
-		ctx.SetParamNames("id")
-		ctx.SetParamValues("1")
+		category, err := json.Marshal(testCase.reqBody)
+		if err != nil {
+			t.Error(err)
+		}
+
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(category))
+		req.Header.Set("Content-Type", "application/json")
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		
+		c.SetPath(testCase.path)
+		c.SetParamNames("id")
+		c.SetParamValues("1")
 
 		t.Run(testCase.name, func(t *testing.T) {
-			if assert.NoError(t, cc.EditCategories(ctx)) {
-				assert.Equal(t, testCase.expectCode, w.Code)
-				body := w.Body.String()
+			if assert.NoError(t, controllers.EditCategories(c)) {
+				assert.Equal(t, testCase.expectCode, rec.Code)
+				body := rec.Body.String()
 
 				var response = struct {
 					Status string `json:"status"`
@@ -186,6 +286,69 @@ func TestEditCategories(t *testing.T) {
 				assert.Equal(t, testCase.response, response.Status)
 			}
 		})
+	}
+}
+
+func TestEditCategoriesError(t *testing.T) {
+	var testCases = []struct {
+		name       		string
+		path       		string
+		expectCode 		int
+		expectError   	string
+		paramValues		string
+		reqBody			map[string]interface{}
+	}{
+		{
+			name:       "Edit Categories Invalid ID",
+			path:       "/categories/:id",
+			expectCode: http.StatusBadRequest,
+			expectError: "Invalid id",
+			paramValues: "a",
+			reqBody: 	map[string]interface{}{
+				"name":  "botol plastik",
+				"point": 10,
+			},
+		},
+		{
+			name:       "Edit Categories Invalid Category ID",
+			path:       "/categories/:id",
+			expectCode: http.StatusNotFound,
+			expectError: "Not found",
+			paramValues: "10",
+			reqBody: 	map[string]interface{}{
+				"name":  "botol plastik",
+				"point": 10,
+			},
+		},
+	}
+	
+	e, db := InitEcho()
+	Setup(db)
+	categoryDB := database.NewCategoryDB(db)
+	categoryControllers := NewCategoryController(categoryDB)
+
+	for _, testCase := range testCases {
+		reqBody, err := json.Marshal(testCase.reqBody)
+		if err != nil {
+			t.Error(err)
+		}
+
+		req := httptest.NewRequest(http.MethodPut, "/", bytes.NewBuffer(reqBody))
+		req.Header.Set("Content-Type", "application/json")
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		
+		c.SetPath(testCase.path)
+		c.SetParamNames("id")
+		c.SetParamValues(testCase.paramValues)
+
+		t.Run(testCase.name, func(t *testing.T) {
+			err := categoryControllers.EditCategories(c)
+			if assert.Error(t, err){
+				assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
+			}
+		})
+		
 	}
 }
 
@@ -204,7 +367,7 @@ func TestDeleteCategories(t *testing.T) {
 		},
 	}
 
-	e, db, _ := InitEcho()
+	e, db := InitEcho()
 	CartSetup(db)
 	Setup(db)
 	cdb := database.NewCategoryDB(db)
@@ -235,5 +398,53 @@ func TestDeleteCategories(t *testing.T) {
 				assert.Equal(t, testCase.response, response.Message)
 			}
 		})
+	}
+}
+
+func TestDeleteCategoriesError(t *testing.T) {
+	var testCases = []struct {
+		name       		string
+		path       		string
+		expectCode 		int
+		expectError   	string
+		paramValues		string
+	}{
+		{
+			name:       "Delete Categories Invalid ID",
+			path:       "/categories/:id",
+			expectCode: http.StatusBadRequest,
+			expectError: "Invalid id",
+			paramValues: "a",
+		},
+		{
+			name:       "Delete Categories Invalid ID",
+			path:       "/categories/:id",
+			expectCode: http.StatusNotFound,
+			expectError: "Not found",
+			paramValues: "1",
+		},
+	}
+	
+	e, db := InitEcho()
+	Setup(db)
+	categoryDB := database.NewCategoryDB(db)
+	categoryControllers := NewCategoryController(categoryDB)
+
+	for _, testCase := range testCases {
+		req := httptest.NewRequest(http.MethodDelete, "/", nil)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		
+		c.SetPath(testCase.path)
+		c.SetParamNames("id")
+		c.SetParamValues(testCase.paramValues)
+
+		t.Run(testCase.name, func(t *testing.T) {
+			err := categoryControllers.DeleteCategories(c)
+			if assert.Error(t, err){
+				assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
+			}
+		})
+		
 	}
 }

@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"database/sql"
+	// "database/sql"
 
 	_ "github.com/go-sql-driver/mysql"
 
@@ -12,11 +12,11 @@ import (
 	"gorm.io/gorm"
 )
 
-func userRoute(e *echo.Echo, db *gorm.DB, dbSQL *sql.DB) {
-	udb := database.NewUserDB(db, dbSQL)
+func userRoute(e *echo.Echo, db *gorm.DB) {
+	udb := database.NewUserDB(db)
 	ldb := database.NewLoginDB(db)
 	cdb := database.NewCartDB(db)
-	sdb := database.NewStaffDB(db, dbSQL)
+	sdb := database.NewStaffDB(db)
 	dpdb := database.NewDropPointsDB(db)
 	uc := controllers.NewUserController(udb, ldb, cdb)
 	lc := controllers.NewLoginController(udb, ldb, sdb, dpdb)

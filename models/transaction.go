@@ -41,4 +41,5 @@ type TransactionSQL struct {
 	CheckoutID   int        `json:"checkout_id"`
 	CreatedAt    string		`json:"created_at"`
 	UpdatedAt    string		`json:"updated_at"`
+	DropPointAddress string                `json:"drop_point_address"`
 }

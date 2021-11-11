@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"database/sql"
-
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/darienkentanu/suit/controllers"
@@ -12,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func categoryRoute(e *echo.Echo, db *gorm.DB, dbSQL *sql.DB) {
+func categoryRoute(e *echo.Echo, db *gorm.DB) {
 	cdb := database.NewCategoryDB(db)
 	cc := controllers.NewCategoryController(cdb)
 	e.GET("/categories", cc.GetCategories)

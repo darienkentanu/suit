@@ -173,15 +173,15 @@ func TestClaimVoucher(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db := InitEcho()
 	UserSetup(db)
 	VcSetup(db)
 	UserVoucherSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
-	userVoucherDB := database.NewUserVoucherDB(db, dbSQL)
+	userVoucherDB := database.NewUserVoucherDB(db)
 	voucherDB := database.NewVoucherDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	userVoucherControllers := NewUserVoucherController(userVoucherDB, userDB, voucherDB)
@@ -248,6 +248,122 @@ func TestClaimVoucher(t *testing.T) {
 	}
 }
 
+func TestClaimVoucherErrorID(t *testing.T) {
+	var testCases = []struct {
+		name       	string
+		path       	string
+		loginPath	string
+		expectCodeLogin int
+		expectCode 	int
+		expectError   	string
+		paramValues	string
+		login		map[string]interface{}
+	}{
+		{
+			name:       "Claim Voucher Invalid ID",
+			path:       "/claim/:id",
+			loginPath:	"/login",
+			expectCodeLogin: http.StatusOK,
+			expectCode: http.StatusBadRequest,
+			expectError:   "Invalid input",
+			paramValues: "a",
+			login:		map[string]interface{}{
+				"email"			: "alikatania@gmail.com",
+				"password"		: "alika123",
+			},
+		},
+		{
+			name:       "Claim Voucher Not Enough Points",
+			path:       "/claim/:id",
+			loginPath:	"/login",
+			expectCodeLogin: http.StatusOK,
+			expectCode: http.StatusBadRequest,
+			expectError:   "Not enough point",
+			paramValues: "1",
+			login:		map[string]interface{}{
+				"email"			: "alikatania@gmail.com",
+				"password"		: "alika123",
+			},
+		},
+		{
+			name:       "Claim Voucher Invalid Voucher ID",
+			path:       "/claim/:id",
+			loginPath:	"/login",
+			expectCodeLogin: http.StatusOK,
+			expectCode: http.StatusInternalServerError,
+			expectError:   "Internal server error",
+			paramValues: "5",
+			login:		map[string]interface{}{
+				"email"			: "alikatania@gmail.com",
+				"password"		: "alika123",
+			},
+		},
+	}
+	
+	e, db := InitEcho()
+	UserSetup(db)
+	VcSetup(db)
+	UserVoucherSetup(db)
+	userDB := database.NewUserDB(db)
+	loginDB := database.NewLoginDB(db)
+	staffDB := database.NewStaffDB(db)
+	dropPointDB := database.NewDropPointsDB(db)
+	userVoucherDB := database.NewUserVoucherDB(db)
+	voucherDB := database.NewVoucherDB(db)
+	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
+	userVoucherControllers := NewUserVoucherController(userVoucherDB, userDB, voucherDB)
+	InsertDataUser(db)
+	InsertDataVoucher(db)
+
+	for _, testCase := range testCases {
+		login, err := json.Marshal(testCase.login)
+		if err != nil {
+			t.Error(err)
+		}
+
+		loginReq := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(login))
+		loginReq.Header.Set("Content-Type", "application/json")
+		loginRec := httptest.NewRecorder()
+		loginC := e.NewContext(loginReq, loginRec)
+		
+		loginC.SetPath(testCase.loginPath)
+
+		if assert.NoError(t, loginControllers.Login(loginC)) {
+			assert.Equal(t, testCase.expectCodeLogin, loginRec.Code)
+			body := loginRec.Body.String()
+
+			var responseLogin = struct {
+				Status string					`json:"status"`
+				Data   models.ResponseLogin 	`json:"data"`
+			}{}
+			err := json.Unmarshal([]byte(body), &responseLogin)
+			if err != nil {
+				assert.Error(t, err, "error")
+			}
+
+			assert.NotEmpty(t, responseLogin.Data.Token)
+			token := responseLogin.Data.Token
+
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", token))
+			req.Header.Set("Content-Type", "application/json")
+			rec := httptest.NewRecorder()
+			c := e.NewContext(req, rec)
+
+			c.SetPath(testCase.path)
+			c.SetParamNames("id")
+			c.SetParamValues(testCase.paramValues)
+
+			t.Run(testCase.name, func(t *testing.T) {
+				err := echoMiddleware.JWT([]byte(constants.JWT_SECRET))(userVoucherControllers.ClaimVoucher)(c)
+				if assert.Error(t, err){
+					assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
+				}
+			})
+		}
+	}
+}
+
 
 func TestRedeemVoucher(t *testing.T) {
 	var testCases = []struct {
@@ -273,15 +389,15 @@ func TestRedeemVoucher(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	UserSetup(db)
 	VcSetup(db)
 	UserVoucherSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
-	userVoucherDB := database.NewUserVoucherDB(db, dbSQL)
+	userVoucherDB := database.NewUserVoucherDB(db)
 	voucherDB := database.NewVoucherDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	userVoucherControllers := NewUserVoucherController(userVoucherDB, userDB, voucherDB)
@@ -347,6 +463,109 @@ func TestRedeemVoucher(t *testing.T) {
 	}
 }
 
+func TestRedeemVoucherError(t *testing.T) {
+	var testCases = []struct {
+		name       	string
+		path       	string
+		loginPath	string
+		expectCodeLogin int
+		expectCode 	int
+		expectError string
+		paramValues	string
+		login		map[string]interface{}
+	}{
+		{
+			name:       "Redeem Voucher Invalid ID",
+			path:       "/redeem/:id",
+			loginPath:	"/login",
+			expectCodeLogin: http.StatusOK,
+			expectCode: http.StatusBadRequest,
+			expectError:   "Invalid input",
+			paramValues: "a",
+			login:		map[string]interface{}{
+				"email"			: "alikatania@gmail.com",
+				"password"		: "alika123",
+			},
+		},
+		{
+			name:       "Redeem Voucher Not Available",
+			path:       "/redeem/:id",
+			loginPath:	"/login",
+			expectCodeLogin: http.StatusOK,
+			expectCode: http.StatusBadRequest,
+			expectError:   "Not available",
+			paramValues: "10",
+			login:		map[string]interface{}{
+				"email"			: "alikatania@gmail.com",
+				"password"		: "alika123",
+			},
+		},
+	}
+	
+	e, db  := InitEcho()
+	UserSetup(db)
+	VcSetup(db)
+	UserVoucherSetup(db)
+	userDB := database.NewUserDB(db)
+	loginDB := database.NewLoginDB(db)
+	staffDB := database.NewStaffDB(db)
+	dropPointDB := database.NewDropPointsDB(db)
+	userVoucherDB := database.NewUserVoucherDB(db)
+	voucherDB := database.NewVoucherDB(db)
+	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
+	userVoucherControllers := NewUserVoucherController(userVoucherDB, userDB, voucherDB)
+	InsertDataUserVoucher(db)
+
+	for _, testCase := range testCases {
+		login, err := json.Marshal(testCase.login)
+		if err != nil {
+			t.Error(err)
+		}
+
+		loginReq := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(login))
+		loginReq.Header.Set("Content-Type", "application/json")
+		loginRec := httptest.NewRecorder()
+		loginC := e.NewContext(loginReq, loginRec)
+		
+		loginC.SetPath(testCase.loginPath)
+
+		if assert.NoError(t, loginControllers.Login(loginC)) {
+			assert.Equal(t, testCase.expectCodeLogin, loginRec.Code)
+			body := loginRec.Body.String()
+
+			var responseLogin = struct {
+				Status string					`json:"status"`
+				Data   models.ResponseLogin 	`json:"data"`
+			}{}
+			err := json.Unmarshal([]byte(body), &responseLogin)
+			if err != nil {
+				assert.Error(t, err, "error")
+			}
+
+			assert.NotEmpty(t, responseLogin.Data.Token)
+			token := responseLogin.Data.Token
+
+			req := httptest.NewRequest(http.MethodPut, "/", nil)
+			req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", token))
+			req.Header.Set("Content-Type", "application/json")
+			rec := httptest.NewRecorder()
+			c := e.NewContext(req, rec)
+
+			c.SetPath(testCase.path)
+			c.SetParamNames("id")
+
+			c.SetParamValues(testCase.paramValues)
+
+			t.Run(testCase.name, func(t *testing.T) {
+				err := echoMiddleware.JWT([]byte(constants.JWT_SECRET))(userVoucherControllers.RedeemVoucher)(c)
+				if assert.Error(t, err){
+					assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
+				}
+			})
+		}
+	}
+}
+
 func TestGetUserVoucher(t *testing.T) {
 	var testCases = []struct {
 		name       	string
@@ -371,15 +590,15 @@ func TestGetUserVoucher(t *testing.T) {
 		},
 	}
 	
-	e, db, dbSQL := InitEcho()
+	e, db  := InitEcho()
 	UserSetup(db)
 	VcSetup(db)
 	UserVoucherSetup(db)
-	userDB := database.NewUserDB(db, dbSQL)
+	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
-	staffDB := database.NewStaffDB(db, dbSQL)
+	staffDB := database.NewStaffDB(db)
 	dropPointDB := database.NewDropPointsDB(db)
-	userVoucherDB := database.NewUserVoucherDB(db, dbSQL)
+	userVoucherDB := database.NewUserVoucherDB(db)
 	voucherDB := database.NewVoucherDB(db)
 	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
 	userVoucherControllers := NewUserVoucherController(userVoucherDB, userDB, voucherDB)

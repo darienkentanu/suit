@@ -1,7 +1,7 @@
 package database
 
 import (
-	"database/sql"
+	"errors"
 
 	"github.com/darienkentanu/suit/models"
 	"gorm.io/gorm"
@@ -9,11 +9,10 @@ import (
 
 type UserDB struct {
 	db *gorm.DB
-	dbSQL *sql.DB
 }
 
-func NewUserDB(db *gorm.DB, dbSQL *sql.DB) *UserDB {
-	return &UserDB{db: db, dbSQL: dbSQL}
+func NewUserDB(db *gorm.DB) *UserDB {
+	return &UserDB{db: db}
 }
 
 type UserModel interface {
@@ -43,18 +42,11 @@ func (m *UserDB) CreateUser(user models.User) (models.User, error) {
 func (m *UserDB) GetAllUsers() ([]models.ResponseGetUser, error) {
 	var users []models.ResponseGetUser
 
-	rows, err := m.dbSQL.Query("SELECT u.id, u.fullname, l.email, l.username, u.point, u.phone_number, u.gender, u.address, l.role FROM users u JOIN logins l ON u.id = l.user_id")
-	if err != nil {
+	if err := m.db.Raw("SELECT u.id, u.fullname, l.email, l.username, u.point, u.phone_number, u.gender, u.address, l.role FROM users u JOIN logins l ON u.id = l.user_id").Scan(&users).Error; err != nil {
 		return nil, err
-	}
-	defer rows.Close()
-	
-	for rows.Next() {
-		var user models.ResponseGetUser
-		if err := rows.Scan(&user.ID, &user.Fullname, &user.Email, &user.Username, &user.Point, &user.PhoneNumber, &user.Gender, &user.Address, &user.Role); err != nil {
-			return nil, err
-		}
-		users = append(users, user)
+	} else if len(users) == 0 {
+		err := errors.New("is empty")
+		return nil, err
 	}
 
 	return users, nil
@@ -80,16 +72,8 @@ func (m *UserDB) UpdateUser(id int, newUser models.User) (models.User, error) {
 
 func (m *UserDB) GetUserProfile(id int) (models.ResponseGetUser, error) {
 	var account models.ResponseGetUser
-	rows, err := m.dbSQL.Query("SELECT u.id, u.fullname, l.email, l.username, u.point, u.phone_number, u.gender, u.address, l.role FROM users u JOIN logins l ON u.id = l.user_id WHERE user_id = ?", id)
-	if err != nil {
+	if err := m.db.Raw("SELECT u.id, u.fullname, l.email, l.username, u.point, u.phone_number, u.gender, u.address, l.role FROM users u JOIN logins l ON u.id = l.user_id WHERE user_id = ?", id).Scan(&account).Error; err != nil {
 		return account, err
-	}
-	defer rows.Close()
-	
-	for rows.Next() {
-		if err := rows.Scan(&account.ID, &account.Fullname, &account.Email, &account.Username, &account.Point, &account.PhoneNumber, &account.Gender, &account.Address, &account.Role); err != nil {
-			return account, err
-		}		
 	}
 
 	return account, nil
