@@ -4,9 +4,9 @@ jobs:
 
   build:
     name: Build
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
-    - name: pull-deploy
+    - name: pull-test-deploy
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
@@ -14,6 +14,6 @@ jobs:
         key: ${{ secrets.KEY }}
         port: ${{ secrets.PORT }}
         script: |
-          cd suit
+          cd app
           git pull origin main
           docker-compose down && docker-compose up --build -d
