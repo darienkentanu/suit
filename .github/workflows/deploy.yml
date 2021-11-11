@@ -6,7 +6,7 @@ jobs:
     name: Build
     runs-on: ubuntu-18.04
     steps:
-    - name: pull-test-deploy
+    - name: pull-deploy
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
