@@ -4,7 +4,7 @@ import (
 	"github.com/darienkentanu/suit/controllers"
 	"github.com/darienkentanu/suit/lib/database"
 	"github.com/darienkentanu/suit/middlewares"
-	_ "github.com/go-sql-driver/mysql"
+
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
