@@ -22,7 +22,7 @@ func (cc *CategoryController) GetCategories(c echo.Context) error {
 	categories, err := cc.db.GetCategories()
 
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+		return echo.NewHTTPError(http.StatusNotFound, "Not found")
 	}
 	var res models.Category_Response
 	var resSlc []models.Category_Response
@@ -40,7 +40,9 @@ func (cc *CategoryController) GetCategories(c echo.Context) error {
 
 func (cc *CategoryController) AddCategories(c echo.Context) error {
 	var category models.Category
-	c.Bind(&category)
+	if err := c.Bind(&category); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid input")
+	}
 
 	category, err := cc.db.AddCategories(category)
 	if err != nil {
@@ -66,9 +68,9 @@ func (cc *CategoryController) EditCategories(c echo.Context) error {
 	c.Bind(&newCategory)
 	newCategory, err = cc.db.EditCategoriesById(id, newCategory)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+		return echo.NewHTTPError(http.StatusNotFound, "Not found")
 	}
-	return c.JSON(http.StatusCreated, M{
+	return c.JSON(http.StatusOK, M{
 		"status": "success",
 		"data": M{
 			"id":    newCategory.ID,
@@ -86,7 +88,7 @@ func (cc *CategoryController) DeleteCategories(c echo.Context) error {
 
 	err = cc.db.DeleteCategoriesById(id)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, err)
+		return echo.NewHTTPError(http.StatusNotFound, "Not found")
 	}
 
 	return c.JSON(http.StatusOK, M{

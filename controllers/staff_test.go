@@ -273,8 +273,8 @@ func TestGetAllStaffError(t *testing.T) {
 		{
 			name:       "Get All Staff Error",
 			path:       "/staff",
-			expectCode: http.StatusInternalServerError,
-			expectError:   "Internal server error",
+			expectCode: http.StatusNotFound,
+			expectError:   "Not found",
 		},
 	}
 	

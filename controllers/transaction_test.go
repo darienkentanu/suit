@@ -394,8 +394,6 @@ func TestGetTransactionWithRangeError(t *testing.T) {
 	}
 
 	e, db  := InitEcho()
-	// UserSetup(db)
-	// CartSetup(db)
 	TransactionSetup(db)
 	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
