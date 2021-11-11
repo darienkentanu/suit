@@ -27,6 +27,9 @@ func (dpdb *DropPointsDB) GetDropPoints() ([]models.Drop_Point, error) {
 	var dropPoints []models.Drop_Point
 	if err := dpdb.db.Find(&dropPoints).Error; err != nil {
 		return dropPoints, err
+	} else if len(dropPoints) == 0 {
+		err := errors.New("is empty")
+		return dropPoints, err
 	}
 	return dropPoints, nil
 }
@@ -49,16 +52,22 @@ func (dpdb *DropPointsDB) EditDropPointsById(id int, newDropPoints models.Drop_P
 	dropPoints.Longitude = newDropPoints.Longitude
 	if err := dpdb.db.Save(&dropPoints).Error; err != nil {
 		return dropPoints, err
+	} else if dropPoints.ID == 0 {
+		err := errors.New("not found")
+		return dropPoints, err
 	}
 	return dropPoints, nil
 }
 
 func (dpdb *DropPointsDB) DeleteDropPointsById(id int) error {
-	err := dpdb.db.Delete(&models.Drop_Point{}, id).Error
-	if err != nil {
-		err := errors.New("bad request")
+	var dropPoint models.Drop_Point
+
+	row := dpdb.db.Delete(&dropPoint, id).RowsAffected
+	if row == 0 {
+		err := errors.New("not found")
 		return err
 	}
+
 	return nil
 }
 

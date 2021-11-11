@@ -23,7 +23,7 @@ func (dpc *DropPointsController) GetDropPoints(c echo.Context) error {
 	dropPoints, err := dpc.db.GetDropPoints()
 
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+		return echo.NewHTTPError(http.StatusNotFound, "Not found")
 	}
 	var res models.Drop_Points_Response
 	var resSlc []models.Drop_Points_Response
@@ -40,7 +40,10 @@ func (dpc *DropPointsController) GetDropPoints(c echo.Context) error {
 
 func (dpc *DropPointsController) AddDropPoints(c echo.Context) error {
 	var dropPoints models.Drop_Point
-	c.Bind(&dropPoints)
+	if err := c.Bind(&dropPoints); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid input")
+	}
+
 	dropPoints.Latitude, dropPoints.Longitude = gmaps.Geocoding(dropPoints.Address)
 
 	dropPoints, err := dpc.db.AddDropPoints(dropPoints)
@@ -63,11 +66,13 @@ func (dpc *DropPointsController) EditDropPoints(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid id")
 	}
 	var newDropPoints models.Drop_Point
-	c.Bind(&newDropPoints)
+	if err := c.Bind(&newDropPoints); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid input")
+	}
 	newDropPoints.Latitude, newDropPoints.Longitude = gmaps.Geocoding(newDropPoints.Address)
 	newDropPoints, err = dpc.db.EditDropPointsById(id, newDropPoints)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+		return echo.NewHTTPError(http.StatusNotFound, "Not found")
 	}
 	return c.JSON(http.StatusOK, M{
 		"status": "success",
@@ -86,7 +91,7 @@ func (dpc *DropPointsController) DeleteDropPoints(c echo.Context) error {
 
 	err = dpc.db.DeleteDropPointsById(id)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "Internal server error")
+		return echo.NewHTTPError(http.StatusNotFound, "Not found")
 	}
 
 	return c.JSON(http.StatusOK, M{

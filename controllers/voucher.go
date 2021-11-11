@@ -22,7 +22,7 @@ func (vc *VoucherController) GetVouchers(c echo.Context) error {
 	vouchers, err := vc.db.GetVouchers()
 
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+		return echo.NewHTTPError(http.StatusNotFound, "Not found")
 	}
 	var response models.Voucher_Response
 	var responseSlice []models.Voucher_Response
@@ -40,7 +40,9 @@ func (vc *VoucherController) GetVouchers(c echo.Context) error {
 
 func (vc *VoucherController) AddVouchers(c echo.Context) error {
 	var vouchers models.Voucher
-	c.Bind(&vouchers)
+	if err := c.Bind(&vouchers); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid input")
+	}
 
 	vouchers, err := vc.db.AddVouchers(vouchers)
 	if err != nil {
@@ -63,12 +65,15 @@ func (vc *VoucherController) EditVouchers(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid id")
 	}
 	var newVoucher models.Voucher
-	c.Bind(&newVoucher)
+	if err := c.Bind(&newVoucher); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid input")
+	}
+
 	newVoucher, err = vc.db.EditVouchersById(id, newVoucher)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+		return echo.NewHTTPError(http.StatusNotFound, "Not found")
 	}
-	return c.JSON(http.StatusCreated, M{
+	return c.JSON(http.StatusOK, M{
 		"status": "success",
 		"data": M{
 			"id":    newVoucher.ID,

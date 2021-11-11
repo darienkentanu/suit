@@ -27,6 +27,9 @@ func (vdb *VoucherDB) GetVouchers() ([]models.Voucher, error) {
 	var vouchers []models.Voucher
 	if err := vdb.db.Find(&vouchers).Error; err != nil {
 		return vouchers, err
+	} else if len(vouchers) == 0 {
+		err := errors.New("is empty")
+		return nil, err
 	}
 	return vouchers, nil
 }
@@ -46,6 +49,9 @@ func (vdb *VoucherDB) EditVouchersById(id int, newVouchers models.Voucher) (mode
 	voucher.Name = newVouchers.Name
 	voucher.Point = newVouchers.Point
 	if err := vdb.db.Save(&voucher).Error; err != nil {
+		return voucher, err
+	} else if voucher.ID == 0 {
+		err := errors.New("not found")
 		return voucher, err
 	}
 	return voucher, nil

@@ -245,6 +245,116 @@ func TestRegisterUserError(t *testing.T) {
 	}
 }
 
+func TestRegisterUserInternalServerError(t *testing.T) {
+	var testCases = []struct {
+		name       	string
+		path       	string
+		expectCode 	int
+		expectError string
+		reqBody		map[string]interface{}
+	}{
+		{
+			name:       "Register User Internal server error",
+			path:       "/register",
+			expectCode: http.StatusInternalServerError,
+			expectError:   "Cannot create user",
+			reqBody: 	map[string]interface{}{
+				"fullname"		: "Ara Alifia",
+				"email"			: "araalifia@gmail.com",
+				"username"		: "alifia",
+				"password"		: "alifia123",
+				"phone_number"	: "0827873486",
+				"gender"		: "female",
+				"address"		: "Jl. Kebon Jeruk Raya No. 27, Kebon Jeruk, Jakarta Barat 11530",
+			},
+		},
+	}
+
+	e, db := InitEcho()
+	UserSetup(db)
+	db.Migrator().DropTable(&models.Login{})
+	userDB := database.NewUserDB(db)
+	loginDB := database.NewLoginDB(db)
+	cartDB := database.NewCartDB(db)
+	controllers := NewUserController(userDB, loginDB, cartDB)
+
+	for _, testCase := range testCases {
+		register, err := json.Marshal(testCase.reqBody)
+		if err != nil {
+			t.Error(err)
+		}
+
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(register))
+		req.Header.Set("Content-Type", "application/json")
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		
+		c.SetPath(testCase.path)
+
+		t.Run(testCase.name, func(t *testing.T) {
+			err := controllers.RegisterUsers(c)
+			if assert.Error(t, err){
+				assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
+			}
+		})
+	}
+}
+
+func TestRegisterUserCartError(t *testing.T) {
+	var testCases = []struct {
+		name       	string
+		path       	string
+		expectCode 	int
+		expectError string
+		reqBody		map[string]interface{}
+	}{
+		{
+			name:       "Register User Internal server error",
+			path:       "/register",
+			expectCode: http.StatusInternalServerError,
+			expectError:   "Cannot create cart",
+			reqBody: 	map[string]interface{}{
+				"fullname"		: "Ara Alifia",
+				"email"			: "araalifia@gmail.com",
+				"username"		: "alifia",
+				"password"		: "alifia123",
+				"phone_number"	: "0827873486",
+				"gender"		: "female",
+				"address"		: "Jl. Kebon Jeruk Raya No. 27, Kebon Jeruk, Jakarta Barat 11530",
+			},
+		},
+	}
+
+	e, db := InitEcho()
+	UserSetup(db)
+	db.Migrator().DropTable(&models.Cart{})
+	userDB := database.NewUserDB(db)
+	loginDB := database.NewLoginDB(db)
+	cartDB := database.NewCartDB(db)
+	controllers := NewUserController(userDB, loginDB, cartDB)
+
+	for _, testCase := range testCases {
+		register, err := json.Marshal(testCase.reqBody)
+		if err != nil {
+			t.Error(err)
+		}
+
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(register))
+		req.Header.Set("Content-Type", "application/json")
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		
+		c.SetPath(testCase.path)
+
+		t.Run(testCase.name, func(t *testing.T) {
+			err := controllers.RegisterUsers(c)
+			if assert.Error(t, err){
+				assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
+			}
+		})
+	}
+}
+
 func TestGetAllUsers(t *testing.T) {
 	var testCases = []struct {
 		name       string
