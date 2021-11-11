@@ -28,16 +28,17 @@ func (cc *CartController) AddToCart(c echo.Context) error {
 	if !exist {
 		newItem, err := cc.db.AddToCart(userID, input)
 		if err != nil {
-			echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+			return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 		}
 		return c.JSON(http.StatusCreated, M{
 			"status": "success",
 			"data":   newItem,
 		})
 	}
+	
 	newItem, err := cc.db.AddCartWeight(userID, input)
 	if err != nil {
-		echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}
 	return c.JSON(http.StatusCreated, M{
 		"status": "success",
@@ -49,7 +50,7 @@ func (cc *CartController) GetCartItem(c echo.Context) error {
 	userID := middlewares.CurrentLoginUser(c)
 	cartItems, err := cc.db.GetCartItem(userID)
 	if err != nil {
-		echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}
 	return c.JSON(http.StatusOK, M{
 		"status": "success",

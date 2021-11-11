@@ -226,12 +226,29 @@ func TestCreateCheckoutDropoffError(t *testing.T) {
 				"drop_point_id": 1,
 			},
 		},
+		{
+			name:       "Create Checkout Dropoff internal server error",
+			path:       "/checkoutbydropoff",
+			loginPath:	"/login",
+			expectCodeLogin: http.StatusOK,
+			expectCode: http.StatusInternalServerError,
+			expectError:   "Internal server error",
+			login:		map[string]interface{}{
+				"email"			: "alikatania@gmail.com",
+				"password"		: "alika123",
+			},
+			reqBody: 	map[string]interface{}{
+				"category_id": []int{1},
+				"drop_point_id": 1,
+			},
+		},
 	}
 	
 	e, db := InitEcho()
 	UserSetup(db)
 	Setup(db)
 	CartSetup(db)
+	db.Migrator().DropTable(&models.Checkout{})
 	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
 	staffDB := database.NewStaffDB(db)
@@ -245,6 +262,7 @@ func TestCreateCheckoutDropoffError(t *testing.T) {
 	InsertDataUser(db)
 	InsertDataCategory(db)
 	InsertDataDropPoints(db)
+	InsertDataCartItem(db)
 
 	for _, testCase := range testCases {
 		login, err := json.Marshal(testCase.login)
@@ -449,12 +467,28 @@ func TestCreateCheckoutPickupError(t *testing.T) {
 				"category_id": []int{2, 3},
 			},
 		},
+		{
+			name:       "Create Checkout Pickup internal server error",
+			path:       "/checkoutbypickup",
+			loginPath:	"/login",
+			expectCodeLogin: http.StatusOK,
+			expectCode: http.StatusBadRequest,
+			expectError:   "Internal server error",
+			login:		map[string]interface{}{
+				"email"			: "alikatania@gmail.com",
+				"password"		: "alika123",
+			},
+			reqBody: 	map[string]interface{}{
+				"category_id": []int{1},
+			},
+		},
 	}
 	
 	e, db  := InitEcho()
 	UserSetup(db)
 	Setup(db)
 	CartSetup(db)
+	db.Migrator().DropTable(&models.Checkout{})
 	userDB := database.NewUserDB(db)
 	loginDB := database.NewLoginDB(db)
 	staffDB := database.NewStaffDB(db)
@@ -468,6 +502,7 @@ func TestCreateCheckoutPickupError(t *testing.T) {
 	InsertDataUser(db)
 	InsertDataCategory(db)
 	InsertDataDropPoints(db)
+	InsertDataCartItem(db)
 
 	for _, testCase := range testCases {
 		login, err := json.Marshal(testCase.login)
