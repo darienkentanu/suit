@@ -1,8 +1,6 @@
 package routes
 
 import (
-	_ "github.com/go-sql-driver/mysql"
-
 	"github.com/darienkentanu/suit/controllers"
 	"github.com/darienkentanu/suit/lib/database"
 	"github.com/darienkentanu/suit/middlewares"

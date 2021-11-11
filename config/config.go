@@ -4,8 +4,6 @@ import (
 	"log"
 	"os"
 
-	_ "github.com/go-sql-driver/mysql"
-
 	"fmt"
 
 	"github.com/darienkentanu/suit/models"
@@ -78,4 +76,3 @@ func InitDBTest() *gorm.DB {
 	}
 	return db
 }
-
