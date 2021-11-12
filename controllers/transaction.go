@@ -35,9 +35,9 @@ func (controllers *TransactionController) GetTransactions(c echo.Context) error 
 	if role == "staff" {
 		transactions, err = controllers.transactionModel.GetAllTransaction()
 	} else if role == "user" {
-		transactions, err = controllers.transactionModel.GetTransactionsByUserID(id)	
+		transactions, err = controllers.transactionModel.GetTransactionsByUserID(id)
 	}
-	
+
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}
@@ -85,6 +85,8 @@ func (controllers *TransactionController) GetTransactions(c echo.Context) error 
 		} else {
 			resTransaction.Status = "transaction is being processed by staff"
 		}
+		resTransaction.CreatedAt = transaction.CreatedAt
+		resTransaction.UpdatedAt = transaction.UpdatedAt
 		// resTransaction.TotalPoint = totalPointsUsed
 		resAllTransactions = append(resAllTransactions, resTransaction)
 	}
@@ -105,7 +107,7 @@ func (controllers *TransactionController) GetTransactionsDropPoint(c echo.Contex
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}
-	
+
 	var resAllTransactions []models.ResponseGetTransactions
 
 	for _, transaction := range transactions {
@@ -160,7 +162,7 @@ func (controllers *TransactionController) GetTransactionsWithRangeDate(c echo.Co
 	if rangeDate != "daily" && rangeDate != "weekly" && rangeDate != "monthly" {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid range")
 	}
-	
+
 	role := middlewares.CurrentRoleLoginUser(c)
 	id := middlewares.CurrentLoginUser(c)
 
@@ -225,7 +227,7 @@ func (controllers *TransactionController) GetTransactionTotalWithRangeDate(c ech
 
 	role := middlewares.CurrentRoleLoginUser(c)
 	id := middlewares.CurrentLoginUser(c)
-	
+
 	response, err := controllers.transactionModel.GetTransationTotalRangeDate(id, role, rangeDate)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
@@ -240,7 +242,7 @@ func (controllers *TransactionController) GetTransactionTotalWithRangeDate(c ech
 func (controllers *TransactionController) GetTransactionTotal(c echo.Context) error {
 	role := middlewares.CurrentRoleLoginUser(c)
 	id := middlewares.CurrentLoginUser(c)
-	
+
 	response, err := controllers.transactionModel.GetTransationTotal(id, role)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
