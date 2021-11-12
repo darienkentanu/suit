@@ -1,7 +1,6 @@
 package config
 
 import (
-	"log"
 	"os"
 
 	"fmt"
@@ -17,8 +16,8 @@ func GetConfig() (config map[string]string) {
 	if err != nil {
 		conf2, err := godotenv.Read("../../suit/.env")
 		if err != nil {
-			log.Fatal(err)
-			// fmt.Println("cannot read '.env' files -> reading docker CONN_STRING")
+			// log.Fatal(err)
+			fmt.Println("cannot read '.env' files -> reading docker CONN_STRING")
 			return nil
 		}
 		return conf2
