@@ -20,10 +20,11 @@ This is final project of alterra academy
 ```
 $ git clone https://github.com/darienkentanu/suit
 ```
-- add your '.env' files containing following env variabel
-- DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME,
-- DB_TEST_USERNAME, DB_TEST_PASSWORD, DB_TEST_HOST, DB_TEST_PORT, DB_TEST_NAME
-
+- add your '.env' files containing following env variabel:
+```
+DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME,
+DB_TEST_USERNAME, DB_TEST_PASSWORD, DB_TEST_HOST, DB_TEST_PORT, DB_TEST_NAME
+```
 $ go run main.go or $ docker-compose up --build -d
 
 ```
