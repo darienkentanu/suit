@@ -62,10 +62,6 @@ after that import the file-insert.sql to your database
 | PUT | /vouchers/:id | Update voucher by staff | Yes | Yes
 | DELETE | /vouchers/:id | Delete voucher by staff | Yes | Yes
 |---|---|---|---|---|
-| GET | /uservouchers | Get list of all user voucher | Yes | No
-| POST | /claim/:id | Claim voucher by voucher id | Yes | No
-| POST | /redeem/:id | Redeem voucher by voucher id | Yes | No
-|---|---|---|---|---|
 | POST | /cart | Add category list to user cart | Yes | No
 | GET | /cart | Get list of user all cart item | Yes | No
 | PUT | /cartitems/:id | Update user cart item by id | Yes | No
@@ -74,6 +70,10 @@ after that import the file-insert.sql to your database
 | POST | /checkoutbypickup | Checkout by request pickup | Yes | No
 | POST | /checkoutbydropoff | Checkout by dropoff on drop point | Yes | No
 | POST | /verification/:id | Verification by transaction id | Yes | Yes
+|---|---|---|---|---|
+| GET | /uservouchers | Get list of all user voucher | Yes | No
+| POST | /claim/:id | Claim voucher by voucher id | Yes | No
+| POST | /redeem/:id | Redeem voucher by voucher id | Yes | No
 |---|---|---|---|---|
 | GET | /transactions | Get list of all transaction | Yes | No
 | GET | /transactionbydroppoint/:id | Get list of all transaction by drop points id (staff only) | Yes | Yes
