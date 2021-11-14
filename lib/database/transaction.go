@@ -115,29 +115,29 @@ func (m *TransactionDB) GetTransationTotalRangeDate(id int, role, rangeDate stri
 	
 	if role == "staff" {
 		if rangeDate == "daily" {
-			if err := m.db.Raw("SELECT ci.category_id, c.name, SUM(ci.weight) FROM cart_items ci JOIN categories c ON ci.category_id = c.id JOIN transactions t ON ci.checkout_id = t.checkout_id WHERE t.created_at >= DATE_ADD(CURDATE(), INTERVAL -1 DAY) AND ci.checkout_id IS NOT NULL AND t.status = 1 GROUP BY ci.category_id ORDER BY ci.category_id").Scan(&categories).Error; err != nil {
+			if err := m.db.Raw("SELECT ci.category_id as id, c.name, SUM(ci.weight) as weight FROM cart_items ci JOIN categories c ON ci.category_id = c.id JOIN transactions t ON ci.checkout_id = t.checkout_id WHERE t.created_at >= DATE_ADD(CURDATE(), INTERVAL -1 DAY) AND ci.checkout_id IS NOT NULL AND t.status = 1 GROUP BY ci.category_id ORDER BY ci.category_id").Scan(&categories).Error; err != nil {
 				return nil, err
 			}
 		} else if rangeDate == "weekly" {
-			if err := m.db.Raw("SELECT ci.category_id, c.name, SUM(ci.weight) FROM cart_items ci JOIN categories c ON ci.category_id = c.id JOIN transactions t ON ci.checkout_id = t.checkout_id WHERE t.created_at >= DATE_ADD(CURDATE(), INTERVAL -7 DAY) AND ci.checkout_id IS NOT NULL AND t.status = 1 GROUP BY ci.category_id ORDER BY ci.category_id").Scan(&categories).Error; err != nil {
+			if err := m.db.Raw("SELECT ci.category_id as id, c.name, SUM(ci.weight) as weight FROM cart_items ci JOIN categories c ON ci.category_id = c.id JOIN transactions t ON ci.checkout_id = t.checkout_id WHERE t.created_at >= DATE_ADD(CURDATE(), INTERVAL -7 DAY) AND ci.checkout_id IS NOT NULL AND t.status = 1 GROUP BY ci.category_id ORDER BY ci.category_id").Scan(&categories).Error; err != nil {
 				return nil, err
 			}
 		} else if rangeDate == "monthly" {
-			if err := m.db.Raw("SELECT ci.category_id, c.name, SUM(ci.weight) FROM cart_items ci JOIN categories c ON ci.category_id = c.id JOIN transactions t ON ci.checkout_id = t.checkout_id WHERE t.created_at >= DATE_ADD(CURDATE(), INTERVAL -30 DAY) AND ci.checkout_id IS NOT NULL AND t.status = 1 GROUP BY ci.category_id ORDER BY ci.category_id").Scan(&categories).Error; err != nil {
+			if err := m.db.Raw("SELECT ci.category_id as id, c.name, SUM(ci.weight) as weight FROM cart_items ci JOIN categories c ON ci.category_id = c.id JOIN transactions t ON ci.checkout_id = t.checkout_id WHERE t.created_at >= DATE_ADD(CURDATE(), INTERVAL -30 DAY) AND ci.checkout_id IS NOT NULL AND t.status = 1 GROUP BY ci.category_id ORDER BY ci.category_id").Scan(&categories).Error; err != nil {
 				return nil, err
 			}
 		}
 	} else if role == "user" {
 		if rangeDate == "daily" {
-			if err := m.db.Raw("SELECT ci.category_id, c.name, SUM(ci.weight) FROM cart_items ci JOIN categories c ON ci.category_id = c.id JOIN transactions t ON ci.checkout_id = t.checkout_id WHERE ci.created_at >= DATE_ADD(CURDATE(), INTERVAL -1 DAY) AND ci.checkout_id IS NOT NULL AND t.status = 1 AND ci.cart_user_id = ? GROUP BY ci.category_id ORDER BY ci.category_id", id).Scan(&categories).Error; err != nil {
+			if err := m.db.Raw("SELECT ci.category_id as id, c.name, SUM(ci.weight) as weight FROM cart_items ci JOIN categories c ON ci.category_id = c.id JOIN transactions t ON ci.checkout_id = t.checkout_id WHERE ci.created_at >= DATE_ADD(CURDATE(), INTERVAL -1 DAY) AND ci.checkout_id IS NOT NULL AND t.status = 1 AND ci.cart_user_id = ? GROUP BY ci.category_id ORDER BY ci.category_id", id).Scan(&categories).Error; err != nil {
 				return nil, err
 			}
 		} else if rangeDate == "weekly" {
-			if err := m.db.Raw("SELECT ci.category_id, c.name, SUM(ci.weight) FROM cart_items ci JOIN categories c ON ci.category_id = c.id JOIN transactions t ON ci.checkout_id = t.checkout_id WHERE ci.created_at >= DATE_ADD(CURDATE(), INTERVAL -7 DAY) AND ci.checkout_id IS NOT NULL AND t.status = 1 AND ci.cart_user_id = ? GROUP BY ci.category_id ORDER BY ci.category_id", id).Scan(&categories).Error; err != nil {
+			if err := m.db.Raw("SELECT ci.category_id as id, c.name, SUM(ci.weight) as weight FROM cart_items ci JOIN categories c ON ci.category_id = c.id JOIN transactions t ON ci.checkout_id = t.checkout_id WHERE ci.created_at >= DATE_ADD(CURDATE(), INTERVAL -7 DAY) AND ci.checkout_id IS NOT NULL AND t.status = 1 AND ci.cart_user_id = ? GROUP BY ci.category_id ORDER BY ci.category_id", id).Scan(&categories).Error; err != nil {
 				return nil, err
 			}
 		} else if rangeDate == "monthly" {
-			if err := m.db.Raw("SELECT ci.category_id, c.name, SUM(ci.weight) FROM cart_items ci JOIN categories c ON ci.category_id = c.id JOIN transactions t ON ci.checkout_id = t.checkout_id WHERE ci.created_at >= DATE_ADD(CURDATE(), INTERVAL -30 DAY) AND ci.checkout_id IS NOT NULL AND t.status = 1 AND ci.cart_user_id = ? GROUP BY ci.category_id ORDER BY ci.category_id", id).Scan(&categories).Error; err != nil {
+			if err := m.db.Raw("SELECT ci.category_id as id, c.name, SUM(ci.weight) as weight FROM cart_items ci JOIN categories c ON ci.category_id = c.id JOIN transactions t ON ci.checkout_id = t.checkout_id WHERE ci.created_at >= DATE_ADD(CURDATE(), INTERVAL -30 DAY) AND ci.checkout_id IS NOT NULL AND t.status = 1 AND ci.cart_user_id = ? GROUP BY ci.category_id ORDER BY ci.category_id", id).Scan(&categories).Error; err != nil {
 				return nil, err
 			}
 		}
@@ -150,11 +150,11 @@ func (m *TransactionDB) GetTransationTotal(id int, role string) ([]models.Respon
 	var categories []models.ResponseCategoryReport
 	
 	if role == "staff" {
-		if err := m.db.Raw("SELECT ci.category_id, c.name, SUM(ci.weight) FROM cart_items ci JOIN categories c ON ci.category_id = c.id JOIN transactions t ON ci.checkout_id = t.checkout_id WHERE ci.checkout_id IS NOT NULL AND t.status = 1 GROUP BY ci.category_id ORDER BY ci.category_id").Scan(&categories).Error; err != nil {
+		if err := m.db.Raw("SELECT ci.category_id as id, c.name, SUM(ci.weight) as weight FROM cart_items ci JOIN categories c ON ci.category_id = c.id JOIN transactions t ON ci.checkout_id = t.checkout_id WHERE ci.checkout_id IS NOT NULL AND t.status = 1 GROUP BY ci.category_id ORDER BY ci.category_id").Scan(&categories).Error; err != nil {
 			return nil, err
 		}
 	} else if role == "user" {
-		if err := m.db.Raw("SELECT ci.category_id, c.name, SUM(ci.weight) FROM cart_items ci JOIN categories c ON ci.category_id = c.id JOIN transactions t ON ci.checkout_id = t.checkout_id WHERE ci.checkout_id IS NOT NULL AND t.status = 1 AND ci.cart_user_id = ? GROUP BY ci.category_id ORDER BY ci.category_id", id).Scan(&categories).Error; err != nil {
+		if err := m.db.Raw("SELECT ci.category_id as id, c.name, SUM(ci.weight) as weight FROM cart_items ci JOIN categories c ON ci.category_id = c.id JOIN transactions t ON ci.checkout_id = t.checkout_id WHERE ci.checkout_id IS NOT NULL AND t.status = 1 AND ci.cart_user_id = ? GROUP BY ci.category_id ORDER BY ci.category_id", id).Scan(&categories).Error; err != nil {
 			return nil, err
 		}
 	}

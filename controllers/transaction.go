@@ -146,6 +146,8 @@ func (controllers *TransactionController) GetTransactionsDropPoint(c echo.Contex
 		} else {
 			resTransaction.Status = "transaction is being processed by staff"
 		}
+		resTransaction.CreatedAt = transaction.CreatedAt
+		resTransaction.UpdatedAt = transaction.UpdatedAt
 		// resTransaction.TotalPoint = totalPointsUsed
 		resAllTransactions = append(resAllTransactions, resTransaction)
 	}
@@ -209,6 +211,8 @@ func (controllers *TransactionController) GetTransactionsWithRangeDate(c echo.Co
 		} else {
 			resTransaction.Status = "transaction is being processed by staff"
 		}
+		resTransaction.CreatedAt = transaction.CreatedAt
+		resTransaction.UpdatedAt = transaction.UpdatedAt
 		resAllTransactions = append(resAllTransactions, resTransaction)
 	}
 

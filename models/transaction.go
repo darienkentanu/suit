@@ -39,7 +39,7 @@ type TransactionSQL struct {
 	Method       string     `json:"method"`
 	Drop_PointID int        `json:"drop_point_id"`
 	CheckoutID   int        `json:"checkout_id"`
-	CreatedAt    string		`json:"created_at"`
-	UpdatedAt    string		`json:"updated_at"`
+	CreatedAt    time.Time		`json:"created_at"`
+	UpdatedAt    time.Time		`json:"updated_at"`
 	DropPointAddress string                `json:"drop_point_address"`
 }
