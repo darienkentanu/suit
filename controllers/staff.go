@@ -9,14 +9,16 @@ import (
 )
 
 type StaffController struct {
-	staffModel database.StaffModel
-	loginModel database.LoginModel
+	staffModel      database.StaffModel
+	loginModel      database.LoginModel
+	dropPointsModel database.DropPointsModel
 }
 
-func NewStaffController(staffModel database.StaffModel, loginModel database.LoginModel) *StaffController {
+func NewStaffController(staffModel database.StaffModel, loginModel database.LoginModel, dropPointsModel database.DropPointsModel) *StaffController {
 	return &StaffController{
-		staffModel: staffModel,
-		loginModel: loginModel,
+		staffModel:      staffModel,
+		loginModel:      loginModel,
+		dropPointsModel: dropPointsModel,
 	}
 }
 
@@ -77,6 +79,11 @@ func (controllers *StaffController) AddStaff(c echo.Context) error {
 	response.PhoneNumber = staff.PhoneNumber
 	response.Role = login.Role
 	response.DropPointID = staff.Drop_PointID
+	dropPoints, err := controllers.dropPointsModel.GetDropPointsByID(staff.Drop_PointID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Cannot get droppoint address")
+	}
+	response.DropPointAddress = dropPoints.Address
 
 	return c.JSON(http.StatusCreated, M{
 		"status": "success",
