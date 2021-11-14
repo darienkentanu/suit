@@ -268,6 +268,102 @@ func TestGetProfile(t *testing.T) {
 	}
 }
 
+func TestGetProfileError(t *testing.T) {
+	var testCases = []struct {
+		name       	string
+		path       	string
+		loginPath	string
+		expectCodeLogin int
+		expectCode 	int
+		expectError string
+		login		map[string]interface{}
+	}{
+		{
+			name:       "Get Profile User Internal Server Error",
+			path:       "/profile",
+			loginPath:	"/login",
+			expectCodeLogin: http.StatusOK,
+			expectCode: http.StatusInternalServerError,
+			expectError:   "Internal server error",
+			login:		map[string]interface{}{
+				"email"			: "alikatania@gmail.com",
+				"password"		: "alika123",
+			},
+		},
+		{
+			name:       "Get Profile Staff Internal Server Error",
+			path:       "/profile",
+			loginPath:	"/login",
+			expectCodeLogin: http.StatusOK,
+			expectCode: http.StatusInternalServerError,
+			expectError:   "Internal server error",
+			login:		map[string]interface{}{
+				"email"			: "azkam@gmail.com",
+				"password"		: "azka123",
+			},
+		},
+	}
+	
+	e, db  := InitEcho()
+	UserSetup(db)
+	userDB := database.NewUserDB(db)
+	loginDB := database.NewLoginDB(db)
+	staffDB := database.NewStaffDB(db)
+	dropPointDB := database.NewDropPointsDB(db)
+	loginControllers := NewLoginController(userDB, loginDB, staffDB, dropPointDB)
+	InsertDataUser(db)
+	InsertDataDropPoints(db)
+	InsertDataStaff(db)
+	db.Migrator().DropTable(&models.Staff{})
+	db.Migrator().DropTable(&models.User{})
+
+	for _, testCase := range testCases {
+		login, err := json.Marshal(testCase.login)
+		if err != nil {
+			t.Error(err)
+		}
+
+		loginReq := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(login))
+		loginReq.Header.Set("Content-Type", "application/json")
+		loginRec := httptest.NewRecorder()
+		loginC := e.NewContext(loginReq, loginRec)
+		
+		loginC.SetPath(testCase.loginPath)
+
+		if assert.NoError(t, loginControllers.Login(loginC)) {
+			assert.Equal(t, testCase.expectCodeLogin, loginRec.Code)
+			body := loginRec.Body.String()
+
+			var responseLogin = struct {
+				Status string					`json:"status"`
+				Data   models.ResponseLogin 	`json:"data"`
+			}{}
+			err := json.Unmarshal([]byte(body), &responseLogin)
+			if err != nil {
+				assert.Error(t, err, "error")
+			}
+
+			assert.NotEmpty(t, responseLogin.Data.Token)
+			token := responseLogin.Data.Token
+
+			req := httptest.NewRequest(http.MethodPut, "/", nil)
+			req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", token))
+			req.Header.Set("Content-Type", "application/json")
+			rec := httptest.NewRecorder()
+			c := e.NewContext(req, rec)
+			
+			c.SetPath(testCase.path)
+
+			t.Run(testCase.name, func(t *testing.T) {
+				err := echoMiddleware.JWT([]byte(constants.JWT_SECRET))(loginControllers.GetProfile)(c)
+				if assert.Error(t, err){
+					assert.Containsf(t, err.Error(), testCase.expectError, "expected error containing %q, got %s", testCase.expectError, err)
+				}
+			})
+		}
+	}
+}
+
 func TestUpdateProfile(t *testing.T) {
 	var testCases = []struct {
 		name       	string
