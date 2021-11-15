@@ -73,7 +73,7 @@ after that import the file-insert.sql to your database
 |---|---|---|---|---|
 | GET | /uservouchers | Get list of all user voucher | Yes | No
 | POST | /claim/:id | Claim voucher by voucher id | Yes | No
-| POST | /redeem/:id | Redeem voucher by voucher id | Yes | No
+| PUT | /redeem/:id | Redeem voucher by voucher id | Yes | No
 |---|---|---|---|---|
 | GET | /transactions | Get list of all transaction | Yes | No
 | GET | /transactionbydroppoint/:id | Get list of all transaction by drop points id (staff only) | Yes | Yes
