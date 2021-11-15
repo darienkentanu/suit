@@ -696,7 +696,7 @@ paths:
           $ref: "#/components/responses/ServerError" 
 
   /redeem/{id}:
-    post:
+    put:
       security:
         - bearerAuth: []
       tags:
