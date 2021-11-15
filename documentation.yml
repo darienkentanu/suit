@@ -3,7 +3,7 @@ info:
   title: SUIT
   version: 1.0.0
 servers:
-  - url: https://localhost:8000
+  - url: http://localhost:8000
 paths:
   /register:
     post:
@@ -186,6 +186,8 @@ paths:
   
   /droppoints:
     get:
+      security:
+        - bearerAuth: []
       tags:
         - Drop Points
       summary: Get list of all drop point
@@ -276,6 +278,8 @@ paths:
           
   /categories:
     get:
+      security:
+        - bearerAuth: []
       tags:
         - Categories
       summary: Get list of all category
@@ -370,6 +374,8 @@ paths:
 
   /vouchers:
     get:
+      security:
+        - bearerAuth: []
       tags:
         - Vouchers
       summary: Get list of all voucher
