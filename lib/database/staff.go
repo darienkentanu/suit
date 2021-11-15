@@ -40,7 +40,7 @@ func (m *StaffDB) GetPhoneNumberStaff(number string) int {
 func (m *StaffDB) GetAllStaff() ([]models.ResponseGetStaff, error) {
 	var allStaff []models.ResponseGetStaff
 
-	if err := m.db.Raw("SELECT s.id, s.fullname, l.email, l.username, s.phone_number, l.role, s.drop_point_id, d.address FROM staffs s JOIN logins l ON s.id = l.staff_id JOIN drop_points d ON s.drop_point_id = d.id").Scan(&allStaff).Error; err != nil {
+	if err := m.db.Raw("SELECT s.id, s.fullname, l.email, l.username, s.phone_number, l.role, s.drop_point_id, d.address as drop_point_address FROM staffs s JOIN logins l ON s.id = l.staff_id JOIN drop_points d ON s.drop_point_id = d.id").Scan(&allStaff).Error; err != nil {
 		return nil, err
 	} else if len(allStaff) == 0 {
 		err := errors.New("is empty")
