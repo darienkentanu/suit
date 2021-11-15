@@ -281,7 +281,14 @@ func (controllers *CheckoutController) Verification(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal server error")
 	}
-	message := fmt.Sprintf("transaksi anda telah di verifikasi detail transaksi:<br/>ID=%d<br>UserID=%d<br/>Status=%d<br/>Point=%d<br/>Method=%s<br/>Drop_PointID=%d<br/>CheckoutID=%d<br/>CreatedAt=%v<br/>UpdatedAt=%v", transaction.ID, transaction.UserID, transaction.Status, transaction.Point, transaction.Method, transaction.Drop_PointID, transaction.CheckoutID, transaction.CreatedAt, transaction.UpdatedAt)
+
+	message := fmt.Sprintf("transaksi kamu untuk drop point %d telah di verifikasi! Kamu mendapatkan %d point. Berikut detail transaksinya:<br/>ID=%d<br>Method=%s<br/>Tanggal Transaksi=%v<br/>Tanggal Verifikasi=%v", 
+				transaction.Drop_PointID, 
+				transaction.Point, 			
+				transaction.ID,
+				transaction.Method,  
+				transaction.CreatedAt, 
+				transaction.UpdatedAt)
 
 	err = gomails.SendMail(userLogin.Email, message)
 	if err != nil {
