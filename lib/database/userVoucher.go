@@ -37,7 +37,7 @@ func (m *UserVoucherDB) AddUserVoucher(userID, voucherID int) (models.User_Vouch
 func (m *UserVoucherDB) GetAllVoucher(userID int) ([]models.ResponseGetUserVoucher, error) {
 	var userVouchers []models.ResponseGetUserVoucher
 
-	if err := m.db.Raw("SELECT uv.id, uv.user_id, uv.voucher_id, v.name, v.point, uv.status FROM user_vouchers uv JOIN vouchers v ON uv.voucher_id = v.id WHERE user_id = ? ORDER BY uv.status DESC", userID).Scan(&userVouchers).Error; err != nil {
+	if err := m.db.Raw("SELECT uv.id, uv.user_id, uv.voucher_id, v.name as voucher_name, v.point, uv.status FROM user_vouchers uv JOIN vouchers v ON uv.voucher_id = v.id WHERE user_id = ? ORDER BY uv.status DESC", userID).Scan(&userVouchers).Error; err != nil {
 		return nil, err
 	}
 
@@ -65,7 +65,7 @@ func (m *UserVoucherDB) UpdateStatusUserVoucher(userID, voucherID int) (models.U
 func (m *UserVoucherDB) GetUserVoucherByID(userVoucherID int) (models.ResponseGetUserVoucher, error) {
 	var userVoucher models.ResponseGetUserVoucher
 
-	if err := m.db.Raw("SELECT uv.id, uv.user_id, uv.voucher_id, v.name, v.point, uv.status FROM user_vouchers uv JOIN vouchers v ON uv.voucher_id = v.id WHERE uv.id = ?", userVoucherID).Scan(&userVoucher).Error; err != nil {
+	if err := m.db.Raw("SELECT uv.id, uv.user_id, uv.voucher_id, v.name as voucher_name, v.point, uv.status FROM user_vouchers uv JOIN vouchers v ON uv.voucher_id = v.id WHERE uv.id = ?", userVoucherID).Scan(&userVoucher).Error; err != nil {
 		return userVoucher, err
 	}
 
